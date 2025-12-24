@@ -91,7 +91,7 @@ app/
 ### 4.1 Schema Definition
 
 ```typescript
-// lib/db.ts
+// src/lib/db.ts
 import Dexie, { Table } from 'dexie';
 import dexieCloud from 'dexie-cloud-addon';
 
@@ -224,7 +224,7 @@ export const db = new BackboardDB();
 ### 5.2 Clerk + Dexie Cloud Integration
 
 ```typescript
-// lib/auth.ts
+// src/lib/auth.ts
 import { db } from './db';
 import { useAuth } from '@clerk/nextjs';
 
@@ -262,7 +262,7 @@ export function useSyncAuth() {
 On app launch, run these jobs client-side:
 
 ```typescript
-// lib/sync.ts
+// src/lib/sync.ts
 import { db } from './db';
 import { 
   addDays, 
@@ -394,7 +394,7 @@ Serwist is the modern successor to next-pwa, actively maintained for Next.js 14+
 import withSerwistInit from "@serwist/next";
 
 const withSerwist = withSerwistInit({
-  swSrc: "app/sw.ts",
+  swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
 });
 
@@ -404,7 +404,7 @@ export default withSerwist({
 ```
 
 ```typescript
-// app/sw.ts
+// src/app/sw.ts
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { Serwist } from "serwist";
@@ -481,7 +481,7 @@ pnpm add @tiptap/extension-placeholder @tiptap/extension-link @tiptap/extension-
 ### 8.2 Basic Editor Component
 
 ```typescript
-// components/editor/tiptap-editor.tsx
+// src/components/editor/tiptap-editor.tsx
 'use client';
 
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -535,7 +535,7 @@ For task notes, we support:
 Dexie provides reactive hooks for IndexedDB queries. This is the primary data layer.
 
 ```typescript
-// hooks/use-tasks.ts
+// src/hooks/use-tasks.ts
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 
@@ -567,7 +567,7 @@ pnpm add zustand
 ```
 
 ```typescript
-// stores/ui-store.ts
+// src/stores/ui-store.ts
 import { create } from 'zustand';
 
 interface UIState {
@@ -614,68 +614,164 @@ export const useUIStore = create<UIState>((set) => ({
 
 ```
 backboard-v4/
-├── app/
-│   ├── layout.tsx              # Root layout, Clerk provider
-│   ├── page.tsx                # Redirect to /tasks
-│   ├── tasks/page.tsx
-│   ├── schedule/page.tsx
-│   ├── projects/page.tsx
-│   ├── jobs/page.tsx
-│   └── archive/page.tsx
-├── components/
-│   ├── ui/                     # shadcn/ui components
-│   ├── layout/
-│   │   ├── sidebar.tsx
-│   │   └── page-shell.tsx
-│   ├── tasks/
-│   │   ├── task-list.tsx
-│   │   ├── task-item.tsx
-│   │   ├── task-actions.tsx
-│   │   └── add-task.tsx
-│   ├── scopes/
-│   │   ├── scope-selector.tsx
-│   │   ├── scope-detail-modal.tsx
-│   │   └── archive-dialog.tsx
-│   ├── schedule/
-│   │   ├── schedule-grid.tsx
-│   │   └── schedule-cell.tsx
-│   ├── projects/
-│   │   ├── project-list.tsx
-│   │   └── month-timeline.tsx
-│   └── jobs/
-│       ├── job-list.tsx
-│       └── weekday-grid.tsx
-├── hooks/
-│   ├── use-tasks.ts            # Dexie live queries
-│   ├── use-scopes.ts
-│   ├── use-schedule.ts
-│   ├── use-sync.ts             # Sync job runner
-│   └── use-sync-auth.ts        # Clerk + Dexie Cloud
-├── lib/
-│   ├── db.ts                   # Dexie database
-│   ├── sync.ts                 # Sync jobs
-│   ├── utils.ts                # Utilities
-│   └── constants.ts            # App constants
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx          # Root layout, Clerk provider
+│   │   ├── page.tsx            # Redirect to /tasks
+│   │   ├── sw.ts               # Service worker (Serwist)
+│   │   ├── globals.css         # Tailwind CSS v4 entry
+│   │   ├── tasks/page.tsx
+│   │   ├── schedule/page.tsx
+│   │   ├── projects/page.tsx
+│   │   ├── jobs/page.tsx
+│   │   └── archive/page.tsx
+│   ├── components/
+│   │   ├── ui/                 # shadcn/ui components
+│   │   ├── layout/
+│   │   │   ├── sidebar.tsx
+│   │   │   └── page-shell.tsx
+│   │   ├── tasks/
+│   │   │   ├── task-list.tsx
+│   │   │   ├── task-item.tsx
+│   │   │   ├── task-actions.tsx
+│   │   │   └── add-task.tsx
+│   │   ├── scopes/
+│   │   │   ├── scope-selector.tsx
+│   │   │   ├── scope-detail-modal.tsx
+│   │   │   └── archive-dialog.tsx
+│   │   ├── schedule/
+│   │   │   ├── schedule-grid.tsx
+│   │   │   └── schedule-cell.tsx
+│   │   ├── projects/
+│   │   │   ├── project-list.tsx
+│   │   │   └── month-timeline.tsx
+│   │   └── jobs/
+│   │       ├── job-list.tsx
+│   │       └── weekday-grid.tsx
+│   ├── hooks/
+│   │   ├── use-tasks.ts        # Dexie live queries
+│   │   ├── use-scopes.ts
+│   │   ├── use-schedule.ts
+│   │   ├── use-sync.ts         # Sync job runner
+│   │   └── use-sync-auth.ts    # Clerk + Dexie Cloud
+│   ├── lib/
+│   │   ├── db.ts               # Dexie database
+│   │   ├── sync.ts             # Sync jobs
+│   │   ├── utils.ts            # Utilities
+│   │   └── constants.ts        # App constants
+│   └── stores/
+│       └── ui-store.ts         # Zustand UI state
 ├── public/
 │   ├── manifest.json
 │   └── icons/
-├── specs/
-│   ├── product.md
-│   └── trd.md
-├── tests/
-│   └── ...                     # Minimal Vitest tests
+├── dev/
+│   ├── specs/
+│   │   ├── prd.md              # Product Requirements Document
+│   │   ├── trd.md              # Technical Requirements Document
+│   │   ├── visuals/            # Figma screenshots
+│   │   └── logs/               # LLM session logs
+│   ├── tests/
+│   │   └── ...                 # Minimal Vitest tests
+│   └── scripts/
+│       └── ...                 # Build/dev scripts
 ├── .env.local
-├── next.config.ts             # Next.js 16 config (TypeScript)
-├── postcss.config.mjs         # PostCSS with @tailwindcss/postcss
+├── eslint.config.mjs           # ESLint flat config
+├── .prettierrc                 # Prettier config
+├── next.config.ts              # Next.js 16 config (TypeScript)
+├── postcss.config.mjs          # PostCSS with @tailwindcss/postcss
 ├── tsconfig.json
 └── package.json
 ```
 
 > **Note**: Tailwind CSS v4 uses CSS-first configuration. Theme customization is done in your main CSS file using `@theme` blocks, not a separate `tailwind.config.js`.
 
+> **Note**: The `dev/` folder is excluded from ESLint/Prettier to keep specs and scripts lightweight.
+
 ---
 
-## 11. Key Dependencies
+## 11. Linting & Formatting
+
+### 11.1 ESLint Configuration
+
+Using ESLint flat config with Next.js, TypeScript, and Prettier integration:
+
+```javascript
+// eslint.config.mjs
+import { defineConfig, globalIgnores } from "eslint/config"
+import nextVitals from "eslint-config-next/core-web-vitals"
+import nextTypescript from "eslint-config-next/typescript"
+import prettier from "eslint-plugin-prettier/recommended"
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTypescript,
+  prettier,
+  {
+    rules: {
+      "import/order": "warn",
+      "no-console": ["warn", { allow: ["error", "warn"] }],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+      "prettier/prettier": "warn",
+    },
+  },
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "node_modules",
+    "dev/*",
+  ]),
+])
+
+export default eslintConfig
+```
+
+### 11.2 Prettier Configuration
+
+```json
+// .prettierrc
+{
+  "plugins": [
+    "prettier-plugin-tailwindcss",
+    "prettier-plugin-classnames",
+    "prettier-plugin-merge"
+  ],
+  "semi": false,
+  "printWidth": 100,
+  "proseWrap": "always",
+  "trailingComma": "es5",
+  "quotes": true,
+  "quoteProps": "consistent",
+  "tailwindStylesheet": "./src/app/globals.css",
+  "tailwindFunctions": ["twm", "twv"]
+}
+```
+
+### 11.3 IDE Integration
+
+Recommended VS Code / Cursor settings (`.vscode/settings.json`):
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}
+```
+
+---
+
+## 12. Key Dependencies
 
 ```json
 {
@@ -707,8 +803,16 @@ backboard-v4/
     "@tailwindcss/postcss": "^4.0.0",
     "@serwist/next": "^9.0.0",
     "serwist": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "prettier-plugin-tailwindcss": "^0.6.0",
+    "prettier-plugin-classnames": "^0.7.0",
+    "prettier-plugin-merge": "^0.7.0",
     "vitest": "^3.0.0",
-    "@testing-library/react": "^16.0.0"
+    "@testing-library/react": "^16.0.0",
+    "fake-indexeddb": "^6.0.0"
   }
 }
 ```
@@ -717,7 +821,7 @@ backboard-v4/
 
 ---
 
-## 12. Environment Variables
+## 13. Environment Variables
 
 ```bash
 # .env.local
@@ -734,11 +838,11 @@ NEXT_PUBLIC_DEXIE_CLOUD_URL=https://your-db.dexie.cloud
 
 ---
 
-## 13. Testing Strategy
+## 14. Testing Strategy
 
 Minimal testing to "check the box":
 
-### 11.1 Vitest Setup
+### 14.1 Vitest Setup
 
 ```typescript
 // vitest.config.ts
@@ -754,7 +858,7 @@ export default defineConfig({
 });
 ```
 
-### 11.2 Test Coverage
+### 14.2 Test Coverage
 
 | Area | Coverage |
 |------|----------|
@@ -764,10 +868,10 @@ export default defineConfig({
 | E2E | Skip for MVP |
 
 ```typescript
-// tests/sync.test.ts
+// dev/tests/sync.test.ts
 import { describe, it, expect, beforeEach } from 'vitest';
 import 'fake-indexeddb/auto';
-import { db } from '../lib/db';
+import { db } from '@/lib/db';
 
 describe('Sync Jobs', () => {
   beforeEach(async () => {
@@ -783,9 +887,9 @@ describe('Sync Jobs', () => {
 
 ---
 
-## 14. Development Workflow
+## 15. Development Workflow
 
-### 12.1 Getting Started
+### 15.1 Getting Started
 
 ```bash
 # Install dependencies
@@ -799,10 +903,10 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-### 12.2 Tailwind CSS v4 Setup
+### 15.2 Tailwind CSS v4 Setup
 
 ```css
-/* app/globals.css */
+/* src/app/globals.css */
 @import "tailwindcss";
 
 /* Custom theme configuration (replaces tailwind.config.js) */
@@ -822,7 +926,7 @@ export default {
 };
 ```
 
-### 12.3 shadcn/ui Components
+### 15.3 shadcn/ui Components
 
 ```bash
 # Initialize shadcn/ui
@@ -835,7 +939,7 @@ pnpm dlx shadcn@latest add input
 # etc.
 ```
 
-### 12.4 Deployment
+### 15.4 Deployment
 
 ```bash
 # Deploy to Vercel
@@ -844,7 +948,7 @@ vercel --prod
 
 ---
 
-## 15. Open Technical Decisions
+## 16. Open Technical Decisions
 
 | Item | Status | Notes |
 |------|--------|-------|
@@ -856,7 +960,7 @@ vercel --prod
 
 ---
 
-## 16. References
+## 17. References
 
 - [Next.js 16 Docs](https://nextjs.org/docs)
 - [React 19 Docs](https://react.dev)
