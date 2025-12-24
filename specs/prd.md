@@ -32,7 +32,7 @@
 ```
 [Quick capture] → Triage
                      ↓ (drag to scope)
-Recurring ──(hourly cron)──→ Now → Later → Backlog → Done
+Recurring ──(on app sync)──→ Now → Later → Backlog → Done
                                                        ↓
                                             (purge after 7 days)
 ```
@@ -40,7 +40,7 @@ Recurring ──(hourly cron)──→ Now → Later → Backlog → Done
 | List | Behavior |
 |------|----------|
 | **Triage** | Unscoped tasks; exit-only (drag to a Job/Project). Always visible in Now/Later/Backlog. Not visible in Recurring. Only visible in Recent if has tasks. |
-| **Recurring** | Templates with frequency; hourly cron inserts into Now at scheduled time |
+| **Recurring** | Templates with frequency; on app sync, inserts into Now if scheduled time passed |
 | **Now** | Today's active work |
 | **Later** | Near-term queue |
 | **Backlog** | Parked for future |
@@ -50,7 +50,7 @@ Recurring ──(hourly cron)──→ Now → Later → Backlog → Done
 
 | Entity | Horizon | Behavior |
 |--------|---------|----------|
-| **DefaultScheduleSlot** | Weekly template | "Job X on Mon/Wed/Fri" – nightly cron creates ScheduleSlots |
+| **DefaultScheduleSlot** | Weekly template | "Job X on Mon/Wed/Fri" – on app sync, creates ScheduleSlots for next 7 days |
 | **ScheduleSlot** | Next 7 days | Click cells to toggle Scope active on a day |
 | **MonthSlot** | Next 6 months | Click cells to toggle Project active in a month (non-consecutive OK) |
 
@@ -198,7 +198,7 @@ This is a **destructive hint** pattern – guiding users that these tasks should
 - **Rows**: ALL non-archived Scopes + Projects active in current month (if week spans months, show projects active in EITHER month)
 - **Interaction**: Click cell to toggle ScheduleSlot
 - **Color coding**: 🟡 Gold = Job, 🔵 Blue = Project
-- **Auto-population**: Nightly cron fills from DefaultScheduleSlot
+- **Auto-population**: On app sync, fills from DefaultScheduleSlot
 
 ### 4.3 Jobs Page
 
