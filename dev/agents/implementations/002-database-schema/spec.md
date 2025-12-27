@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **ID** | 002 |
-| **Status** | 🔵 Ready |
-| **Progress** | — |
+| **Status** | 🟢 In Progress |
+| **Progress** | Step 1 of 5 complete |
 | **Created** | 2025-12-27 |
 | **Last Updated** | 2025-12-27 |
 
