@@ -1,8 +1,5 @@
-export default function Home() {
-  return (
-    <main>
-      <h1>Backboard</h1>
-    </main>
-  )
-}
+import { redirect } from "next/navigation"
 
+export default function Home() {
+  redirect("/tasks")
+}
