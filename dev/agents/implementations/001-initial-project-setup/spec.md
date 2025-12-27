@@ -4,9 +4,9 @@
 |-------|-------|
 | **ID** | 001 |
 | **Status** | ⏸️ Paused |
+| **Progress** | Step 1 of 13 complete |
 | **Created** | 2025-12-24 |
 | **Last Updated** | 2025-12-26 |
-| **Progress** | Step 1 of 13 complete |
 
 ---
 

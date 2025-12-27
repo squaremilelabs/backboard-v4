@@ -1,10 +1,17 @@
 # Implement Spec
 
-Execute an implementation spec, handling both fresh starts and resumed sessions.
+Execute an implementation spec **one step at a time**, with user review after each step.
 
 ## Your Role
 
-You are an implementation executor. Your job is to take an implementation spec from `dev/agents/implementations/` and execute it step by step, verifying each step as you go.
+You are an implementation executor. Your job is to take an implementation spec from `dev/agents/implementations/` and execute it **one step per session**. After completing each step, you pause for user review.
+
+**Core workflow**: Execute step → Verify → Update spec → Commit → Pause for review
+
+This step-by-step approach ensures:
+- User can review each change before proceeding
+- Atomic commits make rollback easy
+- Progress is tracked granularly in the spec
 
 ---
 
@@ -109,30 +116,40 @@ git checkout -b {implementation-folder-name}
 
 ---
 
-## Phase 4: Execute Implementation
+## Phase 4: Execute ONE Step
 
-### Before starting:
+**Execute only ONE step per session**, then pause for user review.
+
+### Before the first step:
 
 1. **Update spec status** to 🟢 In Progress (if not already)
 2. **Read the References section** — review any linked PRD/TRD sections
 3. **Confirm dependencies** — ensure prerequisite implementations are complete
 
-### For each step:
+### For the current step:
 
 1. **Read the step** — understand Do, Commands, and Verify
 2. **Execute** — run commands, create files, make changes
 3. **Verify** — confirm the step succeeded using the Verify criteria
-4. **Check off** — mark the step complete in the spec (optional but helpful)
-5. **Commit** — make atomic commits per step or logical group of steps
+4. **Update spec** — mark step complete with ✅, update Progress field
+5. **Commit** — always commit after each step
 
 ### Commit message format:
 ```
-[{implementation-id}] {brief description}
+[{implementation-id}] Step {N}: {step title}
 
 Example:
-[001] Configure ESLint and Prettier
-[001] Create placeholder pages
+[001] Step 1: Initialize Next.js project
+[001] Step 5: Install Prettier and plugins
 ```
+
+### After step completion:
+
+1. **Update spec metadata**:
+   - Set `Progress` to "Step N of M complete"
+   - Set `Status` to ⏸️ Paused
+2. **Commit the spec update** along with the step changes
+3. **Report to user** with pause summary (see Phase 4.5)
 
 ### If a step fails:
 1. Stop and report the error
@@ -140,11 +157,34 @@ Example:
 3. Ask user how to proceed:
    - Fix and retry?
    - Skip and continue?
-   - Pause implementation?
+   - Pause and investigate later?
 
 ---
 
-## Phase 5: Verification
+## Phase 4.5: Pause Summary
+
+After each step, provide a concise pause summary:
+
+> **Step {N} complete** ⏸️
+>
+> **Branch**: `{branch-name}`
+> **Commit**: `{short-hash}` — "{commit message}"
+>
+> **Progress**: Step {N} of {M}
+> **Next**: Step {N+1}: {next step title}
+>
+> Resume with `/implement {ID}` when ready.
+
+This format allows the user to quickly understand:
+- What was just completed
+- What's coming next
+- How to resume
+
+---
+
+## Phase 5: Verification (Final Step Only)
+
+**Only run this phase after completing the LAST step** in the implementation plan.
 
 After all steps are complete:
 
@@ -233,21 +273,35 @@ Provide a summary to the user:
 ## Tips for Agents
 
 - **Read the full spec first** — understand the big picture before starting
-- **One step at a time** — don't skip ahead
-- **Verify as you go** — catch issues early
-- **Commit frequently** — atomic commits make rollback easier
+- **ONE step per session** — execute, verify, commit, then STOP
+- **Always commit after each step** — atomic commits are mandatory, not optional
+- **Always update the spec** — mark steps complete, update Progress field
+- **Always pause after step completion** — user review is the standard workflow
 - **Ask when uncertain** — better to clarify than to guess wrong
-- **Update the spec** — check off completed items so progress is tracked
 
 ---
 
 ## Quick Reference: Status Flow
 
 ```
-🟡 Planning → 🔵 Ready → 🟢 In Progress → ✅ Complete
-                              ↓
-                          ⏸️ Paused
-                              ↓
-                         (resume) → 🟢 In Progress → ✅ Complete
+🟡 Planning → 🔵 Ready → 🟢 In Progress → ⏸️ Paused (after each step)
+                                              ↓
+                                         (resume) → 🟢 In Progress → ⏸️ Paused
+                                              ↓
+                                         (repeat until final step)
+                                              ↓
+                                          ✅ Complete
+```
+
+## Quick Reference: Single Step Flow
+
+```
+1. Resume/Start → Check current step
+2. Execute step → Verify success
+3. Update spec → Mark step ✅, update Progress
+4. Commit → "[{ID}] Step {N}: {title}"
+5. Set status → ⏸️ Paused
+6. Report → Pause summary to user
+7. STOP → Wait for user to resume
 ```
 

@@ -102,6 +102,7 @@ Use this template:
 |-------|-------|
 | **ID** | {###} |
 | **Status** | 🟡 Planning |
+| **Progress** | — |
 | **Created** | {YYYY-MM-DD} |
 | **Last Updated** | {YYYY-MM-DD} |
 
@@ -205,10 +206,20 @@ Manual checks:
 |--------|---------|
 | 🟡 Planning | Spec is being drafted |
 | 🔵 Ready | Spec is complete, ready to implement |
-| 🟢 In Progress | Implementation is underway |
-| ✅ Complete | Implementation is finished |
-| ⏸️ Paused | Work is paused |
+| 🟢 In Progress | Currently executing a step |
+| ⏸️ Paused | Step complete, awaiting user review (standard state between steps) |
+| ✅ Complete | All steps and verification finished |
 | ❌ Cancelled | Implementation was cancelled |
+
+### Progress Field
+
+The `Progress` field tracks step-by-step progress:
+- `—` when not started
+- `Step 1 of 13 complete` after completing step 1
+- `Step 5 of 13 complete` after completing step 5
+- Removed or set to `All steps complete` when finished
+
+This field is updated after each step to enable seamless resume.
 
 ---
 
@@ -231,6 +242,7 @@ When filling out the template, remember:
 - Include exact commands when possible — don't say "run the linter", say `pnpm lint`
 - If copying config from TRD, say "Copy from TRD §X" rather than duplicating
 - If config needs modifications from TRD, specify what changes
+- Steps are marked complete by appending ✅ to the step title (e.g., `### Step 1: Initialize Project ✅`)
 
 ### Verification Section
 - Prefer **executable commands** over descriptive criteria
