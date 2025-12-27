@@ -71,6 +71,12 @@ None — this is the first implementation.
 
 Exact files this implementation will create or modify:
 
+### Base Project Files (Step 1)
+- [x] `package.json`
+- [x] `tsconfig.json`
+- [x] `next.config.ts`
+- [x] `.gitignore`
+
 ### Config Files (project root)
 - [ ] `eslint.config.mjs`
 - [ ] `.prettierrc`
@@ -80,8 +86,8 @@ Exact files this implementation will create or modify:
 
 ### App Files
 - [ ] `src/app/globals.css`
-- [ ] `src/app/layout.tsx`
-- [ ] `src/app/page.tsx` (redirect to /tasks)
+- [x] `src/app/layout.tsx` (placeholder created Step 1, final version Step 10)
+- [x] `src/app/page.tsx` (placeholder created Step 1, final version Step 11)
 - [ ] `src/app/tasks/page.tsx`
 - [ ] `src/app/schedule/page.tsx`
 - [ ] `src/app/jobs/page.tsx`
