@@ -4,7 +4,7 @@
 |-------|-------|
 | **ID** | 002 |
 | **Status** | 🟢 In Progress |
-| **Progress** | Step 2 of 5 complete |
+| **Progress** | Step 3 of 5 complete |
 | **Created** | 2025-12-27 |
 | **Last Updated** | 2025-12-27 |
 
@@ -60,7 +60,7 @@ Read these before implementing:
 Exact files this implementation will create or modify:
 
 - [x] `src/lib/db.ts` — Database class, types, and schema
-- [ ] `.env.example` — Add Dexie Cloud URL placeholder (modify existing)
+- [x] `.env.example` — Add Dexie Cloud URL placeholder (modify existing)
 - [ ] `package.json` — New dependencies (modified by pnpm)
 
 ---
