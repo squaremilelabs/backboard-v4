@@ -4,9 +4,9 @@
 |-------|-------|
 | **ID** | 001 |
 | **Status** | 🟢 In Progress |
-| **Progress** | Step 5 of 13 complete |
+| **Progress** | Step 6 of 13 complete |
 | **Created** | 2025-12-24 |
-| **Last Updated** | 2025-12-26 |
+| **Last Updated** | 2025-12-27 |
 
 ---
 
@@ -78,7 +78,7 @@ Exact files this implementation will create or modify:
 - [x] `.gitignore`
 
 ### Config Files (project root)
-- [ ] `eslint.config.mjs`
+- [x] `eslint.config.mjs`
 - [ ] `.prettierrc`
 - [x] `postcss.config.mjs`
 - [ ] `.env.example`
@@ -194,24 +194,25 @@ pnpm add -D prettier prettier-plugin-tailwindcss prettier-plugin-classnames pret
 
 ---
 
-### Step 6: Configure ESLint
+### Step 6: Configure ESLint ✅
 
-**Do**: Replace the default ESLint config with flat config from TRD §11.1.
+**Do**: Configure ESLint flat config per Next.js 16 docs. Use ESLint CLI directly (not deprecated `next lint`).
+
+**Note**: Updated from TRD §11.1 to use Next.js 16 recommended approach with `eslint-config-next@16` and `eslint-config-prettier/flat`.
 
 **Create file** `eslint.config.mjs`:
 ```javascript
 import { defineConfig, globalIgnores } from "eslint/config"
 import nextVitals from "eslint-config-next/core-web-vitals"
-import nextTypescript from "eslint-config-next/typescript"
-import prettier from "eslint-plugin-prettier/recommended"
+import nextTs from "eslint-config-next/typescript"
+import prettier from "eslint-config-prettier/flat"
 
 const eslintConfig = defineConfig([
   ...nextVitals,
-  ...nextTypescript,
+  ...nextTs,
   prettier,
   {
     rules: {
-      "import/order": "warn",
       "no-console": ["warn", { allow: ["error", "warn"] }],
       "@typescript-eslint/no-unused-vars": [
         "warn",
@@ -221,7 +222,6 @@ const eslintConfig = defineConfig([
           caughtErrorsIgnorePattern: "^_",
         },
       ],
-      "prettier/prettier": "warn",
     },
   },
   globalIgnores([
@@ -237,7 +237,10 @@ const eslintConfig = defineConfig([
 export default eslintConfig
 ```
 
-**Verify**: Run `pnpm lint` — should complete (warnings OK, no errors)
+**Also**: Updated `package.json` scripts to use `eslint .` instead of deprecated `next lint`.
+
+**Verify**: 
+- ✅ `pnpm lint` completes (warnings OK, no errors)
 
 ---
 
