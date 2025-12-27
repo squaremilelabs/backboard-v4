@@ -206,8 +206,7 @@ Manual checks:
 |--------|---------|
 | 🟡 Planning | Spec is being drafted |
 | 🔵 Ready | Spec is complete, ready to implement |
-| 🟢 In Progress | Currently executing a step |
-| ⏸️ Paused | Step complete, awaiting user review (standard state between steps) |
+| 🟢 In Progress | Implementation underway (see Progress field for current step) |
 | ✅ Complete | All steps and verification finished |
 | ❌ Cancelled | Implementation was cancelled |
 
@@ -219,7 +218,7 @@ The `Progress` field tracks step-by-step progress:
 - `Step 5 of 13 complete` after completing step 5
 - Removed or set to `All steps complete` when finished
 
-This field is updated after each step to enable seamless resume.
+This field is updated after each step to enable seamless continuation.
 
 ---
 

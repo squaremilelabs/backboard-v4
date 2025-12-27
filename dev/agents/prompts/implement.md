@@ -48,9 +48,8 @@ Read the full spec and determine:
 |--------|--------|
 | 🟡 Planning | Stop — spec is not ready. Ask user if they want to finalize it first. |
 | 🔵 Ready | This is a fresh start. Proceed normally. |
-| 🟢 In Progress | This is a resumed session. Check what's done. |
+| 🟢 In Progress | Check Progress field for current step. Continue from there. |
 | ✅ Complete | Already done. Ask user if they want to re-verify or redo. |
-| ⏸️ Paused | Resume work. Check what's done. |
 | ❌ Cancelled | Stop — ask user if they want to un-cancel. |
 
 ### 2. Check completed items
@@ -147,9 +146,9 @@ Example:
 
 1. **Update spec metadata**:
    - Set `Progress` to "Step N of M complete"
-   - Set `Status` to ⏸️ Paused
+   - Keep `Status` as 🟢 In Progress
 2. **Commit the spec update** along with the step changes
-3. **Report to user** with pause summary (see Phase 4.5)
+3. **Report to user** with step summary (see Phase 4.5)
 
 ### If a step fails:
 1. Stop and report the error
@@ -161,11 +160,11 @@ Example:
 
 ---
 
-## Phase 4.5: Pause Summary
+## Phase 4.5: Step Summary
 
-After each step, provide a concise pause summary:
+After each step, provide a concise summary:
 
-> **Step {N} complete** ⏸️
+> **Step {N} complete** ✅
 >
 > **Branch**: `{branch-name}`
 > **Commit**: `{short-hash}` — "{commit message}"
@@ -173,12 +172,12 @@ After each step, provide a concise pause summary:
 > **Progress**: Step {N} of {M}
 > **Next**: Step {N+1}: {next step title}
 >
-> Resume with `/implement {ID}` when ready.
+> Continue with `/implement {ID}` when ready.
 
 This format allows the user to quickly understand:
 - What was just completed
 - What's coming next
-- How to resume
+- How to continue
 
 ---
 
@@ -284,24 +283,19 @@ Provide a summary to the user:
 ## Quick Reference: Status Flow
 
 ```
-🟡 Planning → 🔵 Ready → 🟢 In Progress → ⏸️ Paused (after each step)
-                                              ↓
-                                         (resume) → 🟢 In Progress → ⏸️ Paused
-                                              ↓
-                                         (repeat until final step)
-                                              ↓
-                                          ✅ Complete
+🟡 Planning → 🔵 Ready → 🟢 In Progress (Step 1) → 🟢 In Progress (Step 2) → ... → ✅ Complete
 ```
+
+The Progress field tracks current step. Status stays 🟢 In Progress throughout.
 
 ## Quick Reference: Single Step Flow
 
 ```
-1. Resume/Start → Check current step
+1. Start/Continue → Check Progress field for current step
 2. Execute step → Verify success
-3. Update spec → Mark step ✅, update Progress
+3. Update spec → Mark step ✅, update Progress field
 4. Commit → "[{ID}] Step {N}: {title}"
-5. Set status → ⏸️ Paused
-6. Report → Pause summary to user
-7. STOP → Wait for user to resume
+5. Report → Step summary to user
+6. STOP → Wait for user to continue
 ```
 
