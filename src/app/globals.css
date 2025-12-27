@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Custom theme configuration (replaces tailwind.config.js) */
+@theme {
+  /* Placeholder tokens - will be customized in future implementations */
+  --color-primary: oklch(0.7 0.15 200);
+  --color-secondary: oklch(0.6 0.1 250);
+}
+
