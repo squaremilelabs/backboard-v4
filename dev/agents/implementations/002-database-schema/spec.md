@@ -3,10 +3,10 @@
 | Field | Value |
 |-------|-------|
 | **ID** | 002 |
-| **Status** | 🟢 In Progress |
-| **Progress** | Step 4 of 5 complete |
+| **Status** | ✅ Complete |
+| **Progress** | All 5 steps complete |
 | **Created** | 2025-12-27 |
-| **Last Updated** | 2025-12-27 |
+| **Last Updated** | 2025-12-27 (complete) |
 
 ---
 
@@ -61,7 +61,7 @@ Exact files this implementation will create or modify:
 
 - [x] `src/lib/db.ts` — Database class, types, and schema
 - [x] `.env.example` — Add Dexie Cloud URL placeholder (modify existing)
-- [ ] `package.json` — New dependencies (modified by pnpm)
+- [x] `package.json` — New dependencies (modified by pnpm)
 
 ---
 
@@ -278,11 +278,11 @@ Run these checks after implementation is complete:
 | Lint passes | `pnpm lint` | Exit code 0 (warnings OK) |
 
 Manual checks:
-- [ ] `src/lib/db.ts` exports `db` instance
-- [ ] `src/lib/db.ts` exports all type definitions
-- [ ] Database initializes in browser without errors (check console)
-- [ ] IndexedDB database "backboard" appears in browser DevTools → Application → IndexedDB
-- [ ] No Dexie Cloud connection errors in console (since `NEXT_PUBLIC_DEXIE_CLOUD_URL` is not set)
+- [x] `src/lib/db.ts` exports `db` instance
+- [x] `src/lib/db.ts` exports all type definitions
+- [x] Database initializes in browser without errors (check console)
+- [x] IndexedDB database "backboard" appears in browser DevTools → Application → IndexedDB
+- [x] No Dexie Cloud connection errors in console (since `NEXT_PUBLIC_DEXIE_CLOUD_URL` is not set)
 
 ---
 

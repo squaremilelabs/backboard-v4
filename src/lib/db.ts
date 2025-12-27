@@ -115,4 +115,3 @@ class BackboardDB extends Dexie {
 }
 
 export const db = new BackboardDB()
-
