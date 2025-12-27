@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    "prettier-plugin-tailwindcss",
+    "prettier-plugin-classnames",
+    "prettier-plugin-merge"
+  ],
+  "semi": false,
+  "printWidth": 100,
+  "proseWrap": "always",
+  "trailingComma": "es5",
+  "tailwindStylesheet": "./src/app/globals.css",
+  "tailwindFunctions": ["twm", "twv"]
+}
+
