@@ -1,0 +1,11 @@
+{
+  "tailwindCSS.experimental.configFile": "src/app/globals.css",
+  "tailwindCSS.experimental.classRegex": [
+    ["(?:twv|twm)\\(([^;]*)[\\);]", "[`'\"`]([^'\"`;]*)[`'\"`]"],
+    ["(?:twv|twm)\\(([^;]*)\\)", "[`'\"`]([^'\"`;]*)[`'\"`]"]
+  ],
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
+}
+

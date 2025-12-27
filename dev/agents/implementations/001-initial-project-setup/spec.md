@@ -4,7 +4,7 @@
 |-------|-------|
 | **ID** | 001 |
 | **Status** | 🟢 In Progress |
-| **Progress** | Step 7 of 13 complete |
+| **Progress** | Step 8 of 13 complete |
 | **Created** | 2025-12-24 |
 | **Last Updated** | 2025-12-27 |
 
@@ -82,7 +82,7 @@ Exact files this implementation will create or modify:
 - [x] `.prettierrc`
 - [x] `postcss.config.mjs`
 - [ ] `.env.example`
-- [ ] `.vscode/settings.json`
+- [x] `.vscode/settings.json`
 
 ### App Files
 - [x] `src/app/globals.css`
@@ -270,22 +270,28 @@ export default eslintConfig
 
 ---
 
-### Step 8: Configure IDE Settings
+### Step 8: Configure IDE Settings ✅
 
-**Do**: Create VS Code/Cursor settings per TRD §11.3.
+**Do**: Create VS Code/Cursor settings for Tailwind CSS IntelliSense.
+
+**Note**: User prefers manual formatting/linting, not auto-on-save.
 
 **Create file** `.vscode/settings.json`:
 ```json
 {
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+  "tailwindCSS.experimental.configFile": "src/app/globals.css",
+  "tailwindCSS.experimental.classRegex": [
+    ["(?:twv|twm)\\(([^;]*)[\\);]", "[`'\"`]([^'\"`;]*)[`'\"`]"],
+    ["(?:twv|twm)\\(([^;]*)\\)", "[`'\"`]([^'\"`;]*)[`'\"`]"]
+  ],
+  "files.associations": {
+    "*.css": "tailwindcss"
   }
 }
 ```
 
-**Verify**: File exists at `.vscode/settings.json`
+**Verify**: 
+- ✅ File exists at `.vscode/settings.json`
 
 ---
 
