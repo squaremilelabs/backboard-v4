@@ -1,14 +1,31 @@
 # Implement Spec
 
-Execute an implementation spec **one step at a time**, with user review after each step.
+Execute an implementation spec **one step at a time** by default, with user review after each step.
 
 ## Your Role
 
-You are an implementation executor. Your job is to take an implementation spec from `dev/agents/implementations/` and execute it **one step per session**. After completing each step, you pause for user review.
+You are an implementation executor. Your job is to take an implementation spec from `dev/agents/implementations/` and execute it. By default, you execute **one step per session** and pause for user review.
 
-**Core workflow**: Execute step → Verify → Update spec → Commit → Pause for review
+**Default workflow**: Execute step → Verify → Update spec → Commit → Pause for review
 
-This step-by-step approach ensures:
+### Batch Mode
+
+When the user explicitly requests multiple steps, execute them in sequence:
+- `"implement steps 3 to 5"` → execute steps 3, 4, 5
+- `"implement all remaining steps"` → execute from current step to end
+- `"implement all"` → execute entire implementation
+- `"run steps 2-4"` → execute steps 2, 3, 4
+
+In batch mode:
+- Still commit after **each** step (atomic commits)
+- Still update the spec after each step
+- Continue to next step automatically (no pause between steps)
+- Pause only after completing all requested steps
+- If any step fails, stop immediately and report
+
+### Why step-by-step is the default
+
+This approach ensures:
 - User can review each change before proceeding
 - Atomic commits make rollback easy
 - Progress is tracked granularly in the spec
@@ -115,9 +132,10 @@ git checkout -b {implementation-folder-name}
 
 ---
 
-## Phase 4: Execute ONE Step
+## Phase 4: Execute Steps
 
-**Execute only ONE step per session**, then pause for user review.
+**Default**: Execute ONE step, then pause for user review.
+**Batch mode**: If user requested multiple steps, execute them in sequence.
 
 ### Before the first step:
 
@@ -148,7 +166,9 @@ Example:
    - Set `Progress` to "Step N of M complete"
    - Keep `Status` as 🟢 In Progress
 2. **Commit the spec update** along with the step changes
-3. **Report to user** with step summary (see Phase 4.5)
+3. **Check mode**:
+   - **Default mode**: Report to user and pause (see Phase 4.5)
+   - **Batch mode**: If more steps remain in the requested range, continue to next step; otherwise report batch summary and pause
 
 ### If a step fails:
 1. Stop and report the error
@@ -162,6 +182,8 @@ Example:
 
 ## Phase 4.5: Step Summary
 
+### Single step (default mode)
+
 After each step, provide a concise summary:
 
 > **Step {N} complete** ✅
@@ -171,6 +193,23 @@ After each step, provide a concise summary:
 >
 > **Progress**: Step {N} of {M}
 > **Next**: Step {N+1}: {next step title}
+>
+> Continue with `/implement {ID}` when ready.
+
+### Batch completion
+
+After completing all requested steps, provide a batch summary:
+
+> **Steps {X}–{Y} complete** ✅
+>
+> **Branch**: `{branch-name}`
+> **Commits**: {count} commits
+> - `{hash1}` — Step {X}: {title}
+> - `{hash2}` — Step {X+1}: {title}
+> - ...
+>
+> **Progress**: Step {Y} of {M}
+> **Next**: Step {Y+1}: {next step title} (or "Verification" if all steps done)
 >
 > Continue with `/implement {ID}` when ready.
 
@@ -272,10 +311,10 @@ Provide a summary to the user:
 ## Tips for Agents
 
 - **Read the full spec first** — understand the big picture before starting
-- **ONE step per session** — execute, verify, commit, then STOP
-- **Always commit after each step** — atomic commits are mandatory, not optional
+- **Default is ONE step** — unless user explicitly requests batch execution
+- **Always commit after each step** — atomic commits are mandatory, even in batch mode
 - **Always update the spec** — mark steps complete, update Progress field
-- **Always pause after step completion** — user review is the standard workflow
+- **Pause after completing requested work** — one step (default) or batch (if requested)
 - **Ask when uncertain** — better to clarify than to guess wrong
 
 ---
@@ -288,7 +327,7 @@ Provide a summary to the user:
 
 The Progress field tracks current step. Status stays 🟢 In Progress throughout.
 
-## Quick Reference: Single Step Flow
+## Quick Reference: Default Flow (Single Step)
 
 ```
 1. Start/Continue → Check Progress field for current step
@@ -297,5 +336,18 @@ The Progress field tracks current step. Status stays 🟢 In Progress throughout
 4. Commit → "[{ID}] Step {N}: {title}"
 5. Report → Step summary to user
 6. STOP → Wait for user to continue
+```
+
+## Quick Reference: Batch Flow
+
+```
+1. Parse request → Determine step range (e.g., steps 3-5, or "all remaining")
+2. For each step in range:
+   a. Execute step → Verify success
+   b. Update spec → Mark step ✅, update Progress field
+   c. Commit → "[{ID}] Step {N}: {title}"
+   d. If step fails → STOP and report error
+3. Report → Batch summary to user
+4. STOP → Wait for user to continue
 ```
 
