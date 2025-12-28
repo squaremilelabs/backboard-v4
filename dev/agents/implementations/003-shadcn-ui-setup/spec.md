@@ -15,8 +15,8 @@
 Initialize shadcn/ui with Tailwind CSS v4, configure the CLI, and set up a scoped theming system. The theme supports three contexts via CSS classes:
 
 - **Default** — Neutral colors (no class needed)
-- **`.theme-job`** — Gold primary/secondary (for Job-scoped UI)
-- **`.theme-project`** — Blue primary/secondary (for Project-scoped UI)
+- **`.theme-gold`** — Gold primary/secondary (used for Jobs)
+- **`.theme-blue`** — Blue primary/secondary (used for Projects)
 
 No components are installed — they will be added incrementally as future implementations require them.
 
@@ -47,7 +47,7 @@ External references:
 - Create `src/lib/utils.ts` with `cn()` class merging utility
 - Ensure Tailwind CSS v4 compatibility (shadcn uses CSS variables)
 - Update `globals.css` with shadcn's CSS variable structure
-- **Set up scoped theme classes**: `.theme-job` (gold) and `.theme-project` (blue)
+- **Set up scoped theme classes**: `.theme-gold` and `.theme-blue`
 - Theme classes override `--primary`, `--secondary`, and related variables within their scope
 
 ### Out of Scope
@@ -172,7 +172,7 @@ Do you want to use CSS variables for colors? › yes
 
 ### Step 4: Add Scoped Theme Classes
 
-**Do**: Add `.theme-job` and `.theme-project` classes to `globals.css` that override the primary/secondary colors within their scope.
+**Do**: Add `.theme-gold` and `.theme-blue` classes to `globals.css` that override the primary/secondary colors within their scope.
 
 **Append to `src/app/globals.css`** (inside the `@layer base` block, after `.dark`):
 
@@ -180,11 +180,11 @@ Do you want to use CSS variables for colors? › yes
   /* ==========================================================================
      Scoped Themes
      Apply these classes to containers to theme all children.
-     Usage: <div className="theme-job">...</div>
+     Usage: <div className="theme-gold">...</div>
      ========================================================================== */
 
-  .theme-job {
-    /* Gold theme for Jobs */
+  .theme-gold {
+    /* Gold theme (used for Jobs) */
     --primary: 43 74% 49%;
     --primary-foreground: 0 0% 100%;
     --secondary: 43 60% 85%;
@@ -194,8 +194,8 @@ Do you want to use CSS variables for colors? › yes
     --ring: 43 74% 49%;
   }
 
-  .theme-project {
-    /* Blue theme for Projects */
+  .theme-blue {
+    /* Blue theme (used for Projects) */
     --primary: 199 45% 48%;
     --primary-foreground: 0 0% 100%;
     --secondary: 199 35% 85%;
@@ -207,13 +207,13 @@ Do you want to use CSS variables for colors? › yes
 ```
 
 **Color reference**:
-| Theme | Primary | Approx Hex | Based on |
-|-------|---------|------------|----------|
-| Job (gold) | `43 74% 49%` | `#C9A227` | Figma designs |
-| Project (blue) | `199 45% 48%` | `#4A90A4` | Figma designs |
+| Theme | Primary | Approx Hex | Usage |
+|-------|---------|------------|-------|
+| Gold | `43 74% 49%` | `#C9A227` | Jobs |
+| Blue | `199 45% 48%` | `#4A90A4` | Projects |
 
 **Verify**: 
-- Both `.theme-job` and `.theme-project` classes exist in `globals.css`
+- Both `.theme-gold` and `.theme-blue` classes exist in `globals.css`
 - Classes are inside `@layer base { }` block
 
 ---
@@ -257,17 +257,17 @@ pnpm build
            </button>
          </div>
 
-         {/* Job theme (gold) */}
-         <div className="theme-job rounded-lg border p-4">
-           <p className="mb-2 text-sm text-muted-foreground">Job theme:</p>
+         {/* Gold theme (for Jobs) */}
+         <div className="theme-gold rounded-lg border p-4">
+           <p className="mb-2 text-sm text-muted-foreground">Gold theme:</p>
            <button className="rounded bg-primary px-4 py-2 text-primary-foreground">
              Primary Button
            </button>
          </div>
 
-         {/* Project theme (blue) */}
-         <div className="theme-project rounded-lg border p-4">
-           <p className="mb-2 text-sm text-muted-foreground">Project theme:</p>
+         {/* Blue theme (for Projects) */}
+         <div className="theme-blue rounded-lg border p-4">
+           <p className="mb-2 text-sm text-muted-foreground">Blue theme:</p>
            <button className="rounded bg-primary px-4 py-2 text-primary-foreground">
              Primary Button
            </button>
@@ -280,8 +280,8 @@ pnpm build
 3. Visit `http://localhost:3000/tasks`
 4. Confirm:
    - First button is **dark/neutral** (default)
-   - Second button is **gold** (`.theme-job`)
-   - Third button is **blue** (`.theme-project`)
+   - Second button is **gold** (`.theme-gold`)
+   - Third button is **blue** (`.theme-blue`)
 5. **Remove the test code** — revert to placeholder
 
 **Verify**: 
@@ -304,7 +304,7 @@ Manual checks:
 - [ ] `components.json` exists with `style: "default"` and `tailwind.baseColor: "neutral"`
 - [ ] `src/lib/utils.ts` exports `cn` function
 - [ ] `src/app/globals.css` contains CSS variables in `:root` block
-- [ ] `src/app/globals.css` contains `.theme-job` and `.theme-project` classes
+- [ ] `src/app/globals.css` contains `.theme-gold` and `.theme-blue` classes
 - [ ] Theme classes correctly override colors when applied to containers
 - [ ] No console errors when running `pnpm dev`
 
@@ -323,13 +323,13 @@ The theming system uses CSS variable scoping. All customization happens in `src/
 </div>
 
 {/* Gold theme - apply to any container */}
-<div className="theme-job">
-  <Button>Gold</Button>       {/* Uses gold --primary */}
+<div className="theme-gold">
+  <Button>Gold</Button>        {/* Uses gold --primary */}
   <TaskList />                 {/* All children inherit gold theme */}
 </div>
 
 {/* Blue theme */}
-<div className="theme-project">
+<div className="theme-blue">
   <Button>Blue</Button>        {/* Uses blue --primary */}
 </div>
 ```
@@ -344,10 +344,10 @@ shadcn uses HSL values without the `hsl()` wrapper:
 
 ### Customizing Theme Colors
 
-To adjust the Job (gold) or Project (blue) themes, edit the classes in `globals.css`:
+To adjust the gold or blue themes, edit the classes in `globals.css`:
 
 ```css
-.theme-job {
+.theme-gold {
   /* Adjust these values to tweak gold theme */
   --primary: 43 74% 49%;           /* Main gold */
   --primary-foreground: 0 0% 100%; /* Text on gold */
@@ -357,7 +357,7 @@ To adjust the Job (gold) or Project (blue) themes, edit the classes in `globals.
   --ring: 43 74% 49%;              /* Focus ring */
 }
 
-.theme-project {
+.theme-blue {
   /* Adjust these values to tweak blue theme */
   --primary: 199 45% 48%;          /* Main blue */
   --primary-foreground: 0 0% 100%;
@@ -423,7 +423,7 @@ When building scoped UI (like Tasklists), apply the theme class to the container
 
 ```tsx
 function Tasklist({ scope }: { scope: Scope }) {
-  const themeClass = scope.type === 'job' ? 'theme-job' : 'theme-project'
+  const themeClass = scope.type === 'job' ? 'theme-gold' : 'theme-blue'
   
   return (
     <div className={themeClass}>
