@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import "./globals.css"
+import { PageShell } from "@/components/layout/page-shell"
 
 export const metadata: Metadata = {
   title: "Backboard",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <PageShell>{children}</PageShell>
+      </body>
     </html>
   )
 }

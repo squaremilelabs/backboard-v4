@@ -4,7 +4,7 @@
 |-------|-------|
 | **ID** | 004 |
 | **Status** | 🟢 In Progress |
-| **Progress** | Step 5 complete |
+| **Progress** | Step 8 complete |
 | **Created** | 2025-12-30 |
 | **Last Updated** | 2025-12-30 |
 
@@ -69,10 +69,10 @@ Read these before implementing:
 Exact files this implementation will create or modify:
 
 - [x] `src/components/layout/app-sidebar.tsx` — Sidebar with navigation links
-- [ ] `src/components/layout/page-shell.tsx` — Layout wrapper (sidebar + content + max-width)
+- [x] `src/components/layout/page-shell.tsx` — Layout wrapper (sidebar + content + max-width)
 - [x] `src/components/layout/mobile-nav.tsx` — Mobile hamburger + drawer
 - [x] `src/components/layout/sidebar-toggle.tsx` — Toggle button for collapsing sidebar
-- [ ] `src/app/layout.tsx` — Integrate PageShell (modify existing)
+- [x] `src/app/layout.tsx` — Integrate PageShell (modify existing)
 - [x] `src/components/ui/button.tsx` — shadcn Button component (created by CLI)
 - [x] `src/components/ui/sheet.tsx` — shadcn Sheet component for mobile drawer (created by CLI)
 - [x] `src/components/ui/tooltip.tsx` — shadcn Tooltip for toggle button (created by CLI)
@@ -387,7 +387,7 @@ export function MobileNav() {
 
 ---
 
-### Step 6: Create PageShell Component
+### Step 6: Create PageShell Component ✅
 
 **Do**: Create the layout wrapper with collapsible sidebar, max-width container, and responsive behavior. Sidebar state is persisted to localStorage.
 
@@ -478,7 +478,7 @@ export function PageShell({ children }: PageShellProps) {
 
 ---
 
-### Step 7: Update Root Layout
+### Step 7: Update Root Layout ✅
 
 **Do**: Integrate PageShell into the root layout so all pages get the sidebar.
 
@@ -515,7 +515,7 @@ export default function RootLayout({
 
 ---
 
-### Step 8: Update Page Placeholders
+### Step 8: Update Page Placeholders ✅
 
 **Do**: Update the placeholder pages to remove their own centering (PageShell handles layout now). Add a simple container with padding.
 
