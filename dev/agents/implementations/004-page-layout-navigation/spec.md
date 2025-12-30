@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **ID** | 004 |
-| **Status** | 🔵 Ready |
-| **Progress** | — |
+| **Status** | 🟢 In Progress |
+| **Progress** | Step 1 complete |
 | **Created** | 2025-12-30 |
 | **Last Updated** | 2025-12-30 |
 
@@ -73,15 +73,15 @@ Exact files this implementation will create or modify:
 - [ ] `src/components/layout/mobile-nav.tsx` — Mobile hamburger + drawer
 - [ ] `src/components/layout/sidebar-toggle.tsx` — Toggle button for collapsing sidebar
 - [ ] `src/app/layout.tsx` — Integrate PageShell (modify existing)
-- [ ] `src/components/ui/button.tsx` — shadcn Button component (created by CLI)
-- [ ] `src/components/ui/sheet.tsx` — shadcn Sheet component for mobile drawer (created by CLI)
-- [ ] `src/components/ui/tooltip.tsx` — shadcn Tooltip for toggle button (created by CLI)
+- [x] `src/components/ui/button.tsx` — shadcn Button component (created by CLI)
+- [x] `src/components/ui/sheet.tsx` — shadcn Sheet component for mobile drawer (created by CLI)
+- [x] `src/components/ui/tooltip.tsx` — shadcn Tooltip for toggle button (created by CLI)
 
 ---
 
 ## Implementation Plan
 
-### Step 1: Install shadcn/ui Components
+### Step 1: Install shadcn/ui Components ✅
 
 **Do**: Install the Button, Sheet, and Tooltip components.
 
