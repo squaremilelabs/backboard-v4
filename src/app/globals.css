@@ -120,6 +120,34 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ==========================================================================
+   Scoped Themes
+   Apply these classes to containers to theme all children.
+   Usage: <div className="theme-gold">...</div>
+   ========================================================================== */
+
+.theme-gold {
+  /* Gold theme (used for Jobs) */
+  --primary: oklch(0.72 0.155 85);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.92 0.05 85);
+  --secondary-foreground: oklch(0.45 0.1 85);
+  --accent: oklch(0.96 0.025 85);
+  --accent-foreground: oklch(0.4 0.1 85);
+  --ring: oklch(0.72 0.155 85);
+}
+
+.theme-blue {
+  /* Blue theme (used for Projects) */
+  --primary: oklch(0.6 0.1 220);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.92 0.035 220);
+  --secondary-foreground: oklch(0.45 0.08 220);
+  --accent: oklch(0.96 0.02 220);
+  --accent-foreground: oklch(0.4 0.08 220);
+  --ring: oklch(0.6 0.1 220);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
