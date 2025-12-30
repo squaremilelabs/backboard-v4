@@ -327,6 +327,57 @@ Provide a summary to the user:
 
 ---
 
+## Visual Verification Steps
+
+Some implementation steps require visual verification (testing UI in a browser, checking responsive layouts, etc.). **Do NOT attempt to fully automate these steps** — visual verification is inherently human work.
+
+### When you encounter a visual verification step:
+
+1. **Check for a `visual-verification.md` file** in the implementation folder
+   - If it exists, point the user to it
+   - If it doesn't exist, offer to create one based on the step's test checklist
+
+2. **Hand off to the user**:
+   > "This step requires visual verification. Please:
+   > 1. Run `pnpm dev` in your terminal
+   > 2. Open http://localhost:3000 in your browser
+   > 3. Go through the checklist in `visual-verification.md`
+   > 4. Mark items as verified or add feedback for any issues
+   > 
+   > Once complete, reply with your results."
+
+3. **Address any issues** the user reports, then have them re-verify
+
+4. **When sign-off is complete**, mark the step done and proceed
+
+### Why agents shouldn't do visual verification:
+
+- Browser automation tools are unreliable for visual testing
+- Sandbox restrictions interfere with dev servers
+- Human judgment is required for "looks right" checks
+- Viewport/rendering inconsistencies across tools
+
+---
+
+## Sandbox Restrictions
+
+The default sandbox blocks certain operations. Know when to request elevated permissions:
+
+| Operation | Permission Needed |
+|-----------|-------------------|
+| `pnpm add`, `npm install` (with network) | `["all"]` |
+| `pnpm dlx`, `npx` (CLI tools) | `["all"]` |
+| Git commits, branch operations | `["git_write"]` |
+| API calls, fetching dependencies | `["network"]` |
+
+**When in doubt**, use `required_permissions: ["all"]` for commands that:
+- Access system network interfaces
+- Write to pnpm/npm cache directories
+
+**Do NOT run dev servers** (`pnpm dev`, `npm start`) — ask the user to run these in their own terminal.
+
+---
+
 ## Tips for Agents
 
 - **Read the full spec first** — understand the big picture before starting
@@ -335,6 +386,7 @@ Provide a summary to the user:
 - **Atomic commits are mandatory** — one commit per step, even in batch mode
 - **Always update the spec** — mark steps complete, update Progress field
 - **Ask when uncertain** — better to clarify than to guess wrong
+- **Visual verification = user task** — don't automate browser testing, hand it off
 
 ---
 

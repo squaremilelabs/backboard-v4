@@ -2,8 +2,8 @@
 
 export default function ArchivePage() {
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-4xl font-bold">Archive</h1>
-    </main>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold">Archive</h1>
+    </div>
   )
 }

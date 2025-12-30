@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **ID** | 004 |
-| **Status** | 🔵 Ready |
-| **Progress** | — |
+| **Status** | ✅ Complete |
+| **Progress** | All steps complete |
 | **Created** | 2025-12-30 |
 | **Last Updated** | 2025-12-30 |
 
@@ -68,20 +68,20 @@ Read these before implementing:
 
 Exact files this implementation will create or modify:
 
-- [ ] `src/components/layout/app-sidebar.tsx` — Sidebar with navigation links
-- [ ] `src/components/layout/page-shell.tsx` — Layout wrapper (sidebar + content + max-width)
-- [ ] `src/components/layout/mobile-nav.tsx` — Mobile hamburger + drawer
-- [ ] `src/components/layout/sidebar-toggle.tsx` — Toggle button for collapsing sidebar
-- [ ] `src/app/layout.tsx` — Integrate PageShell (modify existing)
-- [ ] `src/components/ui/button.tsx` — shadcn Button component (created by CLI)
-- [ ] `src/components/ui/sheet.tsx` — shadcn Sheet component for mobile drawer (created by CLI)
-- [ ] `src/components/ui/tooltip.tsx` — shadcn Tooltip for toggle button (created by CLI)
+- [x] `src/components/layout/app-sidebar.tsx` — Sidebar with navigation links
+- [x] `src/components/layout/page-shell.tsx` — Layout wrapper (sidebar + content + max-width)
+- [x] `src/components/layout/mobile-nav.tsx` — Mobile hamburger + drawer
+- [x] `src/components/layout/sidebar-toggle.tsx` — Toggle button for collapsing sidebar
+- [x] `src/app/layout.tsx` — Integrate PageShell (modify existing)
+- [x] `src/components/ui/button.tsx` — shadcn Button component (created by CLI)
+- [x] `src/components/ui/sheet.tsx` — shadcn Sheet component for mobile drawer (created by CLI)
+- [x] `src/components/ui/tooltip.tsx` — shadcn Tooltip for toggle button (created by CLI)
 
 ---
 
 ## Implementation Plan
 
-### Step 1: Install shadcn/ui Components
+### Step 1: Install shadcn/ui Components ✅
 
 **Do**: Install the Button, Sheet, and Tooltip components.
 
@@ -98,7 +98,7 @@ pnpm dlx shadcn@latest add button sheet tooltip
 
 ---
 
-### Step 2: Install Lucide Icons
+### Step 2: Install Lucide Icons ✅
 
 **Do**: Install lucide-react for icons (hamburger, sidebar toggle, etc.).
 
@@ -112,7 +112,7 @@ pnpm add lucide-react
 
 ---
 
-### Step 3: Create SidebarToggle Component
+### Step 3: Create SidebarToggle Component ✅
 
 **Do**: Create a toggle button component that can be used to collapse/expand the sidebar.
 
@@ -171,7 +171,7 @@ export function SidebarToggle({ isCollapsed, onToggle }: SidebarToggleProps) {
 
 ---
 
-### Step 4: Create AppSidebar Component
+### Step 4: Create AppSidebar Component ✅
 
 **Do**: Create the sidebar component with navigation links. Uses `usePathname()` for active state.
 
@@ -272,7 +272,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
 
 ---
 
-### Step 5: Create MobileNav Component
+### Step 5: Create MobileNav Component ✅
 
 **Do**: Create the mobile navigation with hamburger button and Sheet drawer.
 
@@ -387,7 +387,7 @@ export function MobileNav() {
 
 ---
 
-### Step 6: Create PageShell Component
+### Step 6: Create PageShell Component ✅
 
 **Do**: Create the layout wrapper with collapsible sidebar, max-width container, and responsive behavior. Sidebar state is persisted to localStorage.
 
@@ -478,7 +478,7 @@ export function PageShell({ children }: PageShellProps) {
 
 ---
 
-### Step 7: Update Root Layout
+### Step 7: Update Root Layout ✅
 
 **Do**: Integrate PageShell into the root layout so all pages get the sidebar.
 
@@ -515,7 +515,7 @@ export default function RootLayout({
 
 ---
 
-### Step 8: Update Page Placeholders
+### Step 8: Update Page Placeholders ✅
 
 **Do**: Update the placeholder pages to remove their own centering (PageShell handles layout now). Add a simple container with padding.
 
@@ -541,7 +541,7 @@ export default function TasksPage() {
 
 ---
 
-### Step 9: Verify Build
+### Step 9: Verify Build ✅
 
 **Do**: Ensure the project builds successfully.
 
@@ -556,7 +556,7 @@ pnpm build
 
 ---
 
-### Step 10: Visual Verification
+### Step 10: Visual Verification ✅
 
 **Do**: Test the layout in the browser at various screen sizes.
 
