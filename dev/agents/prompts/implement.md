@@ -357,6 +357,87 @@ Some implementation steps require visual verification (testing UI in a browser, 
 - Human judgment is required for "looks right" checks
 - Viewport/rendering inconsistencies across tools
 
+### Checklist markers
+
+The `visual-verification.md` file uses these markers:
+
+| Marker | Meaning |
+|--------|---------|
+| `[x]` | Verified, works as expected |
+| `[!]` | Issue found (user adds feedback inline) |
+| `[~]` | Known issue, deferred (not blocking) |
+| `[ ]` | Not yet checked |
+
+### Agent responsibilities during verification
+
+When user reports issues (items marked `[!]`):
+
+1. **Document the issues** in the Issues & Feedback section under the current round
+   - Summarize each issue briefly
+   - Note what the user reported
+
+2. **Implement fixes** for the reported issues
+
+3. **Reset fixed items** — change `[!]` back to `[ ]` for re-verification
+   - Update the checklist item wording if expectations changed
+   - Remove inline user comments (they're now documented in the round)
+
+4. **Report fixes** and ask user to re-verify
+
+### Rounds workflow
+
+Each verification pass is a "round":
+
+```
+Round 1: User verifies → reports issues → agent fixes
+Round 2: User re-verifies fixed items → may report new issues
+Round 3: ...continues until all items pass or are deferred
+```
+
+Document each round in the Issues & Feedback section:
+
+```markdown
+### Round 1
+
+**Issue 1: {brief title}**
+- {what user reported}
+
+**Issue 2: {brief title}**
+- {what user reported}
+
+**Fixes applied:**
+- {what was changed}
+
+### Round 2
+
+**Issue 1: {if any persist or new issues found}**
+...
+
+**Resolution:** {Fixed / Deferred — reason}
+```
+
+### Deferring issues
+
+Some issues may be low priority or require significant refactoring. It's valid to defer:
+
+1. **Ask user** if they want to defer vs. fix now
+2. **Mark item** with `[~]` and add note: `_(known issue, deferred — {reason})_`
+3. **Document** in the round as "Resolution: Deferred — {reason}"
+4. **Update sign-off** to reflect deferred items exist
+
+**Important**: Don't over-engineer fixes without checking with the user first. If a fix requires significant complexity, ask before implementing.
+
+### Sign-off criteria
+
+Update sign-off section when complete:
+
+```markdown
+- [x] All desktop checks pass (N deferred issues)
+- [x] All mobile checks pass
+- [x] All navigation checks pass
+- [x] No blocking issues (N low-priority issues deferred)
+```
+
 ---
 
 ## Sandbox Restrictions
@@ -387,6 +468,8 @@ The default sandbox blocks certain operations. Know when to request elevated per
 - **Always update the spec** — mark steps complete, update Progress field
 - **Ask when uncertain** — better to clarify than to guess wrong
 - **Visual verification = user task** — don't automate browser testing, hand it off
+- **Don't over-engineer** — if a fix requires significant complexity, ask user before implementing
+- **Deferring is valid** — low-priority issues can be marked `[~]` and documented for later
 
 ---
 
