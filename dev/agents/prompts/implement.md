@@ -6,7 +6,7 @@ Execute an implementation spec **one step at a time** by default, with user revi
 
 You are an implementation executor. Your job is to take an implementation spec from `dev/agents/implementations/` and execute it. By default, you execute **one step per session** and pause for user review.
 
-**Default workflow**: Execute step → Verify → Update spec → Commit → Pause for review
+**Default workflow**: Execute step → Verify → Pause for review → (user approves) → Update spec → Commit
 
 ### Batch Mode
 
@@ -17,11 +17,10 @@ When the user explicitly requests multiple steps, execute them in sequence:
 - `"run steps 2-4"` → execute steps 2, 3, 4
 
 In batch mode:
-- Still commit after **each** step (atomic commits)
-- Still update the spec after each step
-- Continue to next step automatically (no pause between steps)
-- Pause only after completing all requested steps
-- If any step fails, stop immediately and report
+- Execute all requested steps first (no commit between steps)
+- Pause for user review after completing all requested steps
+- Once user approves, commit each step atomically (one commit per step)
+- If any step fails during execution, stop immediately and report
 
 ### Why step-by-step is the default
 
@@ -148,8 +147,14 @@ git checkout -b {implementation-folder-name}
 1. **Read the step** — understand Do, Commands, and Verify
 2. **Execute** — run commands, create files, make changes
 3. **Verify** — confirm the step succeeded using the Verify criteria
-4. **Update spec** — mark step complete with ✅, update Progress field
-5. **Commit** — always commit after each step
+4. **Report and pause** — show what was done, wait for user approval
+5. **DO NOT COMMIT YET** — wait for explicit user approval
+
+### After user approves:
+
+1. **Update spec** — mark step complete with ✅, update Progress field
+2. **Commit** — atomic commit with format below
+3. **Report** — confirm commit with hash
 
 ### Commit message format:
 ```
@@ -160,15 +165,10 @@ Example:
 [001] Step 5: Install Prettier and plugins
 ```
 
-### After step completion:
+### Pause points:
 
-1. **Update spec metadata**:
-   - Set `Progress` to "Step N of M complete"
-   - Keep `Status` as 🟢 In Progress
-2. **Commit the spec update** along with the step changes
-3. **Check mode**:
-   - **Default mode**: Report to user and pause (see Phase 4.5)
-   - **Batch mode**: If more steps remain in the requested range, continue to next step; otherwise report batch summary and pause
+- **Default mode**: Pause after each step for user review before committing
+- **Batch mode**: Execute all requested steps, pause once for review, then commit each step atomically after approval
 
 ### If a step fails:
 1. Stop and report the error
@@ -180,17 +180,28 @@ Example:
 
 ---
 
-## Phase 4.5: Step Summary
+## Phase 4.5: Review Checkpoint
 
 ### Single step (default mode)
 
-After each step, provide a concise summary:
+After executing a step, pause and report for review:
 
-> **Step {N} complete** ✅
+> **Step {N} ready for review** 📋
 >
 > **Branch**: `{branch-name}`
-> **Commit**: `{short-hash}` — "{commit message}"
+> **Changes**: {brief summary of what was done}
 >
+> **Files modified**:
+> - `path/to/file1.ts` — {what changed}
+> - `path/to/file2.css` — {what changed}
+>
+> Review the changes. Reply "ok" to commit, or provide feedback.
+
+### After user approves ("ok", "commit", "lgtm", etc.):
+
+> **Step {N} committed** ✅
+>
+> **Commit**: `{short-hash}` — "{commit message}"
 > **Progress**: Step {N} of {M}
 > **Next**: Step {N+1}: {next step title}
 >
@@ -198,11 +209,24 @@ After each step, provide a concise summary:
 
 ### Batch completion
 
-After completing all requested steps, provide a batch summary:
+After executing all requested steps, pause for review:
 
-> **Steps {X}–{Y} complete** ✅
+> **Steps {X}–{Y} ready for review** 📋
 >
 > **Branch**: `{branch-name}`
+> **Changes**:
+> - Step {X}: {summary}
+> - Step {X+1}: {summary}
+> - ...
+>
+> Review the changes. Reply "ok" to commit all, or provide feedback.
+
+### After user approves batch:
+
+Commit each step atomically, then report:
+
+> **Steps {X}–{Y} committed** ✅
+>
 > **Commits**: {count} commits
 > - `{hash1}` — Step {X}: {title}
 > - `{hash2}` — Step {X+1}: {title}
@@ -212,11 +236,6 @@ After completing all requested steps, provide a batch summary:
 > **Next**: Step {Y+1}: {next step title} (or "Verification" if all steps done)
 >
 > Continue with `/implement {ID}` when ready.
-
-This format allows the user to quickly understand:
-- What was just completed
-- What's coming next
-- How to continue
 
 ---
 
@@ -312,9 +331,9 @@ Provide a summary to the user:
 
 - **Read the full spec first** — understand the big picture before starting
 - **Default is ONE step** — unless user explicitly requests batch execution
-- **Always commit after each step** — atomic commits are mandatory, even in batch mode
+- **Never commit without user approval** — always pause for review first
+- **Atomic commits are mandatory** — one commit per step, even in batch mode
 - **Always update the spec** — mark steps complete, update Progress field
-- **Pause after completing requested work** — one step (default) or batch (if requested)
 - **Ask when uncertain** — better to clarify than to guess wrong
 
 ---
@@ -332,10 +351,11 @@ The Progress field tracks current step. Status stays 🟢 In Progress throughout
 ```
 1. Start/Continue → Check Progress field for current step
 2. Execute step → Verify success
-3. Update spec → Mark step ✅, update Progress field
-4. Commit → "[{ID}] Step {N}: {title}"
-5. Report → Step summary to user
-6. STOP → Wait for user to continue
+3. Report changes → Show what was done
+4. STOP → Wait for user approval
+5. (User says "ok") → Update spec, commit "[{ID}] Step {N}: {title}"
+6. Report commit → Show hash, next step
+7. STOP → Wait for user to continue
 ```
 
 ## Quick Reference: Batch Flow
@@ -344,10 +364,11 @@ The Progress field tracks current step. Status stays 🟢 In Progress throughout
 1. Parse request → Determine step range (e.g., steps 3-5, or "all remaining")
 2. For each step in range:
    a. Execute step → Verify success
-   b. Update spec → Mark step ✅, update Progress field
-   c. Commit → "[{ID}] Step {N}: {title}"
-   d. If step fails → STOP and report error
-3. Report → Batch summary to user
-4. STOP → Wait for user to continue
+   b. If step fails → STOP and report error
+3. Report all changes → Show what was done for each step
+4. STOP → Wait for user approval
+5. (User says "ok") → For each step: update spec, commit atomically
+6. Report commits → Show all hashes
+7. STOP → Wait for user to continue
 ```
 
