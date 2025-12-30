@@ -4,7 +4,7 @@
 |-------|-------|
 | **ID** | 004 |
 | **Status** | 🟢 In Progress |
-| **Progress** | Step 2 complete |
+| **Progress** | Step 3 complete |
 | **Created** | 2025-12-30 |
 | **Last Updated** | 2025-12-30 |
 
@@ -71,7 +71,7 @@ Exact files this implementation will create or modify:
 - [ ] `src/components/layout/app-sidebar.tsx` — Sidebar with navigation links
 - [ ] `src/components/layout/page-shell.tsx` — Layout wrapper (sidebar + content + max-width)
 - [ ] `src/components/layout/mobile-nav.tsx` — Mobile hamburger + drawer
-- [ ] `src/components/layout/sidebar-toggle.tsx` — Toggle button for collapsing sidebar
+- [x] `src/components/layout/sidebar-toggle.tsx` — Toggle button for collapsing sidebar
 - [ ] `src/app/layout.tsx` — Integrate PageShell (modify existing)
 - [x] `src/components/ui/button.tsx` — shadcn Button component (created by CLI)
 - [x] `src/components/ui/sheet.tsx` — shadcn Sheet component for mobile drawer (created by CLI)
@@ -112,7 +112,7 @@ pnpm add lucide-react
 
 ---
 
-### Step 3: Create SidebarToggle Component
+### Step 3: Create SidebarToggle Component ✅
 
 **Do**: Create a toggle button component that can be used to collapse/expand the sidebar.
 
