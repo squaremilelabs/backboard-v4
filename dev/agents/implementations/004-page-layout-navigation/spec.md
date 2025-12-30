@@ -44,7 +44,7 @@ Read these before implementing:
 - **Collapsible sidebar on desktop** with toggle button
 - **Sidebar state persisted to localStorage**
 - Hamburger menu with drawer on mobile
-- **Max-width container at `lg` breakpoint** (1024px)
+- **Max-width on main content** — 1024px (`max-w-5xl`), sidebar width is additional
 - Integration into root `layout.tsx`
 - Install required shadcn/ui components (Sheet, Button, Tooltip)
 
@@ -428,18 +428,18 @@ export function PageShell({ children }: PageShellProps) {
   }
 
   return (
-    <div className="flex h-screen justify-center bg-muted/30">
-      {/* Max-width container */}
-      <div className="flex h-full w-full max-w-5xl">
-        {/* Desktop sidebar - hidden on mobile */}
+    <div className="flex h-screen bg-muted/30">
+      {/* Centered container: sidebar (256px) + content (max 1024px) */}
+      <div className="mx-auto flex h-full">
+        {/* Desktop sidebar - hidden on mobile, fixed width */}
         {isHydrated && (
           <div className="hidden md:block">
             <AppSidebar isCollapsed={isCollapsed} onToggle={toggleSidebar} />
           </div>
         )}
 
-        {/* Main content area */}
-        <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Main content area - max 1024px */}
+        <div className="flex w-screen max-w-5xl flex-col overflow-hidden md:w-auto md:flex-1">
           {/* Header - always visible, content varies by screen size */}
           <header className="flex h-14 items-center gap-2 border-b bg-background px-4">
             {/* Mobile: hamburger menu */}
@@ -589,8 +589,10 @@ pnpm dev
    - Click nav item — navigates and drawer closes
 
 4. **Max-width behavior** (resize to very wide screen):
-   - Content container maxes out at 1024px (lg breakpoint)
+   - Main content maxes out at 1024px (`max-w-5xl`)
+   - Sidebar adds 256px when expanded (total ~1280px)
    - Background color visible on sides
+   - Sidebar collapsed: content still limited to 1024px
 
 5. **Navigation**:
    - Click each nav item — navigates correctly
@@ -623,17 +625,19 @@ Manual checks:
 - [ ] Mobile: hamburger menu appears below 768px
 - [ ] Mobile: drawer opens/closes correctly
 - [ ] Mobile: navigation works and closes drawer
-- [ ] Wide screens: content maxes out at 1024px (lg breakpoint)
+- [ ] Wide screens: main content maxes out at 1024px, sidebar adds 256px when expanded
 - [ ] No layout shift or flash on page load (hydration handled)
 
 ---
 
 ## Design Notes
 
-### Breakpoints
-- **Mobile**: < 768px (md breakpoint) — hamburger drawer
-- **Desktop**: ≥ 768px — collapsible sidebar
-- **Max-width**: 1024px (lg breakpoint) — content container limit
+### Breakpoints & Sizing
+- **Mobile**: < 768px (`md` breakpoint) — hamburger drawer
+- **Desktop**: ≥ 768px (`md` breakpoint) — collapsible sidebar
+- **Main content max-width**: 1024px / 64rem (`max-w-5xl`)
+- **Sidebar width**: 256px (`w-64`) when expanded, 0 when collapsed
+- **Total width**: computed (sidebar + content), centered with `mx-auto`
 
 ### Sidebar Width
 - Fixed 256px (w-64) when expanded
