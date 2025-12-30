@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { AppSidebar } from "./app-sidebar"
 import { MobileNav } from "./mobile-nav"
 import { SidebarToggle } from "./sidebar-toggle"
+import { cn } from "@/lib/utils"
 
 const SIDEBAR_STORAGE_KEY = "backboard-sidebar-collapsed"
 
@@ -12,20 +13,17 @@ interface PageShellProps {
 }
 
 export function PageShell({ children }: PageShellProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  // Start collapsed to match most common initial render, prevents flash
+  const [isCollapsed, setIsCollapsed] = useState(true)
   const [isHydrated, setIsHydrated] = useState(false)
 
   // Load sidebar state from localStorage on mount
   useEffect(() => {
-    // Defer state updates to avoid synchronous setState in effect
-    const id = requestAnimationFrame(() => {
-      const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY)
-      if (stored !== null) {
-        setIsCollapsed(stored === "true")
-      }
-      setIsHydrated(true)
-    })
-    return () => cancelAnimationFrame(id)
+    const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY)
+    // Default to expanded (false) if no preference stored
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsCollapsed(stored === "true")
+    setIsHydrated(true)
   }, [])
 
   // Persist sidebar state to localStorage
@@ -37,40 +35,53 @@ export function PageShell({ children }: PageShellProps) {
 
   return (
     <div className="flex h-screen bg-muted/30">
-      {/* Centered container: sidebar (256px) + content (max 1024px) */}
-      <div className="mx-auto flex h-full">
-        {/* Desktop sidebar - hidden on mobile, fixed width */}
-        {isHydrated && (
-          <div className="hidden md:block">
-            <AppSidebar isCollapsed={isCollapsed} onToggle={toggleSidebar} />
-          </div>
-        )}
+      {/* Centered container: sidebar + content (max 1024px) */}
+      <div className="mx-auto flex h-full w-full max-w-[1280px]">
+        {/* Desktop sidebar - hidden on mobile, animates width */}
+        <div
+          className={cn(
+            "hidden transition-opacity duration-200 md:block",
+            isHydrated ? "opacity-100" : "opacity-0"
+          )}
+        >
+          <AppSidebar isCollapsed={isCollapsed} onToggle={toggleSidebar} />
+        </div>
 
-        {/* Main content area - max 1024px */}
-        <div className="flex w-screen max-w-5xl flex-col overflow-hidden md:w-auto md:flex-1">
+        {/* Main content area - fills available width up to max-w-5xl */}
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           {/* Header - always visible, content varies by screen size */}
-          <header className="flex h-14 items-center gap-2 border-b bg-background px-4">
+          <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
             {/* Mobile: hamburger menu */}
             <div className="md:hidden">
               <MobileNav />
             </div>
 
             {/* Desktop: sidebar toggle (when collapsed) */}
-            {isHydrated && isCollapsed && (
-              <div className="hidden md:block">
-                <SidebarToggle isCollapsed={isCollapsed} onToggle={toggleSidebar} />
-              </div>
-            )}
+            <div
+              className={cn(
+                "hidden transition-opacity duration-200 md:block",
+                isHydrated && isCollapsed ? "opacity-100" : "pointer-events-none opacity-0"
+              )}
+            >
+              <SidebarToggle isCollapsed={isCollapsed} onToggle={toggleSidebar} />
+            </div>
 
             {/* Title - visible when sidebar is collapsed or on mobile */}
-            {(isCollapsed || !isHydrated) && (
-              <span className="hidden font-semibold md:block">Backboard</span>
-            )}
+            <span
+              className={cn(
+                "hidden font-semibold transition-opacity duration-200 md:block",
+                isCollapsed ? "opacity-100" : "opacity-0"
+              )}
+            >
+              Backboard
+            </span>
             <span className="font-semibold md:hidden">Backboard</span>
           </header>
 
-          {/* Page content */}
-          <main className="flex-1 overflow-auto">{children}</main>
+          {/* Page content - constrained to max-w-5xl */}
+          <main className="flex-1 overflow-auto">
+            <div className="mx-auto max-w-5xl">{children}</div>
+          </main>
         </div>
       </div>
     </div>

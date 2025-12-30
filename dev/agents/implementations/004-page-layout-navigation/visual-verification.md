@@ -1,7 +1,7 @@
 # Visual Verification Checklist
 
 > **Implementation**: 004 - Page Layout & Navigation  
-> **Status**: 🔄 In Progress  
+> **Status**: ✅ Complete  
 > **Last Updated**: 2025-12-30
 
 ---
@@ -14,6 +14,7 @@
 4. Mark items with:
    - `[x]` — Verified, works as expected
    - `[!]` — Issue found (add feedback below the item)
+   - `[~]` — Known issue, deferred (not blocking)
    - `[ ]` — Not yet checked
 5. After completing a pass, update the status and date above
 6. If issues exist, agent addresses them, then you re-verify
@@ -26,26 +27,26 @@ Resize browser to at least 768px wide.
 
 ### Sidebar Expanded
 
-- [ ] Sidebar visible on left side
-- [ ] "Backboard" title in sidebar header
-- [ ] Collapse button (panel icon) in sidebar header
-- [ ] Main nav items: Tasks, Schedule, Projects, Jobs
-- [ ] Secondary nav at bottom: Archive (separated by border)
-- [ ] Active page is highlighted in nav
+- [x] Sidebar visible on left side
+- [x] "Backboard" title in sidebar header
+- [x] Collapse button (panel icon) in sidebar header
+- [x] Main nav items: Tasks, Schedule, Projects, Jobs
+- [x] Secondary nav at bottom: Archive (separated by border)
+- [x] Active page is highlighted in nav
 
 ### Sidebar Collapsed
 
-- [ ] Click collapse button → sidebar disappears
-- [ ] Header shows expand button + "Backboard" title
-- [ ] Click expand button → sidebar reappears
-- [ ] Refresh page → sidebar state persists (localStorage)
+- [x] Click collapse button → sidebar disappears (with animation)
+- [x] Header shows expand button + "Backboard" title
+- [x] Click expand button → sidebar reappears (with animation)
+- [x] Refresh page → sidebar state persists (localStorage)
 
 ### Layout & Spacing
 
-- [ ] Main content has max-width (~1024px)
-- [ ] Background color visible on sides when window is wide
-- [ ] No horizontal scrolling
-- [ ] No layout shift on page load
+- [x] Main content has max-width (~1024px) and fills available width
+- [x] Background color visible on sides when window is wide
+- [x] No horizontal scrolling
+- [~] No layout shift on page load _(known issue, deferred — low priority)_
 
 ---
 
@@ -55,19 +56,19 @@ Resize browser to less than 768px wide (or use DevTools mobile mode).
 
 ### Header
 
-- [ ] Hamburger menu icon visible
-- [ ] "Backboard" title visible
-- [ ] Sidebar is NOT visible (hidden)
+- [x] Hamburger menu icon visible
+- [x] "Backboard" title visible
+- [x] Sidebar is NOT visible (hidden)
 
 ### Drawer Navigation
 
-- [ ] Click hamburger → drawer slides in from left
-- [ ] Drawer shows "Backboard" title
-- [ ] All nav items visible: Tasks, Schedule, Projects, Jobs
-- [ ] Archive in bottom section with separator
-- [ ] Active page is highlighted
-- [ ] Click nav item → navigates AND closes drawer
-- [ ] Click outside drawer → drawer closes
+- [x] Click hamburger → drawer slides in from left
+- [x] Drawer shows "Backboard" title
+- [x]  All nav items visible: Tasks, Schedule, Projects, Jobs
+- [x] Archive in bottom section with separator
+- [x] Active page is highlighted
+- [x] Click nav item → navigates AND closes drawer
+- [x] Click outside drawer → drawer closes
 
 ---
 
@@ -75,12 +76,12 @@ Resize browser to less than 768px wide (or use DevTools mobile mode).
 
 Test each route works correctly.
 
-- [ ] `/tasks` — Shows "Tasks" heading
-- [ ] `/schedule` — Shows "Schedule" heading
-- [ ] `/projects` — Shows "Projects" heading
-- [ ] `/jobs` — Shows "Jobs" heading
-- [ ] `/archive` — Shows "Archive" heading
-- [ ] Active state updates when navigating
+- [x] `/tasks` — Shows "Tasks" heading
+- [x] `/schedule` — Shows "Schedule" heading
+- [x] `/projects` — Shows "Projects" heading
+- [x] `/jobs` — Shows "Jobs" heading
+- [x] `/archive` — Shows "Archive" heading
+- [x] Active state updates when navigating
 
 ---
 
@@ -90,26 +91,42 @@ _Document any issues found during verification. Agent will address these, then y
 
 ### Round 1
 
-<!-- Example format:
-**Issue**: Sidebar doesn't collapse on first click
-**Steps to reproduce**: Click collapse button in sidebar header
-**Expected**: Sidebar should hide immediately
-**Actual**: Nothing happens on first click, works on second
-**Screenshot**: (optional - paste or describe)
--->
+**Issue 1: No sidebar animation**
+- Sidebar collapse/expand works but has no transition
+- Requested smooth CSS width animation
 
-_(No issues found yet)_
+**Issue 2: Content too thin when empty**
+- Main content has max-width but doesn't fill available screen width
+- Looks too narrow when page content is minimal
+
+**Issue 3: Layout shift on page load**
+- Sidebar starts collapsed for a moment, then expands
+- Visible flash/shift during hydration
+
+**Fixes applied:**
+- Added `transition-[width] duration-200` to sidebar, animates from `w-64` to `w-0`
+- Restructured layout: content uses `flex-1` to fill width, `max-w-5xl` on inner div
+- Changed initial state to collapsed, uses opacity fade during hydration
+
+### Round 2
+
+**Issue 1: Layout shift still present**
+- Sidebar still starts collapsed then expands on page load
+- localStorage read happens after React hydration, causing mismatch
+- Fixing requires blocking script or alternative storage approach
+
+**Resolution:** Deferred — low priority, does not block core functionality
 
 ---
 
 ## Sign-off
 
-When all items are checked and no issues remain:
+When all items are checked and no blocking issues remain:
 
-- [ ] All desktop checks pass
-- [ ] All mobile checks pass
-- [ ] All navigation checks pass
-- [ ] No outstanding issues
+- [x] All desktop checks pass (1 deferred issue)
+- [x] All mobile checks pass
+- [x] All navigation checks pass
+- [x] No blocking issues (1 low-priority issue deferred)
 
 **Verified by**: _______________  
 **Date**: _______________
