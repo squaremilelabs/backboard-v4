@@ -4,7 +4,7 @@
 |-------|-------|
 | **ID** | 004 |
 | **Status** | 🟢 In Progress |
-| **Progress** | Step 3 complete |
+| **Progress** | Step 4 complete |
 | **Created** | 2025-12-30 |
 | **Last Updated** | 2025-12-30 |
 
@@ -68,7 +68,7 @@ Read these before implementing:
 
 Exact files this implementation will create or modify:
 
-- [ ] `src/components/layout/app-sidebar.tsx` — Sidebar with navigation links
+- [x] `src/components/layout/app-sidebar.tsx` — Sidebar with navigation links
 - [ ] `src/components/layout/page-shell.tsx` — Layout wrapper (sidebar + content + max-width)
 - [ ] `src/components/layout/mobile-nav.tsx` — Mobile hamburger + drawer
 - [x] `src/components/layout/sidebar-toggle.tsx` — Toggle button for collapsing sidebar
@@ -171,7 +171,7 @@ export function SidebarToggle({ isCollapsed, onToggle }: SidebarToggleProps) {
 
 ---
 
-### Step 4: Create AppSidebar Component
+### Step 4: Create AppSidebar Component ✅
 
 **Do**: Create the sidebar component with navigation links. Uses `usePathname()` for active state.
 
