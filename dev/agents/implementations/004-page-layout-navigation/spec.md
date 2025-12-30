@@ -4,7 +4,7 @@
 |-------|-------|
 | **ID** | 004 |
 | **Status** | 🟢 In Progress |
-| **Progress** | Step 4 complete |
+| **Progress** | Step 5 complete |
 | **Created** | 2025-12-30 |
 | **Last Updated** | 2025-12-30 |
 
@@ -70,7 +70,7 @@ Exact files this implementation will create or modify:
 
 - [x] `src/components/layout/app-sidebar.tsx` — Sidebar with navigation links
 - [ ] `src/components/layout/page-shell.tsx` — Layout wrapper (sidebar + content + max-width)
-- [ ] `src/components/layout/mobile-nav.tsx` — Mobile hamburger + drawer
+- [x] `src/components/layout/mobile-nav.tsx` — Mobile hamburger + drawer
 - [x] `src/components/layout/sidebar-toggle.tsx` — Toggle button for collapsing sidebar
 - [ ] `src/app/layout.tsx` — Integrate PageShell (modify existing)
 - [x] `src/components/ui/button.tsx` — shadcn Button component (created by CLI)
@@ -272,7 +272,7 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
 
 ---
 
-### Step 5: Create MobileNav Component
+### Step 5: Create MobileNav Component ✅
 
 **Do**: Create the mobile navigation with hamburger button and Sheet drawer.
 
