@@ -3,10 +3,12 @@
 | Field | Value |
 |-------|-------|
 | **ID** | 005 |
-| **Status** | 🟢 In Progress |
-| **Progress** | Steps 1-12 ✅ — awaiting visual verification |
+| **Status** | ✅ Complete |
+| **Progress** | Core CRUD complete. Visual design deferred to 006. |
 | **Created** | 2025-12-31 |
 | **Last Updated** | 2025-12-31 |
+
+> **Note**: This implementation delivers core CRUD functionality (add, edit, archive) for Jobs and Projects. However, the visual layout does not yet match the Figma designs (grid structure, sticky columns, etc.). A follow-up implementation (006) will focus on design alignment.
 
 ---
 

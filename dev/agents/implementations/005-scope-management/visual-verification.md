@@ -1,5 +1,7 @@
 # Visual Verification: 005 Scope Management
 
+> **Status: CLOSED** — Core CRUD functionality verified. Visual design items deferred to 006 (design alignment spec).
+
 ## Instructions
 
 1. Run `pnpm dev` in your terminal
@@ -8,7 +10,7 @@
 4. Mark items with:
    - `[x]` — Verified, works as expected
    - `[!]` — Issue found (add feedback inline)
-   - `[~]` — Known issue, deferred
+   - `[~]` — Known issue, deferred to 006
    - `[ ]` — Not yet checked
 
 ---
@@ -16,7 +18,7 @@
 ## Jobs Page (`/jobs`)
 
 ### Layout
-- [ ] Grid structure: title column (288px) + 7 day columns
+- [~] Grid structure: title column (288px) + 7 day columns
 - [x] Grid header shows day names
 - [x] Each job is a row with title + 7 cell placeholders
 - [x] List-only on mobile (no grid columns)
@@ -38,14 +40,14 @@
 
 ### Edit Job (Mobile)
 - [x] Click anywhere on row → modal opens as full-screen sheet with proper padding
-- [ ] Title as editable header with colored dot indicator
-- [ ] Long titles truncate properly
+- [~] Title as editable header with colored dot indicator
+- [~] Long titles truncate properly
 - [x] Title saves on blur or Enter
 
 ### More Menu (Desktop)
 - [x] Hover job row → "..." button appears
 - [x] Click "..." → modal dialog opens
-- [ ] Title as editable header with colored dot indicator
+- [~] Title as editable header with colored dot indicator
 - [x] Click "Done" to close modal
 
 ### Archive Job
@@ -58,9 +60,9 @@
 ## Projects Page (`/projects`)
 
 ### Layout
-- [ ] Grid structure: title column (288px) + 6 month columns
-- [ ] Nested items align properly in grid (indented within title cell)
-- [ ] Title column and header stay frozen when scrolling horizontally
+- [~] Grid structure: title column (288px) + 6 month columns
+- [~] Nested items align properly in grid (indented within title cell)
+- [~] Title column and header stay frozen when scrolling horizontally
 - [x] Grid header shows month names (dynamic based on current date)
 - [x] Parent projects have hollow dots, children have filled dots
 - [x] No horizontal overflow on mobile (long titles truncated)
