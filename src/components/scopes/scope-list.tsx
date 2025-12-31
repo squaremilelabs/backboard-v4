@@ -3,7 +3,7 @@
 import { useState } from "react"
 
 import { AddScopeInput } from "./add-scope-input"
-import { ScopeListItem } from "./scope-list-item"
+import { ScopeGridRow } from "./scope-grid-row"
 import { ScopeModal } from "./scope-modal"
 import { useScopes } from "@/hooks/use-scopes"
 import type { Scope, ScopeType } from "@/lib/db"
@@ -38,9 +38,9 @@ export function ScopeList({ type }: ScopeListProps) {
   if (type === "job") {
     return (
       <>
-        <div className="flex flex-col gap-1 p-2">
+        <div className="flex flex-col">
           {scopes.map((scope) => (
-            <ScopeListItem key={scope.id} scope={scope} onOpenModal={handleOpenModal} />
+            <ScopeGridRow key={scope.id} scope={scope} onOpenModal={handleOpenModal} />
           ))}
           <AddScopeInput type="job" />
         </div>
@@ -67,13 +67,13 @@ export function ScopeList({ type }: ScopeListProps) {
 
   return (
     <>
-      <div className="flex flex-col gap-1 p-2">
+      <div className="flex flex-col">
         {parentProjects.map((project) => (
           <div key={project.id}>
-            <ScopeListItem scope={project} onOpenModal={handleOpenModal} />
+            <ScopeGridRow scope={project} onOpenModal={handleOpenModal} />
             {/* Nested children */}
             {childrenByParent[project.id]?.map((child) => (
-              <ScopeListItem key={child.id} scope={child} isNested onOpenModal={handleOpenModal} />
+              <ScopeGridRow key={child.id} scope={child} isNested onOpenModal={handleOpenModal} />
             ))}
             {/* Add child project */}
             <AddScopeInput type="project" parentId={project.id} />

@@ -80,7 +80,7 @@ export function PageShell({ children }: PageShellProps) {
 
           {/* Page content - constrained to max-w-5xl */}
           <main className="flex-1 overflow-auto">
-            <div className="mx-auto max-w-5xl">{children}</div>
+            <div className="mx-auto h-full max-w-5xl">{children}</div>
           </main>
         </div>
       </div>

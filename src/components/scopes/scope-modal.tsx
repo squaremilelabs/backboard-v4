@@ -1,18 +1,27 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useIsMobile } from "@/hooks/use-media-query"
 import { updateScopeTitle, archiveScope } from "@/lib/scope-mutations"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,26 +42,45 @@ interface ScopeModalProps {
 
 export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
   const isMobile = useIsMobile()
-  const [title, setTitle] = useState(scope?.title ?? "")
+  const [title, setTitle] = useState("")
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+  const titleInputRef = useRef<HTMLInputElement>(null)
 
-  // Sync title when scope changes
-  const handleOpenChange = (newOpen: boolean) => {
-    if (newOpen && scope) {
+  // Sync title when modal opens or scope changes
+  useEffect(() => {
+    if (open && scope) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTitle(scope.title)
+      setIsEditingTitle(false)
     }
-    onOpenChange(newOpen)
+  }, [open, scope])
+
+  // Focus input when entering edit mode
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current) {
+      titleInputRef.current.focus()
+      titleInputRef.current.select()
+    }
+  }, [isEditingTitle])
+
+  const handleTitleSave = async () => {
+    if (!scope) return
+    const trimmed = title.trim()
+    if (trimmed && trimmed !== scope.title) {
+      await updateScopeTitle(scope.id, trimmed)
+    } else {
+      setTitle(scope.title) // Reset if empty or unchanged
+    }
+    setIsEditingTitle(false)
   }
 
-  const handleSave = async () => {
-    if (!scope || !title.trim()) return
-    setIsSaving(true)
-    try {
-      await updateScopeTitle(scope.id, title.trim())
-      onOpenChange(false)
-    } finally {
-      setIsSaving(false)
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleTitleSave()
+    } else if (e.key === "Escape") {
+      setTitle(scope?.title ?? "")
+      setIsEditingTitle(false)
     }
   }
 
@@ -64,39 +92,62 @@ export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
   }
 
   const typeLabel = scope?.type === "job" ? "Job" : "Project"
+  const isJob = scope?.type === "job"
+  const isNested = !!scope?.parentId
 
-  const content = (
-    <>
-      <div className="space-y-4 py-4">
-        <div className="space-y-2">
-          <label htmlFor="scope-title" className="text-sm font-medium">
-            Title
-          </label>
+  // Dot style: jobs = filled, projects parent = hollow, projects child = filled
+  const dotStyle = isJob
+    ? "bg-primary"
+    : isNested
+      ? "bg-primary"
+      : "border-2 border-primary bg-transparent"
+
+  // Click-to-edit title component (used as modal header)
+  const editableTitle = (
+    <div className="flex min-w-0 items-center gap-2">
+      {/* Colored dot indicator */}
+      <div className={cn("h-3 w-3 shrink-0 rounded-full", dotStyle)} />
+
+      {/* Editable title */}
+      <div className="min-w-0 flex-1">
+        {isEditingTitle ? (
           <Input
-            id="scope-title"
+            ref={titleInputRef}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            onBlur={handleTitleSave}
+            onKeyDown={handleTitleKeyDown}
             placeholder={`${typeLabel} title`}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSave()
-              }
-            }}
+            className="text-lg font-semibold"
           />
-        </div>
-
-        {/* Placeholder for future rich text content */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Notes</label>
-          <div
-            className="rounded-md border border-dashed p-4 text-center text-sm
-              text-muted-foreground"
+        ) : (
+          <h2
+            onClick={() => setIsEditingTitle(true)}
+            className={cn(
+              "-mx-1 cursor-text truncate rounded px-1 text-lg font-semibold",
+              "transition-colors hover:bg-muted/50",
+              !title && "text-muted-foreground"
+            )}
           >
-            Rich text notes coming soon
-          </div>
+            {title || `Untitled ${typeLabel}`}
+          </h2>
+        )}
+      </div>
+    </div>
+  )
+
+  const content = (
+    <div className="flex-1 space-y-4 py-4">
+      {/* Placeholder for future rich text content */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-muted-foreground">Notes</label>
+        <div
+          className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground"
+        >
+          Rich text notes coming soon
         </div>
       </div>
-    </>
+    </div>
   )
 
   const footer = (
@@ -104,14 +155,9 @@ export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
       <Button variant="destructive" onClick={() => setShowArchiveConfirm(true)}>
         Archive
       </Button>
-      <div className="flex gap-2">
-        <Button variant="outline" onClick={() => onOpenChange(false)}>
-          Cancel
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving || !title.trim()}>
-          {isSaving ? "Saving..." : "Save"}
-        </Button>
-      </div>
+      <Button variant="outline" onClick={() => onOpenChange(false)}>
+        Done
+      </Button>
     </div>
   )
 
@@ -137,10 +183,14 @@ export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
   if (isMobile) {
     return (
       <>
-        <Sheet open={open} onOpenChange={handleOpenChange}>
-          <SheetContent side="bottom" className="h-full">
+        <Sheet open={open} onOpenChange={onOpenChange}>
+          <SheetContent side="bottom" className="flex h-full flex-col px-6">
             <SheetHeader>
-              <SheetTitle>Edit {typeLabel}</SheetTitle>
+              <SheetTitle className="sr-only">Edit {typeLabel}</SheetTitle>
+              <SheetDescription className="sr-only">
+                Edit the title and notes for this {typeLabel.toLowerCase()}
+              </SheetDescription>
+              {editableTitle}
             </SheetHeader>
             {content}
             <SheetFooter className="mt-auto">{footer}</SheetFooter>
@@ -153,10 +203,14 @@ export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
 
   return (
     <>
-      <Dialog open={open} onOpenChange={handleOpenChange}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit {typeLabel}</DialogTitle>
+            <DialogTitle className="sr-only">Edit {typeLabel}</DialogTitle>
+            <DialogDescription className="sr-only">
+              Edit the title and notes for this {typeLabel.toLowerCase()}
+            </DialogDescription>
+            {editableTitle}
           </DialogHeader>
           {content}
           <DialogFooter>{footer}</DialogFooter>
