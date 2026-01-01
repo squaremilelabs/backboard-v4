@@ -116,7 +116,7 @@ Key changes:
   {/* Below header */}
   <div className="flex pt-9 h-full w-full">
     {/* Sidebar - flat, no border */}
-    <aside className="w-56 flex-shrink-0">
+    <aside className="w-56 shrink-0">
       <nav className="p-2">...</nav>
     </aside>
 

@@ -184,7 +184,10 @@ export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
     return (
       <>
         <Sheet open={open} onOpenChange={onOpenChange}>
-          <SheetContent side="bottom" className="flex h-full flex-col px-6">
+          <SheetContent
+            side="bottom"
+            className={cn("flex h-full flex-col px-6", isJob ? "theme-gold" : "theme-blue")}
+          >
             <SheetHeader>
               <SheetTitle className="sr-only">Edit {typeLabel}</SheetTitle>
               <SheetDescription className="sr-only">
@@ -204,7 +207,7 @@ export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className={cn("sm:max-w-md", isJob ? "theme-gold" : "theme-blue")}>
           <DialogHeader>
             <DialogTitle className="sr-only">Edit {typeLabel}</DialogTitle>
             <DialogDescription className="sr-only">

@@ -34,55 +34,42 @@ export function PageShell({ children }: PageShellProps) {
   }
 
   return (
-    <div className="flex h-screen bg-muted/30">
-      {/* Centered container: sidebar + content (max 1024px) */}
-      <div className="mx-auto flex h-full w-full max-w-[1280px]">
-        {/* Desktop sidebar - hidden on mobile, animates width */}
+    <div className="flex h-screen flex-col bg-muted/30">
+      {/* Minimal flat header - 36px, spans full width */}
+      <header className="flex h-9 shrink-0 items-center gap-2 px-3">
+        {/* Mobile: hamburger menu */}
+        <div className="md:hidden">
+          <MobileNav />
+        </div>
+
+        {/* Desktop: sidebar toggle */}
         <div
           className={cn(
             "hidden transition-opacity duration-200 md:block",
             isHydrated ? "opacity-100" : "opacity-0"
           )}
         >
-          <AppSidebar isCollapsed={isCollapsed} onToggle={toggleSidebar} />
+          <SidebarToggle isCollapsed={isCollapsed} onToggle={toggleSidebar} />
         </div>
 
-        {/* Main content area - fills available width up to max-w-5xl */}
-        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          {/* Header - always visible, content varies by screen size */}
-          <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
-            {/* Mobile: hamburger menu */}
-            <div className="md:hidden">
-              <MobileNav />
-            </div>
+        {/* Logotype */}
+        <span className="text-sm font-semibold">Backboard</span>
+      </header>
 
-            {/* Desktop: sidebar toggle (when collapsed) */}
-            <div
-              className={cn(
-                "hidden transition-opacity duration-200 md:block",
-                isHydrated && isCollapsed ? "opacity-100" : "pointer-events-none opacity-0"
-              )}
-            >
-              <SidebarToggle isCollapsed={isCollapsed} onToggle={toggleSidebar} />
-            </div>
-
-            {/* Title - visible when sidebar is collapsed or on mobile */}
-            <span
-              className={cn(
-                "hidden font-semibold transition-opacity duration-200 md:block",
-                isCollapsed ? "opacity-100" : "opacity-0"
-              )}
-            >
-              Backboard
-            </span>
-            <span className="font-semibold md:hidden">Backboard</span>
-          </header>
-
-          {/* Page content - constrained to max-w-5xl */}
-          <main className="flex-1 overflow-auto">
-            <div className="mx-auto h-full max-w-5xl">{children}</div>
-          </main>
+      {/* Main area: sidebar + content */}
+      <div className="flex min-h-0 flex-1">
+        {/* Desktop sidebar - flat, no border */}
+        <div
+          className={cn(
+            "hidden transition-opacity duration-200 md:block",
+            isHydrated ? "opacity-100" : "opacity-0"
+          )}
+        >
+          <AppSidebar isCollapsed={isCollapsed} />
         </div>
+
+        {/* Content area - pages decide their own card styling */}
+        <main className="min-w-0 flex-1 p-3 pt-0">{children}</main>
       </div>
     </div>
   )

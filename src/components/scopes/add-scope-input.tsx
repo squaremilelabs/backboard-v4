@@ -4,23 +4,18 @@ import { useState, useRef } from "react"
 import { Plus } from "lucide-react"
 import { createScope } from "@/lib/scope-mutations"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { ScopeType } from "@/lib/db"
 
 interface AddScopeInputProps {
   type: ScopeType
   parentId?: string
-  placeholder?: string
 }
 
-export function AddScopeInput({ type, parentId, placeholder }: AddScopeInputProps) {
+export function AddScopeInput({ type, parentId }: AddScopeInputProps) {
   const [isAdding, setIsAdding] = useState(false)
   const [value, setValue] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
-
-  const typeLabel = type === "job" ? "job" : "project"
-  const defaultPlaceholder = parentId ? `Add sub-${typeLabel}...` : `Add ${typeLabel}...`
 
   const handleSubmit = async () => {
     if (!value.trim()) {
@@ -45,32 +40,36 @@ export function AddScopeInput({ type, parentId, placeholder }: AddScopeInputProp
 
   if (!isAdding) {
     return (
-      <Button
-        variant="ghost"
-        size="sm"
-        className={cn("w-full justify-start gap-2 text-muted-foreground", parentId && "ml-6")}
+      <button
         onClick={() => {
           setIsAdding(true)
-          // Focus after state update
           setTimeout(() => inputRef.current?.focus(), 0)
         }}
+        className={cn(
+          `flex w-56 items-center gap-2 px-4 py-2 text-sm text-muted-foreground transition-colors
+          hover:text-foreground`,
+          parentId && "pl-8"
+        )}
       >
-        <Plus className="h-4 w-4" />
-        {placeholder ?? defaultPlaceholder}
-      </Button>
+        <Plus className="h-3.5 w-3.5" />
+        <span>Add</span>
+      </button>
     )
   }
 
   return (
-    <div className={cn("px-3 py-1", parentId && "ml-6")}>
+    <div className={cn("w-56 px-4 py-1", parentId && "pl-8")}>
       <Input
         ref={inputRef}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={handleSubmit}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder ?? defaultPlaceholder}
-        className="h-8"
+        placeholder={
+          parentId ? "Sub-project name..." : `${type === "job" ? "Job" : "Project"} name...`
+        }
+        className="h-7 border-transparent bg-transparent px-2 shadow-none focus-visible:border-muted
+          focus-visible:ring-0"
       />
     </div>
   )

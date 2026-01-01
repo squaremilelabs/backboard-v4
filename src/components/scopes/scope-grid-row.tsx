@@ -75,7 +75,7 @@ export function ScopeGridRow({ scope, isNested = false, onOpenModal }: ScopeGrid
   return (
     <div
       className={cn(
-        "group flex min-w-0 items-center transition-colors hover:bg-accent",
+        "group flex min-w-0 items-center transition-colors hover:bg-muted/50",
         isMobile && "cursor-pointer"
       )}
       onClick={handleRowClick}
@@ -83,8 +83,8 @@ export function ScopeGridRow({ scope, isNested = false, onOpenModal }: ScopeGrid
       {/* Title cell - fixed width, sticky on scroll */}
       <div
         className={cn(
-          "sticky left-0 z-10 flex w-72 shrink-0 items-center gap-2 bg-background px-3 py-2",
-          "group-hover:bg-accent"
+          "sticky left-0 z-10 flex w-2xs shrink-0 items-center gap-2 px-4 py-2",
+          "bg-background group-hover:bg-muted/50"
         )}
       >
         {/* Indentation for nested items */}
@@ -108,8 +108,8 @@ export function ScopeGridRow({ scope, isNested = false, onOpenModal }: ScopeGrid
             <span
               onClick={handleTitleClick}
               className={cn(
-                "block truncate text-sm font-medium",
-                !isMobile && "-mx-1 cursor-text rounded px-1 hover:bg-muted/50"
+                "block truncate text-sm",
+                !isMobile && "-mx-1 cursor-text rounded px-1 hover:bg-muted"
               )}
             >
               {scope.title}
@@ -136,14 +136,14 @@ export function ScopeGridRow({ scope, isNested = false, onOpenModal }: ScopeGrid
 
       {/* Grid cells - desktop only */}
       {!isMobile && (
-        <div className="flex flex-1 items-center gap-2 px-2 py-2">
+        <div className="flex flex-1 items-center">
           {Array.from({ length: cellCount }).map((_, i) => (
-            <div
-              key={i}
-              className="h-8 flex-1 rounded border border-dashed border-muted-foreground/30
-                transition-colors hover:border-primary/50 hover:bg-muted/30"
-              title="Coming soon"
-            />
+            <div key={i} className="flex-1 px-1 py-1">
+              <div
+                className="h-8 rounded border border-dashed border-muted-foreground/20"
+                title="Coming soon"
+              />
+            </div>
           ))}
         </div>
       )}

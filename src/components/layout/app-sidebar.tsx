@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { SidebarToggle } from "./sidebar-toggle"
 import { cn } from "@/lib/utils"
 
 const mainNavItems = [
@@ -25,10 +24,10 @@ function NavItem({ href, label, isActive }: NavItemProps) {
     <Link
       href={href}
       className={cn(
-        "block rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors",
+        "block rounded-xl border-2 border-transparent px-3 py-1.5 text-sm transition-colors",
         isActive
-          ? "bg-secondary text-secondary-foreground"
-          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          ? "border-border bg-background font-bold text-foreground"
+          : "text-muted-foreground hover:bg-background hover:text-foreground"
       )}
     >
       {label}
@@ -38,27 +37,20 @@ function NavItem({ href, label, isActive }: NavItemProps) {
 
 interface AppSidebarProps {
   isCollapsed: boolean
-  onToggle: () => void
 }
 
-export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
+export function AppSidebar({ isCollapsed }: AppSidebarProps) {
   const pathname = usePathname()
 
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r bg-background transition-[width] duration-200 ease-in-out",
-        isCollapsed ? "w-0 overflow-hidden border-r-0" : "w-64"
+        "flex h-full flex-col transition-[width] duration-200 ease-in-out",
+        isCollapsed ? "w-0 overflow-hidden" : "w-2xs"
       )}
     >
-      {/* Header with toggle */}
-      <div className="flex h-14 min-w-64 items-center justify-between border-b px-4">
-        <span className="font-semibold">Backboard</span>
-        <SidebarToggle isCollapsed={isCollapsed} onToggle={onToggle} />
-      </div>
-
       {/* Main navigation */}
-      <nav className="min-w-64 flex-1 space-y-1 p-4">
+      <nav className="min-w-52 flex-1 space-y-0.5 px-3 py-2">
         {mainNavItems.map((item) => (
           <NavItem
             key={item.href}
@@ -69,8 +61,8 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
         ))}
       </nav>
 
-      {/* Secondary navigation (Archive) */}
-      <nav className="min-w-64 border-t p-4">
+      {/* Secondary navigation (Archive) - spacing instead of border */}
+      <nav className="min-w-52 px-3 pt-6 pb-3">
         {secondaryNavItems.map((item) => (
           <NavItem
             key={item.href}

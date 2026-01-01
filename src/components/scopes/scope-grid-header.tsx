@@ -1,7 +1,6 @@
 "use client"
 
 import { useIsMobile } from "@/hooks/use-media-query"
-import { cn } from "@/lib/utils"
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const
 
@@ -32,16 +31,16 @@ export function ScopeGridHeader({ type }: ScopeGridHeaderProps) {
   const columns = isJobs ? WEEKDAYS : getNext6Months()
 
   return (
-    <div className={cn("flex items-center border-b text-sm font-medium text-muted-foreground")}>
+    <div className="flex shrink-0 items-center border-b text-sm text-muted-foreground">
       {/* Title column header - fixed width, sticky */}
-      <div className="sticky left-0 z-10 w-72 shrink-0 bg-background px-3 py-2">
+      <div className="sticky left-0 z-10 w-2xs shrink-0 px-4 py-3 font-medium">
         {isJobs ? "Jobs" : "Projects"}
       </div>
 
       {/* Column headers */}
-      <div className="flex flex-1 items-center gap-2 px-2 py-2">
+      <div className="flex flex-1 items-center">
         {columns.map((label) => (
-          <div key={label} className="flex-1 text-center">
+          <div key={label} className="flex-1 px-1 py-2 text-center">
             {label}
           </div>
         ))}
