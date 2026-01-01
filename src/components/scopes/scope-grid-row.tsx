@@ -136,7 +136,7 @@ export function ScopeGridRow({ scope, isNested = false, onOpenModal }: ScopeGrid
 
       {/* Grid cells - desktop only */}
       {!isMobile && (
-        <div className="flex flex-1 items-center">
+        <div className="flex flex-1 items-center px-2">
           {Array.from({ length: cellCount }).map((_, i) => (
             <div key={i} className="flex-1 px-1 py-1">
               <div

@@ -38,7 +38,7 @@ export function ScopeGridHeader({ type }: ScopeGridHeaderProps) {
       </div>
 
       {/* Column headers */}
-      <div className="flex flex-1 items-center">
+      <div className="flex flex-1 items-center px-2">
         {columns.map((label) => (
           <div key={label} className="flex-1 px-1 py-2 text-center">
             {label}

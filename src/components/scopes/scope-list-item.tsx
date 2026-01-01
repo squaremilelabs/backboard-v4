@@ -63,7 +63,7 @@ export function ScopeListItem({ scope, isNested = false, onOpenModal }: ScopeLis
   return (
     <div
       className={cn(
-        "group flex min-w-0 items-center gap-2 rounded-md px-3 py-2 transition-colors",
+        "group flex min-w-0 items-center gap-2 rounded-md px-4 py-2 transition-colors",
         "hover:bg-accent",
         isNested && "ml-6",
         isMobile && "cursor-pointer"
