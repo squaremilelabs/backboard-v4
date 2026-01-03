@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { SidebarToggle } from "./sidebar-toggle"
 import { cn } from "@/lib/utils"
 
 const mainNavItems = [
@@ -36,29 +35,18 @@ function NavItem({ href, label, isActive }: NavItemProps) {
   )
 }
 
-interface AppSidebarProps {
-  isCollapsed: boolean
-  onToggle: () => void
-}
-
-export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
+export function AppSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside
-      className={cn(
-        "flex h-full flex-col transition-[width] duration-200 ease-in-out",
-        isCollapsed ? "w-0 overflow-hidden" : "w-70"
-      )}
-    >
-      {/* Header with toggle + logotype */}
-      <div className="flex h-9 min-w-70 items-center gap-2 px-3">
-        <SidebarToggle isCollapsed={isCollapsed} onToggle={onToggle} />
+    <aside className="flex h-full w-72 flex-col">
+      {/* Logotype */}
+      <div className="flex h-12 items-center px-4">
         <span className="text-sm font-semibold">Backboard</span>
       </div>
 
       {/* Main navigation */}
-      <nav className="min-w-70 flex-1 space-y-0.5 px-3 py-2">
+      <nav className="flex-1 space-y-0.5 px-3 py-2">
         {mainNavItems.map((item) => (
           <NavItem
             key={item.href}
@@ -69,8 +57,8 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
         ))}
       </nav>
 
-      {/* Secondary navigation (Archive) - spacing instead of border */}
-      <nav className="min-w-70 px-3 pt-6 pb-3">
+      {/* Secondary navigation (Archive) */}
+      <nav className="px-3 pt-6 pb-3">
         {secondaryNavItems.map((item) => (
           <NavItem
             key={item.href}
