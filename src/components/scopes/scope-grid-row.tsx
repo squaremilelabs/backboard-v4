@@ -128,14 +128,15 @@ export function ScopeGridRow({
   }
 
   return (
-    <div
-      className={cn("group flex min-w-0 items-center", isMobile && "cursor-pointer")}
-      onClick={handleRowClick}
-    >
-      {/* Title cell - fixed width, sticky on scroll */}
+    <div className="group flex min-w-0 items-center">
+      {/* Title cell - fixed width, sticky on scroll, clickable on mobile */}
       <div
-        className="sticky left-0 z-10 flex w-3xs shrink-0 items-center gap-2 bg-background px-4 py-2
-          lg:w-2xs"
+        className={cn(
+          `sticky left-0 z-10 flex w-3xs shrink-0 items-center gap-2 bg-background px-4 py-2
+          lg:w-2xs`,
+          isMobile && "cursor-pointer"
+        )}
+        onClick={handleRowClick}
       >
         {/* Indentation for nested items */}
         {isNested && <div className="w-4 shrink-0" />}
