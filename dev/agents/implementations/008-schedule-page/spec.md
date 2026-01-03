@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **ID** | 008 |
-| **Status** | 🔵 Ready |
-| **Progress** | — |
+| **Status** | 🟢 In Progress |
+| **Progress** | Step 6 of 8 complete |
 | **Created** | 2026-01-03 |
 | **Last Updated** | 2026-01-03 |
 
@@ -65,11 +65,12 @@ Read these before implementing:
 
 Files this implementation will create or modify:
 
-- [ ] `src/lib/schedule-mutations.ts` — Add: `toggleScheduleSlot` function
-- [ ] `src/hooks/use-schedule-slots.ts` — Add: `useScheduleSlots`, `getNext7Days` helper
-- [ ] `src/app/schedule/page.tsx` — Rewrite: Full schedule grid implementation
-- [ ] `src/components/schedule/schedule-grid-header.tsx` — Create: Header with date columns
-- [ ] `src/components/schedule/schedule-grid-row.tsx` — Create: Scope row with schedule cells
+- [x] `src/lib/schedule-mutations.ts` — Add: `toggleScheduleSlot` function
+- [x] `src/hooks/use-schedule-slots.ts` — Add: `useScheduleSlots`, `getNext7Days` helper
+- [x] `src/hooks/use-scopes.ts` — Add: `useScheduleScopes` hook
+- [x] `src/app/schedule/page.tsx` — Rewrite: Full schedule grid implementation
+- [x] `src/components/schedule/schedule-grid-header.tsx` — Create: Header with date columns
+- [x] `src/components/schedule/schedule-grid-row.tsx` — Create: Scope row with schedule cells
 
 ---
 
