@@ -21,13 +21,12 @@ export function ScheduleCell({ state, onClick }: ScheduleCellProps) {
       type="button"
       onClick={onClick}
       className={cn(
-        "group/cell relative flex h-8 w-full items-center justify-center rounded transition-colors",
+        `group/cell relative flex h-8 w-full items-center justify-center rounded-xl
+        transition-colors`,
         // Empty: dashed gray border
-        isEmpty &&
-          `border border-dashed border-muted-foreground/20 hover:border-primary/50
-          hover:bg-primary/10`,
+        isEmpty && "border border-muted-foreground/20 hover:border-primary/50 hover:bg-primary/10",
         // Default: solid primary border (indicates default-scheduled but not selected)
-        isDefault && "border-2 border-primary hover:bg-primary/10",
+        isDefault && "border border-primary/50 hover:bg-primary/10",
         // Active: filled
         isActive && "bg-primary hover:bg-primary/80",
         // Inherited: secondary fill
