@@ -70,3 +70,37 @@ export function getNext6Months(): Array<{ key: string; label: string }> {
   }
   return months
 }
+
+/**
+ * Get all ScheduleSlots as a Set of "scopeId:date" keys for O(1) lookup
+ */
+export function useScheduleSlots(): Set<string> | undefined {
+  const slots = useLiveQuery(() => db.scheduleSlots.toArray())
+
+  if (slots === undefined) return undefined
+
+  return new Set(slots.map((s) => `${s.scopeId}:${s.date}`))
+}
+
+/**
+ * Get next 7 days starting from today
+ * Returns array of { key: "YYYY-MM-DD", label: "Mon, Jan 5", month: "YYYY-MM" }
+ */
+export function getNext7Days(): Array<{ key: string; label: string; month: string }> {
+  const days: Array<{ key: string; label: string; month: string }> = []
+  const now = new Date()
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i)
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+    const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+    const label = date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    })
+    days.push({ key, label, month })
+  }
+
+  return days
+}
