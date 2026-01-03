@@ -7,7 +7,9 @@ interface ContentPanelProps {
 
 export function ContentPanel({ children, className }: ContentPanelProps) {
   return (
-    <div className={cn("h-full overflow-hidden rounded-xl border-2 bg-background", className)}>
+    <div
+      className={cn("h-full w-full overflow-hidden rounded-xl border-2 bg-background", className)}
+    >
       {children}
     </div>
   )
