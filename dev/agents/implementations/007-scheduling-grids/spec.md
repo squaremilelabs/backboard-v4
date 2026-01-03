@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **ID** | 007 |
-| **Status** | 🔵 Ready |
-| **Progress** | — |
+| **Status** | 🟢 In Progress |
+| **Progress** | Step 1 of 8 |
 | **Created** | 2026-01-03 |
 | **Last Updated** | 2026-01-03 |
 
@@ -64,7 +64,7 @@ Read these before implementing:
 
 Files this implementation will create or modify:
 
-- [ ] `src/lib/schedule-mutations.ts` — Create: CRUD functions for DefaultScheduleSlot and MonthSlot
+- [x] `src/lib/schedule-mutations.ts` — Create: CRUD functions for DefaultScheduleSlot and MonthSlot ✅
 - [ ] `src/hooks/use-schedule-slots.ts` — Create: Dexie live queries for schedule data
 - [ ] `src/components/scopes/schedule-cell.tsx` — Create: Reusable toggle cell with hover states
 - [ ] `src/components/scopes/scope-grid-header.tsx` — Modify: Add min-width, enable on mobile
