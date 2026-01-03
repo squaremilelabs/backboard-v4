@@ -43,3 +43,32 @@ export async function toggleMonthSlot(
     })
   }
 }
+
+// ============================================================================
+// ScheduleSlot (7-day schedule)
+// ============================================================================
+
+export async function toggleScheduleSlot(
+  scopeId: string,
+  date: string // YYYY-MM-DD
+): Promise<void> {
+  // Check if slot exists
+  const existing = await db.scheduleSlots.where("[date+scopeId]").equals([date, scopeId]).first()
+
+  if (existing) {
+    await db.scheduleSlots.delete(existing.id)
+  } else {
+    // Derive weekday from date
+    const dateObj = new Date(date + "T00:00:00")
+    const weekdayIndex = dateObj.getDay() // 0 = Sunday
+    const weekdays: Weekday[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+    const weekday = weekdays[weekdayIndex]
+
+    await db.scheduleSlots.add({
+      id: crypto.randomUUID(),
+      date,
+      weekday,
+      scopeId,
+    })
+  }
+}
