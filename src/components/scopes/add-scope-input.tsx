@@ -46,8 +46,8 @@ export function AddScopeInput({ type, parentId }: AddScopeInputProps) {
           setTimeout(() => inputRef.current?.focus(), 0)
         }}
         className={cn(
-          `flex w-56 items-center gap-2 px-4 py-2 text-sm text-muted-foreground transition-colors
-          hover:text-foreground`,
+          `sticky left-0 flex w-3xs items-center gap-2 bg-background px-4 py-2 text-sm
+          text-muted-foreground transition-colors hover:text-foreground lg:w-2xs`,
           parentId && "pl-8"
         )}
       >
@@ -58,7 +58,7 @@ export function AddScopeInput({ type, parentId }: AddScopeInputProps) {
   }
 
   return (
-    <div className={cn("w-56 px-4 py-1", parentId && "pl-8")}>
+    <div className={cn("sticky left-0 w-3xs bg-background px-4 py-1 lg:w-2xs", parentId && "pl-8")}>
       <Input
         ref={inputRef}
         value={value}

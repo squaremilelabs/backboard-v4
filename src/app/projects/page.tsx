@@ -8,12 +8,14 @@ export default function ProjectsPage() {
   return (
     <ContentPanel>
       <div className="theme-blue flex h-full flex-col">
-        {/* Grid header with month columns */}
-        <ScopeGridHeader type="projects" />
-
-        {/* Scrollable project list with grid rows */}
+        {/* Single scroll container for both header and content */}
         <div className="flex-1 overflow-auto">
-          <ScopeList type="project" />
+          <div className="min-w-fit">
+            {/* Sticky header row */}
+            <ScopeGridHeader type="projects" />
+            {/* Content rows */}
+            <ScopeList type="project" />
+          </div>
         </div>
       </div>
     </ContentPanel>

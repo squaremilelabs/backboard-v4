@@ -1,46 +1,34 @@
 "use client"
 
-import { useIsMobile } from "@/hooks/use-media-query"
-
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const
-
-// Get next 6 months starting from current month
-function getNext6Months(): string[] {
-  const months: string[] = []
-  const now = new Date()
-  for (let i = 0; i < 6; i++) {
-    const date = new Date(now.getFullYear(), now.getMonth() + i, 1)
-    months.push(date.toLocaleString("en-US", { month: "short" }))
-  }
-  return months
-}
+import { WEEKDAY_LABELS, WEEKDAYS, getNext6Months } from "@/hooks/use-schedule-slots"
 
 interface ScopeGridHeaderProps {
   type: "jobs" | "projects"
 }
 
 export function ScopeGridHeader({ type }: ScopeGridHeaderProps) {
-  const isMobile = useIsMobile()
-
-  // Don't show header on mobile (no grid columns)
-  if (isMobile) {
-    return null
-  }
-
   const isJobs = type === "jobs"
-  const columns = isJobs ? WEEKDAYS : getNext6Months()
+
+  const columns = isJobs
+    ? WEEKDAYS.map((w) => ({ key: w, label: WEEKDAY_LABELS[w] }))
+    : getNext6Months()
 
   return (
-    <div className="flex shrink-0 items-center border-b text-sm text-muted-foreground">
+    <div
+      className="sticky top-0 z-20 flex shrink-0 items-center border-b bg-background text-sm
+        text-muted-foreground"
+    >
       {/* Title column header - fixed width, sticky */}
-      <div className="sticky left-0 z-10 w-2xs shrink-0 px-4 py-3 font-medium">
+      <div
+        className="sticky left-0 z-10 w-3xs shrink-0 bg-background px-4 py-3 font-medium lg:w-2xs"
+      >
         {isJobs ? "Jobs" : "Projects"}
       </div>
 
-      {/* Column headers */}
+      {/* Column headers - min width enforced */}
       <div className="flex flex-1 items-center px-2">
-        {columns.map((label) => (
-          <div key={label} className="flex-1 px-1 py-2 text-center">
+        {columns.map(({ key, label }) => (
+          <div key={key} className="min-w-18 flex-1 px-1 py-2 text-center">
             {label}
           </div>
         ))}

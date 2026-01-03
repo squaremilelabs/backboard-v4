@@ -8,12 +8,14 @@ export default function JobsPage() {
   return (
     <ContentPanel>
       <div className="theme-gold flex h-full flex-col">
-        {/* Grid header with day columns */}
-        <ScopeGridHeader type="jobs" />
-
-        {/* Scrollable job list with grid rows */}
+        {/* Single scroll container for both header and content */}
         <div className="flex-1 overflow-auto">
-          <ScopeList type="job" />
+          <div className="min-w-fit">
+            {/* Sticky header row */}
+            <ScopeGridHeader type="jobs" />
+            {/* Content rows */}
+            <ScopeList type="job" />
+          </div>
         </div>
       </div>
     </ContentPanel>

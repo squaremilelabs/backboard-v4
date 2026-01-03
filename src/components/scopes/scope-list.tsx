@@ -6,6 +6,7 @@ import { AddScopeInput } from "./add-scope-input"
 import { ScopeGridRow } from "./scope-grid-row"
 import { ScopeModal } from "./scope-modal"
 import { useScopes } from "@/hooks/use-scopes"
+import { useDefaultScheduleSlots, useMonthSlots } from "@/hooks/use-schedule-slots"
 import type { Scope, ScopeType } from "@/lib/db"
 
 interface ScopeListProps {
@@ -14,6 +15,8 @@ interface ScopeListProps {
 
 export function ScopeList({ type }: ScopeListProps) {
   const scopes = useScopes(type)
+  const defaultScheduleSlots = useDefaultScheduleSlots()
+  const monthSlots = useMonthSlots()
   const [modalScope, setModalScope] = useState<Scope | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -34,13 +37,17 @@ export function ScopeList({ type }: ScopeListProps) {
   }
 
   // For jobs: simple flat list
-  // For projects: group by parent/child
   if (type === "job") {
     return (
       <>
         <div className="flex flex-col">
           {scopes.map((scope) => (
-            <ScopeGridRow key={scope.id} scope={scope} onOpenModal={handleOpenModal} />
+            <ScopeGridRow
+              key={scope.id}
+              scope={scope}
+              onOpenModal={handleOpenModal}
+              defaultScheduleSlots={defaultScheduleSlots}
+            />
           ))}
           <AddScopeInput type="job" />
         </div>
@@ -68,17 +75,33 @@ export function ScopeList({ type }: ScopeListProps) {
   return (
     <>
       <div className="flex flex-col">
-        {parentProjects.map((project) => (
-          <div key={project.id}>
-            <ScopeGridRow scope={project} onOpenModal={handleOpenModal} />
-            {/* Nested children */}
-            {childrenByParent[project.id]?.map((child) => (
-              <ScopeGridRow key={child.id} scope={child} isNested onOpenModal={handleOpenModal} />
-            ))}
-            {/* Add child project */}
-            <AddScopeInput type="project" parentId={project.id} />
-          </div>
-        ))}
+        {parentProjects.map((project) => {
+          const children = childrenByParent[project.id] || []
+          const childIds = children.map((c) => c.id)
+
+          return (
+            <div key={project.id}>
+              <ScopeGridRow
+                scope={project}
+                onOpenModal={handleOpenModal}
+                monthSlots={monthSlots}
+                childIds={childIds}
+              />
+              {/* Nested children */}
+              {children.map((child) => (
+                <ScopeGridRow
+                  key={child.id}
+                  scope={child}
+                  isNested
+                  onOpenModal={handleOpenModal}
+                  monthSlots={monthSlots}
+                />
+              ))}
+              {/* Add child project */}
+              <AddScopeInput type="project" parentId={project.id} />
+            </div>
+          )
+        })}
         <AddScopeInput type="project" />
       </div>
 

@@ -3,8 +3,8 @@
 | Field | Value |
 |-------|-------|
 | **ID** | 007 |
-| **Status** | 🟢 In Progress |
-| **Progress** | Step 1 of 8 |
+| **Status** | ✅ Complete |
+| **Progress** | 8 of 8 |
 | **Created** | 2026-01-03 |
 | **Last Updated** | 2026-01-03 |
 
@@ -65,12 +65,12 @@ Read these before implementing:
 Files this implementation will create or modify:
 
 - [x] `src/lib/schedule-mutations.ts` — Create: CRUD functions for DefaultScheduleSlot and MonthSlot ✅
-- [ ] `src/hooks/use-schedule-slots.ts` — Create: Dexie live queries for schedule data
-- [ ] `src/components/scopes/schedule-cell.tsx` — Create: Reusable toggle cell with hover states
-- [ ] `src/components/scopes/scope-grid-header.tsx` — Modify: Add min-width, enable on mobile
-- [ ] `src/components/scopes/scope-grid-row.tsx` — Modify: Replace placeholder cells with interactive ScheduleCell
-- [ ] `src/app/jobs/page.tsx` — Modify: Add scroll container structure for sticky positioning
-- [ ] `src/app/projects/page.tsx` — Modify: Add scroll container structure for sticky positioning
+- [x] `src/hooks/use-schedule-slots.ts` — Create: Dexie live queries for schedule data ✅
+- [x] `src/components/scopes/schedule-cell.tsx` — Create: Reusable toggle cell with hover states ✅
+- [x] `src/components/scopes/scope-grid-header.tsx` — Modify: Add min-width, enable on mobile, sticky header ✅
+- [x] `src/components/scopes/scope-grid-row.tsx` — Modify: Replace placeholder cells with interactive ScheduleCell ✅
+- [x] `src/app/jobs/page.tsx` — Modify: Add scroll container structure for sticky positioning ✅
+- [x] `src/app/projects/page.tsx` — Modify: Add scroll container structure for sticky positioning ✅
 
 ---
 

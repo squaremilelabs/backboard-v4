@@ -2,8 +2,11 @@
 
 import { useState, useRef, useEffect } from "react"
 import { MoreHorizontal } from "lucide-react"
+import { ScheduleCell } from "./schedule-cell"
 import { useIsMobile } from "@/hooks/use-media-query"
+import { WEEKDAYS, getNext6Months } from "@/hooks/use-schedule-slots"
 import { updateScopeTitle } from "@/lib/scope-mutations"
+import { toggleDefaultScheduleSlot, toggleMonthSlot } from "@/lib/schedule-mutations"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,9 +16,22 @@ interface ScopeGridRowProps {
   scope: Scope
   isNested?: boolean
   onOpenModal: (scope: Scope) => void
+  // For jobs: Set of "jobId:weekday" keys
+  defaultScheduleSlots?: Set<string>
+  // For projects: Set of "projectId:month" keys
+  monthSlots?: Set<string>
+  // For projects: child project IDs for inheritance calculation
+  childIds?: string[]
 }
 
-export function ScopeGridRow({ scope, isNested = false, onOpenModal }: ScopeGridRowProps) {
+export function ScopeGridRow({
+  scope,
+  isNested = false,
+  onOpenModal,
+  defaultScheduleSlots,
+  monthSlots,
+  childIds = [],
+}: ScopeGridRowProps) {
   const isMobile = useIsMobile()
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(scope.title)
@@ -69,23 +85,57 @@ export function ScopeGridRow({ scope, isNested = false, onOpenModal }: ScopeGrid
       ? "bg-primary"
       : "border-2 border-primary bg-transparent"
 
-  // Jobs have 7 columns (days), Projects have 6 columns (months)
-  const cellCount = isJob ? 7 : 6
+  // Calculate cell states and render cells
+  const renderCells = () => {
+    if (isJob) {
+      // Jobs: 7 weekday cells
+      return WEEKDAYS.map((weekday) => {
+        const key = `${scope.id}:${weekday}`
+        const isActive = defaultScheduleSlots?.has(key) ?? false
+
+        return (
+          <div key={weekday} className="min-w-18 flex-1 px-1 py-1">
+            <ScheduleCell
+              state={isActive ? "active" : "empty"}
+              onClick={() => toggleDefaultScheduleSlot(scope.id, weekday)}
+            />
+          </div>
+        )
+      })
+    } else {
+      // Projects: 6 month cells
+      const months = getNext6Months()
+      return months.map(({ key: month }) => {
+        const selfKey = `${scope.id}:${month}`
+        const isActive = monthSlots?.has(selfKey) ?? false
+
+        // Check for inherited state (parent with active children)
+        let isInherited = false
+        if (!isNested && !isActive && childIds.length > 0 && monthSlots) {
+          // Check if any child has this month active
+          isInherited = childIds.some((childId) => monthSlots.has(`${childId}:${month}`))
+        }
+
+        const state = isActive ? "active" : isInherited ? "inherited" : "empty"
+
+        return (
+          <div key={month} className="min-w-10 flex-1 px-1 py-1">
+            <ScheduleCell state={state} onClick={() => toggleMonthSlot(scope.id, month)} />
+          </div>
+        )
+      })
+    }
+  }
 
   return (
     <div
-      className={cn(
-        "group flex min-w-0 items-center transition-colors hover:bg-muted/50",
-        isMobile && "cursor-pointer"
-      )}
+      className={cn("group flex min-w-0 items-center", isMobile && "cursor-pointer")}
       onClick={handleRowClick}
     >
       {/* Title cell - fixed width, sticky on scroll */}
       <div
-        className={cn(
-          "sticky left-0 z-10 flex w-2xs shrink-0 items-center gap-2 px-4 py-2",
-          "bg-background group-hover:bg-muted/50"
-        )}
+        className="sticky left-0 z-10 flex w-3xs shrink-0 items-center gap-2 bg-background px-4 py-2
+          lg:w-2xs"
       >
         {/* Indentation for nested items */}
         {isNested && <div className="w-4 shrink-0" />}
@@ -134,19 +184,8 @@ export function ScopeGridRow({ scope, isNested = false, onOpenModal }: ScopeGrid
         )}
       </div>
 
-      {/* Grid cells - desktop only */}
-      {!isMobile && (
-        <div className="flex flex-1 items-center px-2">
-          {Array.from({ length: cellCount }).map((_, i) => (
-            <div key={i} className="flex-1 px-1 py-1">
-              <div
-                className="h-8 rounded border border-dashed border-muted-foreground/20"
-                title="Coming soon"
-              />
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Grid cells - now shown on all screen sizes */}
+      <div className="flex flex-1 items-center px-2">{renderCells()}</div>
     </div>
   )
 }
