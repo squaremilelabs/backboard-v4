@@ -3,7 +3,7 @@
 import { Plus, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-type CellState = "empty" | "active" | "inherited"
+type CellState = "empty" | "active" | "inherited" | "default"
 
 interface ScheduleCellProps {
   state: CellState
@@ -13,6 +13,7 @@ interface ScheduleCellProps {
 export function ScheduleCell({ state, onClick }: ScheduleCellProps) {
   const isActive = state === "active"
   const isInherited = state === "inherited"
+  const isDefault = state === "default"
   const isEmpty = state === "empty"
 
   return (
@@ -21,15 +22,19 @@ export function ScheduleCell({ state, onClick }: ScheduleCellProps) {
       onClick={onClick}
       className={cn(
         "group/cell relative flex h-8 w-full items-center justify-center rounded transition-colors",
-        // Base states
+        // Empty: dashed gray border
         isEmpty &&
           `border border-dashed border-muted-foreground/20 hover:border-primary/50
           hover:bg-primary/10`,
+        // Default: solid primary border (indicates default-scheduled but not selected)
+        isDefault && "border-2 border-primary hover:bg-primary/10",
+        // Active: filled
         isActive && "bg-primary hover:bg-primary/80",
+        // Inherited: secondary fill
         isInherited && "bg-secondary hover:bg-secondary/80"
       )}
     >
-      {/* Hover icon: Plus for empty/inherited, X for active */}
+      {/* Hover icon: Plus for empty/default/inherited, X for active */}
       <span
         className={cn(
           "opacity-0 transition-opacity group-hover/cell:opacity-100",

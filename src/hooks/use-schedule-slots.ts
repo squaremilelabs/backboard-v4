@@ -84,11 +84,17 @@ export function useScheduleSlots(): Set<string> | undefined {
 
 /**
  * Get next 7 days starting from today
- * Returns array of { key: "YYYY-MM-DD", label: "Mon, Jan 5", month: "YYYY-MM" }
+ * Returns array of { key: "YYYY-MM-DD", label: "Mon, Jan 5", month: "YYYY-MM", weekday: Weekday }
  */
-export function getNext7Days(): Array<{ key: string; label: string; month: string }> {
-  const days: Array<{ key: string; label: string; month: string }> = []
+export function getNext7Days(): Array<{
+  key: string
+  label: string
+  month: string
+  weekday: Weekday
+}> {
+  const days: Array<{ key: string; label: string; month: string; weekday: Weekday }> = []
   const now = new Date()
+  const weekdayMap: Weekday[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i)
@@ -99,7 +105,8 @@ export function getNext7Days(): Array<{ key: string; label: string; month: strin
       month: "short",
       day: "numeric",
     })
-    days.push({ key, label, month })
+    const weekday = weekdayMap[date.getDay()]
+    days.push({ key, label, month, weekday })
   }
 
   return days

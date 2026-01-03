@@ -9,6 +9,8 @@ import type { Scope } from "@/lib/db"
 interface ScheduleGridRowProps {
   scope: Scope
   scheduleSlots?: Set<string>
+  /** Default schedule slots for jobs (jobId:weekday keys) */
+  defaultScheduleSlots?: Set<string>
   /** Whether this is a nested child project */
   isNested?: boolean
   /** Whether to show grid cells (false for inactive parent projects) */
@@ -18,6 +20,7 @@ interface ScheduleGridRowProps {
 export function ScheduleGridRow({
   scope,
   scheduleSlots,
+  defaultScheduleSlots,
   isNested = false,
   showCells = true,
 }: ScheduleGridRowProps) {
@@ -60,7 +63,7 @@ export function ScheduleGridRow({
 
       {/* Grid cells - only shown if showCells is true */}
       <div className="flex flex-1 items-center px-2">
-        {days.map(({ key: date }) => {
+        {days.map(({ key: date, weekday }) => {
           if (!showCells) {
             // Empty placeholder to maintain grid alignment
             return <div key={date} className="min-w-20 flex-1 px-1 py-1" />
@@ -69,12 +72,22 @@ export function ScheduleGridRow({
           const slotKey = `${scope.id}:${date}`
           const isActive = scheduleSlots?.has(slotKey) ?? false
 
+          // For jobs: check if default-scheduled on this weekday but not selected
+          const defaultKey = `${scope.id}:${weekday}`
+          const isDefaultScheduled = isJob && (defaultScheduleSlots?.has(defaultKey) ?? false)
+          const isDefault = isDefaultScheduled && !isActive
+
+          // Determine cell state
+          let state: "empty" | "active" | "default" = "empty"
+          if (isActive) {
+            state = "active"
+          } else if (isDefault) {
+            state = "default"
+          }
+
           return (
             <div key={date} className="min-w-20 flex-1 px-1 py-1">
-              <ScheduleCell
-                state={isActive ? "active" : "empty"}
-                onClick={() => toggleScheduleSlot(scope.id, date)}
-              />
+              <ScheduleCell state={state} onClick={() => toggleScheduleSlot(scope.id, date)} />
             </div>
           )
         })}

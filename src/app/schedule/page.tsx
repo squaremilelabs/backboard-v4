@@ -5,7 +5,7 @@ import { ContentPanel } from "@/components/layout/content-panel"
 import { ScheduleGridHeader } from "@/components/schedule/schedule-grid-header"
 import { ScheduleGridRow } from "@/components/schedule/schedule-grid-row"
 import { useScheduleScopes } from "@/hooks/use-scopes"
-import { useScheduleSlots, getNext7Days } from "@/hooks/use-schedule-slots"
+import { useScheduleSlots, useDefaultScheduleSlots, getNext7Days } from "@/hooks/use-schedule-slots"
 
 export default function SchedulePage() {
   // Get the months covered by the 7-day range
@@ -17,6 +17,7 @@ export default function SchedulePage() {
 
   const scopeData = useScheduleScopes(activeMonths)
   const scheduleSlots = useScheduleSlots()
+  const defaultScheduleSlots = useDefaultScheduleSlots()
 
   const hasContent = scopeData && (scopeData.jobs.length > 0 || scopeData.projectGroups.length > 0)
 
@@ -38,7 +39,12 @@ export default function SchedulePage() {
             <div className="flex flex-col">
               {/* Jobs first */}
               {scopeData.jobs.map((job) => (
-                <ScheduleGridRow key={job.id} scope={job} scheduleSlots={scheduleSlots} />
+                <ScheduleGridRow
+                  key={job.id}
+                  scope={job}
+                  scheduleSlots={scheduleSlots}
+                  defaultScheduleSlots={defaultScheduleSlots}
+                />
               ))}
 
               {/* Then projects, grouped by parent/children */}
