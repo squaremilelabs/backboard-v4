@@ -6,7 +6,10 @@ export function ScheduleGridHeader() {
   const days = getNext7Days()
 
   return (
-    <div className="flex shrink-0 items-center border-b bg-background text-sm text-muted-foreground">
+    <div
+      className="sticky top-0 z-20 flex shrink-0 items-center border-b bg-background text-sm
+        text-muted-foreground"
+    >
       {/* Title column header - fixed width, sticky */}
       <div className="sticky left-0 z-10 w-2xs shrink-0 bg-background px-4 py-3 font-medium">
         Schedule

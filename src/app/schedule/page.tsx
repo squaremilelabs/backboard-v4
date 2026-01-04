@@ -23,53 +23,56 @@ export default function SchedulePage() {
 
   return (
     <ContentPanel>
-      <div className="flex h-full flex-col overflow-hidden">
-        {/* Sticky header row */}
-        <ScheduleGridHeader />
-
-        {/* Scrollable content area */}
+      <div className="flex h-full flex-col">
+        {/* Single scroll container for both header and content */}
         <div className="flex-1 overflow-auto">
-          {scopeData === undefined ? (
-            <div className="p-4 text-sm text-muted-foreground">Loading...</div>
-          ) : !hasContent ? (
-            <div className="p-4 text-sm text-muted-foreground">
-              No scopes to schedule. Create Jobs or activate Projects for this month.
-            </div>
-          ) : (
-            <div className="flex flex-col">
-              {/* Jobs first */}
-              {scopeData.jobs.map((job) => (
-                <ScheduleGridRow
-                  key={job.id}
-                  scope={job}
-                  scheduleSlots={scheduleSlots}
-                  defaultScheduleSlots={defaultScheduleSlots}
-                />
-              ))}
+          <div className="min-w-fit">
+            {/* Sticky header row */}
+            <ScheduleGridHeader />
 
-              {/* Then projects, grouped by parent/children */}
-              {scopeData.projectGroups.map(({ parent, parentIsActive, children }) => (
-                <div key={parent.id}>
-                  {/* Parent project row */}
+            {/* Content rows */}
+            {scopeData === undefined ? (
+              <div className="p-4 text-sm text-muted-foreground">Loading...</div>
+            ) : !hasContent ? (
+              <div className="p-4 text-sm text-muted-foreground">
+                No scopes to schedule. Create Jobs or activate Projects for this month.
+              </div>
+            ) : (
+              <div className="flex flex-col">
+                {/* Jobs first */}
+                {scopeData.jobs.map((job) => (
                   <ScheduleGridRow
-                    scope={parent}
+                    key={job.id}
+                    scope={job}
                     scheduleSlots={scheduleSlots}
-                    showCells={parentIsActive}
+                    defaultScheduleSlots={defaultScheduleSlots}
                   />
-                  {/* Child project rows */}
-                  {children.map(({ project, isActive }) => (
+                ))}
+
+                {/* Then projects, grouped by parent/children */}
+                {scopeData.projectGroups.map(({ parent, parentIsActive, children }) => (
+                  <div key={parent.id}>
+                    {/* Parent project row */}
                     <ScheduleGridRow
-                      key={project.id}
-                      scope={project}
+                      scope={parent}
                       scheduleSlots={scheduleSlots}
-                      isNested
-                      showCells={isActive}
+                      showCells={parentIsActive}
                     />
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
+                    {/* Child project rows */}
+                    {children.map(({ project, isActive }) => (
+                      <ScheduleGridRow
+                        key={project.id}
+                        scope={project}
+                        scheduleSlots={scheduleSlots}
+                        isNested
+                        showCells={isActive}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </ContentPanel>
