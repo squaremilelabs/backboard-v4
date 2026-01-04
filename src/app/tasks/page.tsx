@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { ContentPanel } from "@/components/layout/content-panel"
 import { TaskListTabs } from "@/components/tasks/task-list-tabs"
 import { ScopeList } from "@/components/tasks/scope-list"
@@ -8,6 +9,28 @@ import { TaskContentPlaceholder } from "@/components/tasks/task-content-placehol
 import { useIsMobile } from "@/hooks/use-media-query"
 
 export default function TasksPage() {
+  return (
+    <Suspense fallback={<TasksPageSkeleton />}>
+      <TasksPageContent />
+    </Suspense>
+  )
+}
+
+function TasksPageSkeleton() {
+  return (
+    <ContentPanel>
+      <div className="flex h-full flex-col overflow-hidden">
+        <div className="h-12 border-b" />
+        <div className="flex flex-1 overflow-hidden">
+          <div className="w-64 shrink-0 border-r" />
+          <div className="flex-1" />
+        </div>
+      </div>
+    </ContentPanel>
+  )
+}
+
+function TasksPageContent() {
   const isMobile = useIsMobile()
 
   return (
