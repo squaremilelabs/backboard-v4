@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useQueryState } from "nuqs"
 import { searchParamsParsers } from "@/app/tasks/search-params"
-import { useTaskScopes } from "@/hooks/use-task-scopes"
+import { useTaskScopes, findTaskScope, type TaskScope } from "@/hooks/use-task-scopes"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,16 +22,21 @@ export function ScopeSelector() {
   const [activeListType] = useQueryState("list", searchParamsParsers.list)
   const [activeScopeId, setActiveScopeId] = useQueryState("scope", searchParamsParsers.scope)
 
-  const scopes = useTaskScopes(activeListType)
+  const scopeData = useTaskScopes(activeListType)
 
   // Show Triage in Now/Later/Backlog only
   const showTriage = ["now", "later", "backlog"].includes(activeListType)
 
   // Find current selected scope
-  const selectedScope =
-    activeScopeId !== "triage" ? scopes?.find((s) => s.id === activeScopeId) : null
+  const selectedScope = activeScopeId !== "triage" ? findTaskScope(scopeData, activeScopeId) : null
   const selectedLabel =
     activeScopeId === "triage" ? "Triage" : selectedScope?.title || "Select scope..."
+  const selectedThemeClass =
+    selectedScope?.type === "job"
+      ? "theme-gold"
+      : selectedScope?.type === "project"
+        ? "theme-blue"
+        : null
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -42,7 +47,16 @@ export function ScopeSelector() {
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {selectedLabel}
+          <span className="flex items-center gap-2">
+            {activeScopeId === "triage" ? (
+              <span className="h-2 w-2 shrink-0 rounded-full bg-muted-foreground" />
+            ) : selectedThemeClass ? (
+              <span className={selectedThemeClass}>
+                <span className="block h-2 w-2 shrink-0 rounded-full bg-primary" />
+              </span>
+            ) : null}
+            {selectedLabel}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -72,36 +86,75 @@ export function ScopeSelector() {
                 </CommandItem>
               )}
 
-              {/* All scopes */}
-              {scopes?.map((scope) => {
-                const isJob = scope.type === "job"
-                const dotClass = isJob ? "bg-primary" : "bg-primary"
+              {/* Jobs (theme-gold) */}
+              {scopeData?.jobs.map((job) => (
+                <ScopeItem
+                  key={job.id}
+                  scope={job}
+                  isSelected={activeScopeId === job.id}
+                  onSelect={() => {
+                    setActiveScopeId(job.id)
+                    setOpen(false)
+                  }}
+                  themeClass="theme-gold"
+                />
+              ))}
 
-                return (
-                  <CommandItem
-                    key={scope.id}
-                    value={scope.id}
+              {/* Projects (theme-blue) - grouped by parent/child */}
+              {scopeData?.projectGroups.map((group) => (
+                <div key={group.parent.id}>
+                  <ScopeItem
+                    scope={group.parent}
+                    isSelected={activeScopeId === group.parent.id}
                     onSelect={() => {
-                      setActiveScopeId(scope.id)
+                      setActiveScopeId(group.parent.id)
                       setOpen(false)
                     }}
-                    className={cn(scope.isFaded && "opacity-50")}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        activeScopeId === scope.id ? "opacity-100" : "opacity-0"
-                      )}
+                    themeClass="theme-blue"
+                  />
+                  {group.children.map((child) => (
+                    <ScopeItem
+                      key={child.project.id}
+                      scope={child.project}
+                      isSelected={activeScopeId === child.project.id}
+                      onSelect={() => {
+                        setActiveScopeId(child.project.id)
+                        setOpen(false)
+                      }}
+                      themeClass="theme-blue"
+                      isChild
                     />
-                    <span className={cn("mr-2 h-2 w-2 shrink-0 rounded-full", dotClass)} />
-                    {scope.title}
-                  </CommandItem>
-                )
-              })}
+                  ))}
+                </div>
+              ))}
             </CommandGroup>
           </CommandList>
         </Command>
       </PopoverContent>
     </Popover>
+  )
+}
+
+interface ScopeItemProps {
+  scope: TaskScope
+  isSelected: boolean
+  onSelect: () => void
+  themeClass: "theme-gold" | "theme-blue"
+  isChild?: boolean
+}
+
+function ScopeItem({ scope, isSelected, onSelect, themeClass, isChild }: ScopeItemProps) {
+  return (
+    <CommandItem
+      value={scope.id}
+      onSelect={onSelect}
+      className={cn(scope.isFaded && "opacity-50", isChild && "pl-8")}
+    >
+      <Check className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
+      <span className={themeClass}>
+        <span className="mr-2 block h-2 w-2 shrink-0 rounded-full bg-primary" />
+      </span>
+      {scope.title}
+    </CommandItem>
   )
 }

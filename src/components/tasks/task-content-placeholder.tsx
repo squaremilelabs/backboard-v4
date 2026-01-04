@@ -2,17 +2,15 @@
 
 import { useQueryState } from "nuqs"
 import { searchParamsParsers } from "@/app/tasks/search-params"
-import { useScopes } from "@/hooks/use-scopes"
+import { useTaskScopes, findTaskScope } from "@/hooks/use-task-scopes"
 
 export function TaskContentPlaceholder() {
   const [activeListType] = useQueryState("list", searchParamsParsers.list)
   const [activeScopeId] = useQueryState("scope", searchParamsParsers.scope)
-  const scopes = useScopes()
+  const scopeData = useTaskScopes(activeListType)
 
-  const scopeName =
-    activeScopeId === "triage"
-      ? "Triage"
-      : scopes?.find((s) => s.id === activeScopeId)?.title || "Unknown"
+  const selectedScope = activeScopeId !== "triage" ? findTaskScope(scopeData, activeScopeId) : null
+  const scopeName = activeScopeId === "triage" ? "Triage" : selectedScope?.title || "Unknown"
 
   return (
     <div className="flex h-full items-center justify-center p-8">
@@ -22,7 +20,6 @@ export function TaskContentPlaceholder() {
           List: <span className="font-medium">{activeListType}</span> • Scope:{" "}
           <span className="font-medium">{scopeName}</span>
         </p>
-        {/* TODO: Replace with actual TaskList component in next implementation */}
       </div>
     </div>
   )
