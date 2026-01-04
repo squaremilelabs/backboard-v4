@@ -77,13 +77,13 @@ export function ScopeGridRow({
   }
 
   const isJob = scope.type === "job"
-  // For projects: parent = hollow dot, child = filled dot
+  // For projects: parent = filled dot, child = outlined dot
   // For jobs: always filled dot
   const dotStyle = isJob
     ? "bg-primary"
     : isNested
-      ? "bg-primary"
-      : "border-2 border-primary bg-transparent"
+      ? "border-2 border-primary bg-transparent"
+      : "bg-primary"
 
   // Calculate cell states and render cells
   const renderCells = () => {

@@ -144,6 +144,11 @@ interface ScopeItemProps {
 }
 
 function ScopeItem({ scope, isSelected, onSelect, themeClass, isChild }: ScopeItemProps) {
+  // Jobs: filled dot, Projects: parent = filled, child = outlined
+  const isProject = scope.type === "project"
+  const dotClass =
+    isProject && isChild ? "border-2 border-primary bg-transparent" : "bg-primary"
+
   return (
     <CommandItem
       value={scope.id}
@@ -152,7 +157,7 @@ function ScopeItem({ scope, isSelected, onSelect, themeClass, isChild }: ScopeIt
     >
       <Check className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
       <span className={themeClass}>
-        <span className="mr-2 block h-2 w-2 shrink-0 rounded-full bg-primary" />
+        <span className={cn("mr-2 block h-2 w-2 shrink-0 rounded-full", dotClass)} />
       </span>
       {scope.title}
     </CommandItem>

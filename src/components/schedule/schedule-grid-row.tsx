@@ -27,12 +27,12 @@ export function ScheduleGridRow({
   const days = getNext7Days()
   const isJob = scope.type === "job"
 
-  // Jobs: filled dot, Projects: parent = hollow, child = filled
+  // Jobs: filled dot, Projects: parent = filled, child = outlined
   const dotClass = isJob
     ? "bg-primary"
     : isNested
-      ? "bg-primary"
-      : "border-2 border-primary bg-transparent"
+      ? "border-2 border-primary bg-transparent"
+      : "bg-primary"
 
   // Theme wrapper for color context
   const themeClass = isJob ? "theme-gold" : "theme-blue"

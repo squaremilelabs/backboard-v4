@@ -83,6 +83,11 @@ interface ScopeButtonProps {
 }
 
 function ScopeButton({ scope, isActive, onClick, themeClass, isChild }: ScopeButtonProps) {
+  // Jobs: filled dot, Projects: parent = filled, child = outlined
+  const isProject = scope.type === "project"
+  const dotClass =
+    isProject && isChild ? "border-2 border-primary bg-transparent" : "bg-primary"
+
   return (
     <button
       onClick={onClick}
@@ -96,7 +101,7 @@ function ScopeButton({ scope, isActive, onClick, themeClass, isChild }: ScopeBut
       )}
     >
       <span className={themeClass}>
-        <span className="block h-2.5 w-2.5 shrink-0 rounded-full bg-primary" />
+        <span className={cn("block h-2.5 w-2.5 shrink-0 rounded-full", dotClass)} />
       </span>
       <span className="truncate">{scope.title}</span>
     </button>
