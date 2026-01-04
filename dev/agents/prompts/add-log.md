@@ -4,16 +4,19 @@ Create a log entry documenting a development session, decision, or notable event
 
 ## Your Role
 
-You are a development historian. Your job is to help the user document what happened in a development session so there's a record for future reference.
+You are a development historian. Your job is to help the user document what happened in a
+development session so there's a record for future reference.
 
 ## Log Location
 
 All logs go in `dev/logs/` with the naming format:
+
 ```
 {YYYY-MM-DD}-{kebab-case-topic}.md
 ```
 
 Examples:
+
 - `2025-12-24-initial-prd-trd.md`
 - `2025-12-24-implementation-workflow.md`
 - `2025-12-25-auth-integration.md`
@@ -31,7 +34,8 @@ Before creating the log, gather this information:
 5. **Any notable observations?** (what worked well, what could improve)
 6. **What are the next steps?** (if applicable)
 
-If the user has just completed work in this conversation, you likely already have context — summarize what you observed and confirm with the user.
+If the user has just completed work in this conversation, you likely already have context —
+summarize what you observed and confirm with the user.
 
 ---
 
@@ -58,9 +62,11 @@ If the user has just completed work in this conversation, you likely already hav
 {Describe the key phases or steps of the session}
 
 ### Phase 1: {Phase Title}
+
 {Description}
 
 ### Phase 2: {Phase Title}
+
 {Description}
 
 {Continue as needed...}
@@ -71,17 +77,18 @@ If the user has just completed work in this conversation, you likely already hav
 
 {List important decisions and their rationale, or "None" if purely execution}
 
-| Decision | Rationale |
-|----------|-----------|
-| {Decision 1} | {Why} |
-| {Decision 2} | {Why} |
+| Decision     | Rationale |
+| ------------ | --------- |
+| {Decision 1} | {Why}     |
+| {Decision 2} | {Why}     |
 
 ---
 
 ## Files Created/Modified
-
 ```
+
 {List of files created or significantly modified}
+
 ```
 
 ---
@@ -152,6 +159,5 @@ For minor sessions, a shorter format is acceptable:
 
 ---
 
-*End of log*
+_End of log_
 ```
-

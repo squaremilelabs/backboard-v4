@@ -4,19 +4,24 @@ Execute an implementation spec **one step at a time** by default, with user revi
 
 ## Your Role
 
-You are an implementation executor. Your job is to take an implementation spec from `dev/agents/implementations/` and execute it. By default, you execute **one step per session** and pause for user review.
+You are an implementation executor. Your job is to take an implementation spec from
+`dev/agents/implementations/` and execute it. By default, you execute **one step per session** and
+pause for user review.
 
-**Default workflow**: Execute step → Verify → Pause for review → (user approves) → Update spec → Commit
+**Default workflow**: Execute step → Verify → Pause for review → (user approves) → Update spec →
+Commit
 
 ### Batch Mode
 
 When the user explicitly requests multiple steps, execute them in sequence:
+
 - `"implement steps 3 to 5"` → execute steps 3, 4, 5
 - `"implement all remaining steps"` → execute from current step to end
 - `"implement all"` → execute entire implementation
 - `"run steps 2-4"` → execute steps 2, 3, 4
 
 In batch mode:
+
 - Execute all requested steps first (no commit between steps)
 - Pause for user review after completing all requested steps
 - Once user approves, commit each step atomically (one commit per step)
@@ -25,6 +30,7 @@ In batch mode:
 ### Why step-by-step is the default
 
 This approach ensures:
+
 - User can review each change before proceeding
 - Atomic commits make rollback easy
 - Progress is tracked granularly in the spec
@@ -34,22 +40,24 @@ This approach ensures:
 ## Phase 1: Identify the Spec
 
 ### If a spec was provided with the prompt:
+
 - Confirm the spec path/ID with the user
 - Proceed to Phase 2
 
 ### If no spec was provided:
+
 1. List all folders in `dev/agents/implementations/`
 2. Read each `spec.md` to get title and status
 3. Present options to the user:
 
 > "Which implementation would you like to work on?
-> 
-> | ID | Title | Status |
-> |----|-------|--------|
-> | 001 | Initial Project Setup | 🔵 Ready |
-> | 002 | Database Schema | 🟢 In Progress |
-> | ... | ... | ... |
-> 
+>
+> | ID  | Title                 | Status         |
+> | --- | --------------------- | -------------- |
+> | 001 | Initial Project Setup | 🔵 Ready       |
+> | 002 | Database Schema       | 🟢 In Progress |
+> | ... | ...                   | ...            |
+>
 > Enter the ID number:"
 
 ---
@@ -60,17 +68,18 @@ Read the full spec and determine:
 
 ### 1. Check spec status
 
-| Status | Action |
-|--------|--------|
-| 🟡 Planning | Stop — spec is not ready. Ask user if they want to finalize it first. |
-| 🔵 Ready | This is a fresh start. Proceed normally. |
-| 🟢 In Progress | Check Progress field for current step. Continue from there. |
-| ✅ Complete | Already done. Ask user if they want to re-verify or redo. |
-| ❌ Cancelled | Stop — ask user if they want to un-cancel. |
+| Status         | Action                                                                |
+| -------------- | --------------------------------------------------------------------- |
+| 🟡 Planning    | Stop — spec is not ready. Ask user if they want to finalize it first. |
+| 🔵 Ready       | This is a fresh start. Proceed normally.                              |
+| 🟢 In Progress | Check Progress field for current step. Continue from there.           |
+| ✅ Complete    | Already done. Ask user if they want to re-verify or redo.             |
+| ❌ Cancelled   | Stop — ask user if they want to un-cancel.                            |
 
 ### 2. Check completed items
 
 Look for checked boxes `[x]` in these sections:
+
 - **Files Created** — which files already exist?
 - **Implementation Plan** — are any steps marked complete?
 - **Verification** — have any checks passed?
@@ -78,16 +87,18 @@ Look for checked boxes `[x]` in these sections:
 ### 3. Determine starting point
 
 For resumed sessions, identify:
+
 - Last completed step
 - Next step to execute
 - Any files that exist but may need updates (if spec changed)
 
 Report to user:
+
 > "This implementation is **{status}**.
-> 
-> **Completed**: Steps 1-3, 5 files created
-> **Remaining**: Steps 4-8, 3 files to create, verification pending
-> 
+>
+> **Completed**: Steps 1-3, 5 files created **Remaining**: Steps 4-8, 3 files to create,
+> verification pending
+>
 > Ready to continue from Step 4?"
 
 ---
@@ -97,7 +108,9 @@ Report to user:
 Before making any code changes, ensure proper git branching.
 
 ### Branch naming
+
 Use the implementation folder name as the branch name:
+
 - `001-initial-project-setup`
 - `002-database-schema`
 
@@ -110,16 +123,19 @@ git branch --show-current
 ### If on wrong branch:
 
 1. Check if implementation branch exists:
+
 ```bash
 git branch --list "{implementation-folder-name}"
 ```
 
 2. If branch exists, switch to it:
+
 ```bash
 git checkout {implementation-folder-name}
 ```
 
 3. If branch doesn't exist, create it from main:
+
 ```bash
 git checkout main
 git pull origin main  # ensure up to date
@@ -127,14 +143,15 @@ git checkout -b {implementation-folder-name}
 ```
 
 ### Confirm with user:
+
 > "Now on branch `{branch-name}`. Ready to begin implementation?"
 
 ---
 
 ## Phase 4: Execute Steps
 
-**Default**: Execute ONE step, then pause for user review.
-**Batch mode**: If user requested multiple steps, execute them in sequence.
+**Default**: Execute ONE step, then pause for user review. **Batch mode**: If user requested
+multiple steps, execute them in sequence.
 
 ### Before the first step:
 
@@ -157,6 +174,7 @@ git checkout -b {implementation-folder-name}
 3. **Report** — confirm commit with hash
 
 ### Commit message format:
+
 ```
 [{implementation-id}] Step {N}: {step title}
 
@@ -168,9 +186,11 @@ Example:
 ### Pause points:
 
 - **Default mode**: Pause after each step for user review before committing
-- **Batch mode**: Execute all requested steps, pause once for review, then commit each step atomically after approval
+- **Batch mode**: Execute all requested steps, pause once for review, then commit each step
+  atomically after approval
 
 ### If a step fails:
+
 1. Stop and report the error
 2. Attempt to diagnose the issue
 3. Ask user how to proceed:
@@ -188,10 +208,10 @@ After executing a step, pause and report for review:
 
 > **Step {N} ready for review** 📋
 >
-> **Branch**: `{branch-name}`
-> **Changes**: {brief summary of what was done}
+> **Branch**: `{branch-name}` **Changes**: {brief summary of what was done}
 >
 > **Files modified**:
+>
 > - `path/to/file1.ts` — {what changed}
 > - `path/to/file2.css` — {what changed}
 >
@@ -201,9 +221,8 @@ After executing a step, pause and report for review:
 
 > **Step {N} committed** ✅
 >
-> **Commit**: `{short-hash}` — "{commit message}"
-> **Progress**: Step {N} of {M}
-> **Next**: Step {N+1}: {next step title}
+> **Commit**: `{short-hash}` — "{commit message}" **Progress**: Step {N} of {M} **Next**: Step
+> {N+1}: {next step title}
 >
 > Continue with `/implement {ID}` when ready.
 
@@ -213,8 +232,8 @@ After executing all requested steps, pause for review:
 
 > **Steps {X}–{Y} ready for review** 📋
 >
-> **Branch**: `{branch-name}`
-> **Changes**:
+> **Branch**: `{branch-name}` **Changes**:
+>
 > - Step {X}: {summary}
 > - Step {X+1}: {summary}
 > - ...
@@ -228,12 +247,13 @@ Commit each step atomically, then report:
 > **Steps {X}–{Y} committed** ✅
 >
 > **Commits**: {count} commits
+>
 > - `{hash1}` — Step {X}: {title}
 > - `{hash2}` — Step {X+1}: {title}
 > - ...
 >
-> **Progress**: Step {Y} of {M}
-> **Next**: Step {Y+1}: {next step title} (or "Verification" if all steps done)
+> **Progress**: Step {Y} of {M} **Next**: Step {Y+1}: {next step title} (or "Verification" if all
+> steps done)
 >
 > Continue with `/implement {ID}` when ready.
 
@@ -256,23 +276,25 @@ Go through each manual check item and verify.
 ### 3. Report results
 
 > "**Verification Results**:
-> 
-> | Check | Result |
-> |-------|--------|
-> | `pnpm dev` | ✅ Server starts on localhost:3000 |
-> | `pnpm build` | ✅ Exits with code 0 |
-> | `pnpm lint` | ✅ No errors |
-> 
+>
+> | Check        | Result                             |
+> | ------------ | ---------------------------------- |
+> | `pnpm dev`   | ✅ Server starts on localhost:3000 |
+> | `pnpm build` | ✅ Exits with code 0               |
+> | `pnpm lint`  | ✅ No errors                       |
+>
 > **Manual checks**:
+>
 > - [x] Homepage redirects to /tasks
 > - [x] All 5 pages render
 > - [x] Tailwind classes applied
-> 
+>
 > All checks passed!"
 
 ### 4. Update spec status
 
 If all verification passes:
+
 - Update status to ✅ Complete
 - Update "Last Updated" date
 
@@ -287,13 +309,13 @@ Ensure all changes are committed.
 ### 2. Summary
 
 Provide a summary to the user:
+
 > "**Implementation 001 Complete** ✅
-> 
-> **Branch**: `001-initial-project-setup`
-> **Files created**: 14 files, 5 directories
-> **Commits**: 4
-> 
+>
+> **Branch**: `001-initial-project-setup` **Files created**: 14 files, 5 directories **Commits**: 4
+>
 > Next steps:
+>
 > - Merge branch to main (or open PR)
 > - Proceed to next implementation"
 
@@ -310,13 +332,13 @@ Provide a summary to the user:
 
 ### Common issues and responses:
 
-| Issue | Response |
-|-------|----------|
-| Dependency not installed | Run install command and retry |
-| File already exists | Check if content matches; update if needed |
-| Command not found | Check if in correct directory; verify prerequisites |
-| Port already in use | Note the conflict; suggest killing process or using different port |
-| Git conflicts | Stop and ask user to resolve |
+| Issue                    | Response                                                           |
+| ------------------------ | ------------------------------------------------------------------ |
+| Dependency not installed | Run install command and retry                                      |
+| File already exists      | Check if content matches; update if needed                         |
+| Command not found        | Check if in correct directory; verify prerequisites                |
+| Port already in use      | Note the conflict; suggest killing process or using different port |
+| Git conflicts            | Stop and ask user to resolve                                       |
 
 ### When stuck:
 
@@ -329,7 +351,9 @@ Provide a summary to the user:
 
 ## Visual Verification Steps
 
-Some implementation steps require visual verification (testing UI in a browser, checking responsive layouts, etc.). **Do NOT attempt to fully automate these steps** — visual verification is inherently human work.
+Some implementation steps require visual verification (testing UI in a browser, checking responsive
+layouts, etc.). **Do NOT attempt to fully automate these steps** — visual verification is inherently
+human work.
 
 ### When you encounter a visual verification step:
 
@@ -338,12 +362,14 @@ Some implementation steps require visual verification (testing UI in a browser, 
    - If it doesn't exist, offer to create one based on the step's test checklist
 
 2. **Hand off to the user**:
+
    > "This step requires visual verification. Please:
+   >
    > 1. Run `pnpm dev` in your terminal
    > 2. Open http://localhost:3000 in your browser
    > 3. Go through the checklist in `visual-verification.md`
    > 4. Mark items as verified or add feedback for any issues
-   > 
+   >
    > Once complete, reply with your results."
 
 3. **Address any issues** the user reports, then have them re-verify
@@ -361,12 +387,12 @@ Some implementation steps require visual verification (testing UI in a browser, 
 
 The `visual-verification.md` file uses these markers:
 
-| Marker | Meaning |
-|--------|---------|
-| `[x]` | Verified, works as expected |
-| `[!]` | Issue found (user adds feedback inline) |
-| `[~]` | Known issue, deferred (not blocking) |
-| `[ ]` | Not yet checked |
+| Marker | Meaning                                 |
+| ------ | --------------------------------------- |
+| `[x]`  | Verified, works as expected             |
+| `[!]`  | Issue found (user adds feedback inline) |
+| `[~]`  | Known issue, deferred (not blocking)    |
+| `[ ]`  | Not yet checked                         |
 
 ### Agent responsibilities during verification
 
@@ -400,18 +426,20 @@ Document each round in the Issues & Feedback section:
 ### Round 1
 
 **Issue 1: {brief title}**
+
 - {what user reported}
 
 **Issue 2: {brief title}**
+
 - {what user reported}
 
 **Fixes applied:**
+
 - {what was changed}
 
 ### Round 2
 
-**Issue 1: {if any persist or new issues found}**
-...
+**Issue 1: {if any persist or new issues found}** ...
 
 **Resolution:** {Fixed / Deferred — reason}
 ```
@@ -425,7 +453,8 @@ Some issues may be low priority or require significant refactoring. It's valid t
 3. **Document** in the round as "Resolution: Deferred — {reason}"
 4. **Update sign-off** to reflect deferred items exist
 
-**Important**: Don't over-engineer fixes without checking with the user first. If a fix requires significant complexity, ask before implementing.
+**Important**: Don't over-engineer fixes without checking with the user first. If a fix requires
+significant complexity, ask before implementing.
 
 ### Sign-off criteria
 
@@ -444,18 +473,20 @@ Update sign-off section when complete:
 
 The default sandbox blocks certain operations. Know when to request elevated permissions:
 
-| Operation | Permission Needed |
-|-----------|-------------------|
-| `pnpm add`, `npm install` (with network) | `["all"]` |
-| `pnpm dlx`, `npx` (CLI tools) | `["all"]` |
-| Git commits, branch operations | `["git_write"]` |
-| API calls, fetching dependencies | `["network"]` |
+| Operation                                | Permission Needed |
+| ---------------------------------------- | ----------------- |
+| `pnpm add`, `npm install` (with network) | `["all"]`         |
+| `pnpm dlx`, `npx` (CLI tools)            | `["all"]`         |
+| Git commits, branch operations           | `["git_write"]`   |
+| API calls, fetching dependencies         | `["network"]`     |
 
 **When in doubt**, use `required_permissions: ["all"]` for commands that:
+
 - Access system network interfaces
 - Write to pnpm/npm cache directories
 
-**Do NOT run dev servers** (`pnpm dev`, `npm start`) — ask the user to run these in their own terminal.
+**Do NOT run dev servers** (`pnpm dev`, `npm start`) — ask the user to run these in their own
+terminal.
 
 ---
 
@@ -506,4 +537,3 @@ The Progress field tracks current step. Status stays 🟢 In Progress throughout
 6. Report commits → Show all hashes
 7. STOP → Wait for user to continue
 ```
-

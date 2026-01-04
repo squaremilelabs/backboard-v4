@@ -3,16 +3,18 @@
 import { useLiveQuery } from "dexie-react-hooks"
 import { db, type Scope, type ScopeType } from "@/lib/db"
 
-export function useScopes(type: ScopeType) {
-  return useLiveQuery(
-    () =>
-      db.scopes
+export function useScopes(type?: ScopeType) {
+  return useLiveQuery(() => {
+    if (type) {
+      return db.scopes
         .where("type")
         .equals(type)
         .filter((scope) => !scope.archivedAt)
-        .toArray(),
-    [type]
-  )
+        .toArray()
+    }
+    // Return all non-archived scopes if no type specified
+    return db.scopes.filter((scope) => !scope.archivedAt).toArray()
+  }, [type])
 }
 
 export function useScope(id: string | null) {

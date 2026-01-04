@@ -1,18 +1,21 @@
 # Scheduling Grids (Jobs + Projects)
 
-| Field | Value |
-|-------|-------|
-| **ID** | 007 |
-| **Status** | ✅ Complete |
-| **Progress** | 8 of 8 |
-| **Created** | 2026-01-03 |
-| **Last Updated** | 2026-01-03 |
+| Field            | Value       |
+| ---------------- | ----------- |
+| **ID**           | 007         |
+| **Status**       | ✅ Complete |
+| **Progress**     | 8 of 8      |
+| **Created**      | 2026-01-03  |
+| **Last Updated** | 2026-01-03  |
 
 ---
 
 ## Overview
 
-Add interactive scheduling grids to the Jobs and Projects pages. Jobs get a 7-day weekly template (Mon–Sun) for `DefaultScheduleSlot`, Projects get a 6-month timeline for `MonthSlot`. Both grids support click-to-toggle, hover states with plus/X icons, and dual-axis scrolling with sticky headers and title columns.
+Add interactive scheduling grids to the Jobs and Projects pages. Jobs get a 7-day weekly template
+(Mon–Sun) for `DefaultScheduleSlot`, Projects get a 6-month timeline for `MonthSlot`. Both grids
+support click-to-toggle, hover states with plus/X icons, and dual-axis scrolling with sticky headers
+and title columns.
 
 ---
 
@@ -20,24 +23,26 @@ Add interactive scheduling grids to the Jobs and Projects pages. Jobs get a 7-da
 
 Read these before implementing:
 
-| Topic | Source |
-|-------|--------|
-| Jobs page design | `dev/specs/prd.md` §4.3 |
-| Projects page design | `dev/specs/prd.md` §4.4 |
-| DefaultScheduleSlot schema | `dev/specs/trd.md` §4.1 |
-| MonthSlot schema | `dev/specs/trd.md` §4.1 |
-| Visual reference | `dev/specs/visuals/page-jobs.png` |
-| Visual reference | `dev/specs/visuals/page-projects.png` |
+| Topic                      | Source                                |
+| -------------------------- | ------------------------------------- |
+| Jobs page design           | `dev/specs/prd.md` §4.3               |
+| Projects page design       | `dev/specs/prd.md` §4.4               |
+| DefaultScheduleSlot schema | `dev/specs/trd.md` §4.1               |
+| MonthSlot schema           | `dev/specs/trd.md` §4.1               |
+| Visual reference           | `dev/specs/visuals/page-jobs.png`     |
+| Visual reference           | `dev/specs/visuals/page-projects.png` |
 
 ---
 
 ## Scope
 
 ### In Scope
+
 - Jobs page: 7-day grid (Mon–Sun) with clickable cells to toggle `DefaultScheduleSlot`
 - Projects page: 6-month grid (current month → +5) with clickable cells to toggle `MonthSlot`
 - Hover states: Plus icon on empty cells, X icon on filled cells
-- Parent project inheritance display: Light blue (secondary) when children are active but parent is not
+- Parent project inheritance display: Light blue (secondary) when children are active but parent is
+  not
 - Sticky title column (horizontal scroll)
 - Sticky header row (vertical scroll)
 - Minimum column width: `min-w-10` (40px)
@@ -45,6 +50,7 @@ Read these before implementing:
 - Database operations: CRUD for `DefaultScheduleSlot` and `MonthSlot`
 
 ### Out of Scope
+
 - Schedule page (separate implementation)
 - Auto-population logic (ScheduleSlot creation from DefaultScheduleSlot)
 - Drag-and-drop reordering of scopes
@@ -64,11 +70,14 @@ Read these before implementing:
 
 Files this implementation will create or modify:
 
-- [x] `src/lib/schedule-mutations.ts` — Create: CRUD functions for DefaultScheduleSlot and MonthSlot ✅
+- [x] `src/lib/schedule-mutations.ts` — Create: CRUD functions for DefaultScheduleSlot and MonthSlot
+      ✅
 - [x] `src/hooks/use-schedule-slots.ts` — Create: Dexie live queries for schedule data ✅
 - [x] `src/components/scopes/schedule-cell.tsx` — Create: Reusable toggle cell with hover states ✅
-- [x] `src/components/scopes/scope-grid-header.tsx` — Modify: Add min-width, enable on mobile, sticky header ✅
-- [x] `src/components/scopes/scope-grid-row.tsx` — Modify: Replace placeholder cells with interactive ScheduleCell ✅
+- [x] `src/components/scopes/scope-grid-header.tsx` — Modify: Add min-width, enable on mobile,
+      sticky header ✅
+- [x] `src/components/scopes/scope-grid-row.tsx` — Modify: Replace placeholder cells with
+      interactive ScheduleCell ✅
 - [x] `src/app/jobs/page.tsx` — Modify: Add scroll container structure for sticky positioning ✅
 - [x] `src/app/projects/page.tsx` — Modify: Add scroll container structure for sticky positioning ✅
 
@@ -89,10 +98,7 @@ import { db, type Weekday } from "@/lib/db"
 // DefaultScheduleSlot (Jobs weekly template)
 // ============================================================================
 
-export async function toggleDefaultScheduleSlot(
-  jobId: string,
-  weekday: Weekday
-): Promise<void> {
+export async function toggleDefaultScheduleSlot(jobId: string, weekday: Weekday): Promise<void> {
   // Check if slot exists
   const existing = await db.defaultScheduleSlots
     .where("[weekday+jobId]")
@@ -119,10 +125,7 @@ export async function toggleMonthSlot(
   month: string // YYYY-MM
 ): Promise<void> {
   // Check if slot exists
-  const existing = await db.monthSlots
-    .where("[month+projectId]")
-    .equals([month, projectId])
-    .first()
+  const existing = await db.monthSlots.where("[month+projectId]").equals([month, projectId]).first()
 
   if (existing) {
     await db.monthSlots.delete(existing.id)
@@ -155,9 +158,9 @@ import { db, type Weekday } from "@/lib/db"
  */
 export function useDefaultScheduleSlots(): Set<string> | undefined {
   const slots = useLiveQuery(() => db.defaultScheduleSlots.toArray())
-  
+
   if (slots === undefined) return undefined
-  
+
   return new Set(slots.map((s) => `${s.jobId}:${s.weekday}`))
 }
 
@@ -166,9 +169,9 @@ export function useDefaultScheduleSlots(): Set<string> | undefined {
  */
 export function useMonthSlots(): Set<string> | undefined {
   const slots = useLiveQuery(() => db.monthSlots.toArray())
-  
+
   if (slots === undefined) return undefined
-  
+
   return new Set(slots.map((s) => `${s.projectId}:${s.month}`))
 }
 
@@ -178,9 +181,9 @@ export function useMonthSlots(): Set<string> | undefined {
  */
 export function useMonthSlotsByMonth(): Map<string, Set<string>> | undefined {
   const slots = useLiveQuery(() => db.monthSlots.toArray())
-  
+
   if (slots === undefined) return undefined
-  
+
   const byMonth = new Map<string, Set<string>>()
   for (const slot of slots) {
     if (!byMonth.has(slot.month)) {
@@ -256,7 +259,8 @@ export function ScheduleCell({ state, onClick }: ScheduleCellProps) {
       className={cn(
         "group/cell relative flex h-8 w-full items-center justify-center rounded transition-colors",
         // Base states
-        isEmpty && "border border-dashed border-muted-foreground/20 hover:border-primary/50 hover:bg-primary/10",
+        isEmpty &&
+          "border border-dashed border-muted-foreground/20 hover:border-primary/50 hover:bg-primary/10",
         isActive && "bg-primary hover:bg-primary/80",
         isInherited && "bg-secondary hover:bg-secondary/80"
       )}
@@ -268,11 +272,7 @@ export function ScheduleCell({ state, onClick }: ScheduleCellProps) {
           isActive ? "text-primary-foreground" : "text-primary"
         )}
       >
-        {isActive ? (
-          <X className="h-4 w-4" />
-        ) : (
-          <Plus className="h-4 w-4" />
-        )}
+        {isActive ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
       </span>
     </button>
   )
@@ -285,7 +285,8 @@ export function ScheduleCell({ state, onClick }: ScheduleCellProps) {
 
 ### Step 4: Update scope-grid-header.tsx
 
-**Do**: 
+**Do**:
+
 1. Remove mobile hiding (`isMobile` check)
 2. Add `min-w-10` to column cells
 3. Use the new month utilities for consistent key/label handling
@@ -305,7 +306,7 @@ interface ScopeGridHeaderProps {
 
 export function ScopeGridHeader({ type }: ScopeGridHeaderProps) {
   const isJobs = type === "jobs"
-  
+
   const columns = isJobs
     ? WEEKDAYS.map((w) => ({ key: w, label: WEEKDAY_LABELS[w] }))
     : getNext6Months()
@@ -330,7 +331,8 @@ export function ScopeGridHeader({ type }: ScopeGridHeaderProps) {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - `isMobile` check removed — header renders on all screen sizes
 - Columns have `min-w-10` class
 - No TypeScript errors
@@ -340,6 +342,7 @@ export function ScopeGridHeader({ type }: ScopeGridHeaderProps) {
 ### Step 5: Update scope-grid-row.tsx
 
 **Do**:
+
 1. Remove mobile hiding for grid cells
 2. Accept schedule slot data via props
 3. Use `ScheduleCell` component for each cell
@@ -445,7 +448,7 @@ export function ScopeGridRow({
       return WEEKDAYS.map((weekday) => {
         const key = `${scope.id}:${weekday}`
         const isActive = defaultScheduleSlots?.has(key) ?? false
-        
+
         return (
           <div key={weekday} className="min-w-10 flex-1 px-1 py-1">
             <ScheduleCell
@@ -461,22 +464,19 @@ export function ScopeGridRow({
       return months.map(({ key: month }) => {
         const selfKey = `${scope.id}:${month}`
         const isActive = monthSlots?.has(selfKey) ?? false
-        
+
         // Check for inherited state (parent with active children)
         let isInherited = false
         if (!isNested && !isActive && childIds.length > 0 && monthSlots) {
           // Check if any child has this month active
           isInherited = childIds.some((childId) => monthSlots.has(`${childId}:${month}`))
         }
-        
+
         const state = isActive ? "active" : isInherited ? "inherited" : "empty"
-        
+
         return (
           <div key={month} className="min-w-10 flex-1 px-1 py-1">
-            <ScheduleCell
-              state={state}
-              onClick={() => toggleMonthSlot(scope.id, month)}
-            />
+            <ScheduleCell state={state} onClick={() => toggleMonthSlot(scope.id, month)} />
           </div>
         )
       })
@@ -546,15 +546,14 @@ export function ScopeGridRow({
       </div>
 
       {/* Grid cells - now shown on all screen sizes */}
-      <div className="flex items-center px-2">
-        {renderCells()}
-      </div>
+      <div className="flex items-center px-2">{renderCells()}</div>
     </div>
   )
 }
 ```
 
 **Verify**:
+
 - Grid cells render on mobile (no `isMobile` hiding)
 - Cells have `min-w-10` class
 - ScheduleCell component used for each cell
@@ -686,6 +685,7 @@ export function ScopeList({ type }: ScopeListProps) {
 ```
 
 **Verify**:
+
 - Schedule hooks imported and used
 - Data passed to ScopeGridRow via props
 - childIds calculated and passed for parent projects
@@ -696,6 +696,7 @@ export function ScopeList({ type }: ScopeListProps) {
 ### Step 7: Update page layouts for dual-axis scrolling
 
 **Do**: Restructure Jobs and Projects pages to support:
+
 1. Horizontal scrolling with sticky title column
 2. Vertical scrolling with sticky header row
 
@@ -756,6 +757,7 @@ export default function ProjectsPage() {
 ```
 
 **Verify**:
+
 - Pages have `overflow-hidden` on container
 - Scroll container has `overflow-auto`
 - Header stays fixed during vertical scroll
@@ -768,6 +770,7 @@ export default function ProjectsPage() {
 **Do**: Remove the placeholder component that is no longer needed.
 
 **Command**:
+
 ```bash
 rm src/components/scopes/grid-placeholder.tsx
 ```
@@ -780,12 +783,12 @@ rm src/components/scopes/grid-placeholder.tsx
 
 Run these checks after implementation is complete:
 
-| Check | Command | Expected Result |
-|-------|---------|-----------------|
-| TypeScript | `pnpm tsc --noEmit` | No errors |
-| Linting | `pnpm lint` | No errors |
-| Build | `pnpm build` | Exits with code 0 |
-| Dev server | `pnpm dev` | Starts without errors |
+| Check      | Command             | Expected Result       |
+| ---------- | ------------------- | --------------------- |
+| TypeScript | `pnpm tsc --noEmit` | No errors             |
+| Linting    | `pnpm lint`         | No errors             |
+| Build      | `pnpm build`        | Exits with code 0     |
+| Dev server | `pnpm dev`          | Starts without errors |
 
 Manual checks:
 
@@ -799,4 +802,3 @@ Manual checks:
 - [ ] **Vertical scroll**: Header row stays fixed, rows scroll
 - [ ] **Mobile**: Grids visible and scrollable horizontally (may show 1-2 columns)
 - [ ] **Column width**: Cells don't shrink below 40px (min-w-10)
-

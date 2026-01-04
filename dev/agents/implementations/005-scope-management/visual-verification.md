@@ -1,6 +1,7 @@
 # Visual Verification: 005 Scope Management
 
-> **Status: CLOSED** — Core CRUD functionality verified. Visual design items deferred to 006 (design alignment spec).
+> **Status: CLOSED** — Core CRUD functionality verified. Visual design items deferred to 006 (design
+> alignment spec).
 
 ## Instructions
 
@@ -18,6 +19,7 @@
 ## Jobs Page (`/jobs`)
 
 ### Layout
+
 - [~] Grid structure: title column (288px) + 7 day columns
 - [x] Grid header shows day names
 - [x] Each job is a row with title + 7 cell placeholders
@@ -25,6 +27,7 @@
 - [x] Gold theme applied (`.theme-gold`)
 
 ### Add Job
+
 - [x] "+ Add job..." button visible at bottom of list
 - [x] Click button → input appears
 - [x] Type title, press Enter → job created
@@ -33,24 +36,28 @@
 - [x] Press Escape → input closes
 
 ### Edit Job (Desktop)
+
 - [x] Click on job title → inline edit mode
 - [x] Edit text, press Enter → title saved
 - [x] Press Escape → reverts to original
 - [x] Click away → saves changes
 
 ### Edit Job (Mobile)
+
 - [x] Click anywhere on row → modal opens as full-screen sheet with proper padding
 - [~] Title as editable header with colored dot indicator
 - [~] Long titles truncate properly
 - [x] Title saves on blur or Enter
 
 ### More Menu (Desktop)
+
 - [x] Hover job row → "..." button appears
 - [x] Click "..." → modal dialog opens
 - [~] Title as editable header with colored dot indicator
 - [x] Click "Done" to close modal
 
 ### Archive Job
+
 - [x] In modal, click Archive button
 - [x] Confirmation dialog appears
 - [x] Confirm → job removed from list
@@ -60,6 +67,7 @@
 ## Projects Page (`/projects`)
 
 ### Layout
+
 - [~] Grid structure: title column (288px) + 6 month columns
 - [~] Nested items align properly in grid (indented within title cell)
 - [~] Title column and header stay frozen when scrolling horizontally
@@ -69,15 +77,18 @@
 - [x] Blue theme applied (`.theme-blue`)
 
 ### Add Project
+
 - [x] "+ Add project..." at bottom of list
 - [x] Creates top-level project
 
 ### Project Nesting
+
 - [x] Parent projects show "+ Add sub-project..." underneath
 - [x] Adding sub-project creates nested child
 - [x] Child projects are indented
 
 ### All interactions from Jobs page work on Projects
+
 - [x] Add, inline edit, modal edit, archive all work
 
 ---
@@ -103,23 +114,29 @@
 ### Round 1
 
 **Issue 1: Layout doesn't take full page height**
+
 - Jobs/Projects pages only as tall as content
 - Grid placeholder doesn't fill right panel
 
 **Issue 2: Mobile horizontal overflow**
+
 - Long titles cause horizontal scroll on mobile
 
 **Issue 3: Modal needs padding**
+
 - Sheet content body lacks horizontal padding
 
 **Issue 4: Modal title not pre-populated**
+
 - Title input is empty when modal opens
 - Stale value persists when switching between scopes
 
 **Issue 5: Console accessibility warning**
+
 - Missing DialogDescription for screen readers
 
 **Fixes applied:**
+
 - Added `h-full` to page-shell.tsx wrapper
 - Added `min-w-0` and flex layout to left panel
 - Added `px-6` padding to SheetContent
@@ -127,6 +144,7 @@
 - Added `DialogDescription` and `SheetDescription` with `sr-only`
 
 **Round 1.5 — Additional fix:**
+
 - Implemented Notion-style click-to-edit title in modal
 - Title displays as heading, click to enter edit mode
 - Saves on blur or Enter, Escape to cancel
@@ -135,13 +153,16 @@
 ### Round 2
 
 **Issue 1: Grid structure per visual designs**
+
 - Layout should be a grid with title column + day/month columns
 - Each scope is a row with title + grid cells (not separate panel)
 
 **Issue 2: Modal title should be editable header**
+
 - Remove "Edit Job" label, use editable title as header
 
 **Fixes applied:**
+
 - Created `ScopeGridRow` component with title + 7 cells (jobs) or 6 cells (projects)
 - Created `ScopeGridHeader` with day names (jobs) or month names (projects)
 - Made modal header use editable title instead of static label
@@ -151,25 +172,30 @@
 ### Round 3
 
 **Issue 1: Title column width**
+
 - Title column should be fixed at 288px
 
 **Issue 2: Nested items grid alignment**
+
 - Sub-items pushing grid cells right instead of aligning properly
 
 **Issue 3: Frozen columns with horizontal scroll**
+
 - Title column and header should stay frozen while cells scroll
 
 **Issue 4: Modal dot indicator**
+
 - Add colored dot indicator next to title in modal
 
 **Issue 5: Modal title truncation**
+
 - Long titles should truncate in the modal
 
 **Fixes applied:**
+
 - Changed from CSS Grid to Flexbox layout
 - Title column fixed at 288px (w-72) with `sticky left-0`
 - Nested items indent within title cell, not entire row
 - Grid cells scroll horizontally, title stays sticky
 - Added colored dot indicator to modal title
 - Modal title truncates with `truncate` class
-

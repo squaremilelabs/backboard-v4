@@ -9,7 +9,9 @@
 
 ## Summary
 
-This session established the foundational specs for Backboard V4 – a local-first task management app. Starting from a Figma file, we iteratively built out both the Product Requirements Document (PRD) and Technical Requirements Document (TRD) through a structured interview process.
+This session established the foundational specs for Backboard V4 – a local-first task management
+app. Starting from a Figma file, we iteratively built out both the Product Requirements Document
+(PRD) and Technical Requirements Document (TRD) through a structured interview process.
 
 ---
 
@@ -28,15 +30,16 @@ This session established the foundational specs for Backboard V4 – a local-fir
 
 Started with a draft PRD outline, then refined through Q&A:
 
-| Round | Topics Covered |
-|-------|----------------|
-| 1 | Core concepts: Jobs vs Projects, Task lifecycle, Scheduling model |
-| 2 | Triage behavior, Schedule grid interactions, Scope visibility rules |
-| 3 | Unfocused scope warnings, Archive flow, Data lifecycle |
-| 4 | Local-first sync jobs (replaced server cron), Mobile support requirements |
+| Round | Topics Covered                                                            |
+| ----- | ------------------------------------------------------------------------- |
+| 1     | Core concepts: Jobs vs Projects, Task lifecycle, Scheduling model         |
+| 2     | Triage behavior, Schedule grid interactions, Scope visibility rules       |
+| 3     | Unfocused scope warnings, Archive flow, Data lifecycle                    |
+| 4     | Local-first sync jobs (replaced server cron), Mobile support requirements |
 
 **Key Clarifications from User**:
-- Triage is for quick-add, tasks only move *out* of Triage
+
+- Triage is for quick-add, tasks only move _out_ of Triage
 - Schedule grid: toggle cells (not drag duration bars)
 - Week starts on Monday (auto-detect, user-modifiable)
 - Projects can span non-consecutive months
@@ -47,22 +50,23 @@ Started with a draft PRD outline, then refined through Q&A:
 
 Established tech stack through targeted questions:
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Framework | Next.js 16 (App Router) | LLM-friendly, latest version |
-| Rendering | Fully client-side | Local-first architecture |
-| UI Components | shadcn/ui | LLM-friendly, copied into codebase |
-| Styling | Tailwind CSS v4 | CSS-first config, latest version |
-| Local DB | Dexie.js | IndexedDB wrapper with reactive hooks |
-| Sync | Dexie Cloud | Managed sync, Clerk JWT integration |
-| Auth | Clerk | User's existing preference |
-| PWA | @serwist/next | Modern successor to next-pwa |
-| Rich Text | Tiptap | Headless, ProseMirror-based |
-| State | Zustand + Dexie useLiveQuery | Lightweight UI state + reactive data |
-| Testing | Vitest (minimal) | Lean, just to check the box |
-| Hosting | Vercel | Optimized for Next.js |
+| Decision      | Choice                       | Rationale                             |
+| ------------- | ---------------------------- | ------------------------------------- |
+| Framework     | Next.js 16 (App Router)      | LLM-friendly, latest version          |
+| Rendering     | Fully client-side            | Local-first architecture              |
+| UI Components | shadcn/ui                    | LLM-friendly, copied into codebase    |
+| Styling       | Tailwind CSS v4              | CSS-first config, latest version      |
+| Local DB      | Dexie.js                     | IndexedDB wrapper with reactive hooks |
+| Sync          | Dexie Cloud                  | Managed sync, Clerk JWT integration   |
+| Auth          | Clerk                        | User's existing preference            |
+| PWA           | @serwist/next                | Modern successor to next-pwa          |
+| Rich Text     | Tiptap                       | Headless, ProseMirror-based           |
+| State         | Zustand + Dexie useLiveQuery | Lightweight UI state + reactive data  |
+| Testing       | Vitest (minimal)             | Lean, just to check the box           |
+| Hosting       | Vercel                       | Optimized for Next.js                 |
 
 **Version Research**: Used Context7 MCP to verify latest versions:
+
 - Next.js 16.x (not 14 as initially assumed)
 - Tailwind CSS 4.x (major changes from v3)
 - React 19.x (bundled with Next.js 16)
@@ -79,11 +83,13 @@ Established tech stack through targeted questions:
 ## Key Decisions Made
 
 ### Product Decisions
+
 - **Ephemeral by design**: No permanent history, focused on "now"
 - **Time horizons**: 7-day schedule view, 6-month project timeline
 - **Unfocused scope pattern**: Red warning when tasks are in "Now" but scope not scheduled today
 
 ### Technical Decisions
+
 - **Local-first**: All data in IndexedDB, sync optional on account creation
 - **No server-side cron**: Sync jobs run client-side on app launch
 - **PWA-first**: Installable on mobile/desktop
@@ -116,14 +122,14 @@ specs/
 
 ## Tools Used
 
-| Tool | Purpose |
-|------|---------|
-| `mcp_Figma_get_design_context` | Extract design structure and code hints |
-| `mcp_Figma_get_screenshot` | Capture visual references |
-| `mcp_Figma_get_metadata` | Get node hierarchy |
-| `mcp_context7_resolve-library-id` | Find library documentation |
-| `mcp_context7_get-library-docs` | Verify latest versions |
-| `gh repo create` | Create GitHub repository |
+| Tool                              | Purpose                                 |
+| --------------------------------- | --------------------------------------- |
+| `mcp_Figma_get_design_context`    | Extract design structure and code hints |
+| `mcp_Figma_get_screenshot`        | Capture visual references               |
+| `mcp_Figma_get_metadata`          | Get node hierarchy                      |
+| `mcp_context7_resolve-library-id` | Find library documentation              |
+| `mcp_context7_get-library-docs`   | Verify latest versions                  |
+| `gh repo create`                  | Create GitHub repository                |
 
 ---
 
@@ -141,15 +147,16 @@ specs/
 ## Observations
 
 **What worked well**:
+
 - Figma MCP tools provided quick visual context
 - Interview-style PRD development caught edge cases early
 - Context7 prevented using outdated package versions
 
 **What could improve**:
+
 - Figma screenshots couldn't be auto-saved to disk (manual export needed)
 - Some back-and-forth on terminology (Mode → Job)
 
 ---
 
-*End of log*
-
+_End of log_

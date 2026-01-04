@@ -4,7 +4,8 @@
 
 ### Design Principles
 
-- **LLM-Friendly**: Tech choices optimized for AI-assisted development (well-documented, popular, lots of training data)
+- **LLM-Friendly**: Tech choices optimized for AI-assisted development (well-documented, popular,
+  lots of training data)
 - **Local-First**: App works fully offline; data stored locally in IndexedDB
 - **Sync-Ready**: Architecture supports cloud sync from day 1 via Dexie Cloud
 - **PWA-Installable**: Users can install on mobile/desktop for native-like experience
@@ -13,20 +14,20 @@
 
 ## 2. Tech Stack
 
-| Layer | Technology | Version | Notes |
-|-------|------------|---------|-------|
-| **Framework** | Next.js | 16.x | App Router, fully client-side rendering |
-| **React** | React | 19.x | Bundled with Next.js 16 |
-| **UI Components** | shadcn/ui | latest | Copied into codebase, Radix-based |
-| **Styling** | Tailwind CSS | 4.x | Uses `@tailwindcss/postcss` plugin |
-| **Rich Text Editor** | Tiptap | 2.x | Headless, ProseMirror-based |
-| **State Management** | Zustand | 5.x | Lightweight UI state; Dexie handles data |
-| **Local Database** | Dexie.js | 4.x | IndexedDB wrapper with `useLiveQuery` |
-| **Sync Engine** | Dexie Cloud | 4.x | Managed sync service |
-| **Authentication** | Clerk | @clerk/nextjs latest | Auth provider, integrates with Dexie Cloud |
-| **Hosting** | Vercel | - | Optimized for Next.js |
-| **PWA** | @serwist/next | 9.x | Modern PWA plugin (successor to next-pwa) |
-| **Testing** | Vitest | 3.x | Minimal test coverage |
+| Layer                | Technology    | Version              | Notes                                      |
+| -------------------- | ------------- | -------------------- | ------------------------------------------ |
+| **Framework**        | Next.js       | 16.x                 | App Router, fully client-side rendering    |
+| **React**            | React         | 19.x                 | Bundled with Next.js 16                    |
+| **UI Components**    | shadcn/ui     | latest               | Copied into codebase, Radix-based          |
+| **Styling**          | Tailwind CSS  | 4.x                  | Uses `@tailwindcss/postcss` plugin         |
+| **Rich Text Editor** | Tiptap        | 2.x                  | Headless, ProseMirror-based                |
+| **State Management** | Zustand       | 5.x                  | Lightweight UI state; Dexie handles data   |
+| **Local Database**   | Dexie.js      | 4.x                  | IndexedDB wrapper with `useLiveQuery`      |
+| **Sync Engine**      | Dexie Cloud   | 4.x                  | Managed sync service                       |
+| **Authentication**   | Clerk         | @clerk/nextjs latest | Auth provider, integrates with Dexie Cloud |
+| **Hosting**          | Vercel        | -                    | Optimized for Next.js                      |
+| **PWA**              | @serwist/next | 9.x                  | Modern PWA plugin (successor to next-pwa)  |
+| **Testing**          | Vitest        | 3.x                  | Minimal test coverage                      |
 
 ---
 
@@ -64,6 +65,7 @@ Since Backboard is local-first, the entire app runs client-side:
 ### 3.2 Next.js App Router Structure
 
 All pages use `"use client"` directive. Server Components are only used for:
+
 - Static layout shell
 - Metadata generation
 - Initial HTML structure
@@ -92,124 +94,124 @@ app/
 
 ```typescript
 // src/lib/db.ts
-import Dexie, { Table } from 'dexie';
-import dexieCloud from 'dexie-cloud-addon';
+import Dexie, { Table } from "dexie"
+import dexieCloud from "dexie-cloud-addon"
 
 // Types (from product spec)
-type TaskStatus = 'now' | 'later' | 'backlog' | 'done';
-type TasklistType = TaskStatus | 'recurring';
-type ScopeType = 'job' | 'project';
-type Weekday = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+type TaskStatus = "now" | "later" | "backlog" | "done"
+type TasklistType = TaskStatus | "recurring"
+type ScopeType = "job" | "project"
+type Weekday = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun"
 
 interface Task {
-  id: string;
-  scopeId: string | null;        // null = Triage
-  title: string;
-  content?: string;
-  status: TaskStatus;
-  pendingAction?: TaskStatus | 'delete' | null;
-  insertedAt: number;
-  insertedFrom: TasklistType;
-  createdAt: number;
-  completedAt?: number;          // For 7-day purge
+  id: string
+  scopeId: string | null // null = Triage
+  title: string
+  content?: string
+  status: TaskStatus
+  pendingAction?: TaskStatus | "delete" | null
+  insertedAt: number
+  insertedFrom: TasklistType
+  createdAt: number
+  completedAt?: number // For 7-day purge
 }
 
 interface RecurringTask {
-  id: string;
-  scopeId: string;
-  title: string;
-  content?: string;
-  frequency: FrequencyValue[];
-  createdAt: number;
-  lastInsertedDate?: string;     // YYYY-MM-DD, prevents duplicate insertion
+  id: string
+  scopeId: string
+  title: string
+  content?: string
+  frequency: FrequencyValue[]
+  createdAt: number
+  lastInsertedDate?: string // YYYY-MM-DD, prevents duplicate insertion
 }
 
 interface FrequencyValue {
-  weekday: Weekday;
-  time: string;                  // HH:mm
-  timezone: string;
+  weekday: Weekday
+  time: string // HH:mm
+  timezone: string
 }
 
 interface Scope {
-  id: string;
-  type: ScopeType;
-  title: string;
-  content?: string;
-  parentId?: string;             // Only for projects, 1 level
-  createdAt: number;
-  archivedAt?: number;
+  id: string
+  type: ScopeType
+  title: string
+  content?: string
+  parentId?: string // Only for projects, 1 level
+  createdAt: number
+  archivedAt?: number
 }
 
 interface ScheduleSlot {
-  id: string;
-  date: string;                  // YYYY-MM-DD
-  weekday: Weekday;
-  scopeId: string;
+  id: string
+  date: string // YYYY-MM-DD
+  weekday: Weekday
+  scopeId: string
 }
 
 interface MonthSlot {
-  id: string;
-  month: string;                 // YYYY-MM
-  projectId: string;
+  id: string
+  month: string // YYYY-MM
+  projectId: string
 }
 
 interface DefaultScheduleSlot {
-  id: string;
-  weekday: Weekday;
-  jobId: string;
+  id: string
+  weekday: Weekday
+  jobId: string
 }
 
 interface AppMeta {
-  id: string;                    // Always 'app'
-  lastSyncedAt: number;
-  timezone: string;
+  id: string // Always 'app'
+  lastSyncedAt: number
+  timezone: string
 }
 
 // Database class
 class BackboardDB extends Dexie {
-  tasks!: Table<Task>;
-  recurringTasks!: Table<RecurringTask>;
-  scopes!: Table<Scope>;
-  scheduleSlots!: Table<ScheduleSlot>;
-  monthSlots!: Table<MonthSlot>;
-  defaultScheduleSlots!: Table<DefaultScheduleSlot>;
-  appMeta!: Table<AppMeta>;
+  tasks!: Table<Task>
+  recurringTasks!: Table<RecurringTask>
+  scopes!: Table<Scope>
+  scheduleSlots!: Table<ScheduleSlot>
+  monthSlots!: Table<MonthSlot>
+  defaultScheduleSlots!: Table<DefaultScheduleSlot>
+  appMeta!: Table<AppMeta>
 
   constructor() {
-    super('backboard', { addons: [dexieCloud] });
-    
+    super("backboard", { addons: [dexieCloud] })
+
     this.version(1).stores({
-      tasks: 'id, scopeId, status, createdAt, completedAt',
-      recurringTasks: 'id, scopeId',
-      scopes: 'id, type, archivedAt',
-      scheduleSlots: 'id, date, scopeId, [date+scopeId]',
-      monthSlots: 'id, month, projectId, [month+projectId]',
-      defaultScheduleSlots: 'id, weekday, jobId, [weekday+jobId]',
-      appMeta: 'id',
-    });
+      tasks: "id, scopeId, status, createdAt, completedAt",
+      recurringTasks: "id, scopeId",
+      scopes: "id, type, archivedAt",
+      scheduleSlots: "id, date, scopeId, [date+scopeId]",
+      monthSlots: "id, month, projectId, [month+projectId]",
+      defaultScheduleSlots: "id, weekday, jobId, [weekday+jobId]",
+      appMeta: "id",
+    })
 
     // Dexie Cloud configuration
     this.cloud.configure({
       databaseUrl: process.env.NEXT_PUBLIC_DEXIE_CLOUD_URL!,
-      requireAuth: false,  // Allow anonymous local usage
-    });
+      requireAuth: false, // Allow anonymous local usage
+    })
   }
 }
 
-export const db = new BackboardDB();
+export const db = new BackboardDB()
 ```
 
 ### 4.2 Indexes Explained
 
-| Table | Index | Purpose |
-|-------|-------|---------|
-| tasks | `scopeId` | Filter tasks by scope |
-| tasks | `status` | Filter by Now/Later/Backlog/Done |
-| tasks | `completedAt` | Purge done tasks >7 days |
-| scopes | `type` | Filter Jobs vs Projects |
-| scopes | `archivedAt` | Find archived scopes for purge |
-| scheduleSlots | `[date+scopeId]` | Compound: check if scope scheduled on date |
-| monthSlots | `[month+projectId]` | Compound: check if project active in month |
+| Table         | Index               | Purpose                                    |
+| ------------- | ------------------- | ------------------------------------------ |
+| tasks         | `scopeId`           | Filter tasks by scope                      |
+| tasks         | `status`            | Filter by Now/Later/Backlog/Done           |
+| tasks         | `completedAt`       | Purge done tasks >7 days                   |
+| scopes        | `type`              | Filter Jobs vs Projects                    |
+| scopes        | `archivedAt`        | Find archived scopes for purge             |
+| scheduleSlots | `[date+scopeId]`    | Compound: check if scope scheduled on date |
+| monthSlots    | `[month+projectId]` | Compound: check if project active in month |
 
 ---
 
@@ -225,26 +227,26 @@ export const db = new BackboardDB();
 
 ```typescript
 // src/lib/auth.ts
-import { db } from './db';
-import { useAuth } from '@clerk/nextjs';
+import { db } from "./db"
+import { useAuth } from "@clerk/nextjs"
 
 export function useSyncAuth() {
-  const { getToken, isSignedIn } = useAuth();
+  const { getToken, isSignedIn } = useAuth()
 
   useEffect(() => {
     if (isSignedIn) {
       // Login to Dexie Cloud with Clerk token
       db.cloud.login({
         token: async () => {
-          const token = await getToken({ template: 'dexie-cloud' });
-          return token;
+          const token = await getToken({ template: "dexie-cloud" })
+          return token
         },
-      });
+      })
     } else {
       // Logout from Dexie Cloud (keeps local data)
-      db.cloud.logout();
+      db.cloud.logout()
     }
-  }, [isSignedIn]);
+  }, [isSignedIn])
 }
 ```
 
@@ -263,120 +265,107 @@ On app launch, run these jobs client-side:
 
 ```typescript
 // src/lib/sync.ts
-import { db } from './db';
-import { 
-  addDays, 
-  format, 
-  isAfter, 
-  subDays,
-  startOfWeek,
-  parse 
-} from 'date-fns';
+import { db } from "./db"
+import { addDays, format, isAfter, subDays, startOfWeek, parse } from "date-fns"
 
 export async function runSyncJobs() {
-  const now = new Date();
-  const today = format(now, 'yyyy-MM-dd');
-  
+  const now = new Date()
+  const today = format(now, "yyyy-MM-dd")
+
   await Promise.all([
     insertRecurringTasks(now, today),
     populateScheduleSlots(today),
     purgeDoneTasks(now),
     purgeArchivedScopes(now),
-  ]);
+  ])
 
   // Update last synced timestamp
-  await db.appMeta.put({ id: 'app', lastSyncedAt: Date.now() });
+  await db.appMeta.put({ id: "app", lastSyncedAt: Date.now() })
 }
 
 async function insertRecurringTasks(now: Date, today: string) {
-  const currentWeekday = format(now, 'eee').toLowerCase() as Weekday;
-  const currentTime = format(now, 'HH:mm');
-  
-  const recurringTasks = await db.recurringTasks.toArray();
-  
+  const currentWeekday = format(now, "eee").toLowerCase() as Weekday
+  const currentTime = format(now, "HH:mm")
+
+  const recurringTasks = await db.recurringTasks.toArray()
+
   for (const rt of recurringTasks) {
     // Skip if already inserted today
-    if (rt.lastInsertedDate === today) continue;
-    
+    if (rt.lastInsertedDate === today) continue
+
     // Check if any frequency matches now
-    const shouldInsert = rt.frequency.some(f => 
-      f.weekday === currentWeekday && f.time <= currentTime
-    );
-    
+    const shouldInsert = rt.frequency.some(
+      (f) => f.weekday === currentWeekday && f.time <= currentTime
+    )
+
     if (shouldInsert) {
       await db.tasks.add({
         id: crypto.randomUUID(),
         scopeId: rt.scopeId,
         title: rt.title,
         content: rt.content,
-        status: 'now',
+        status: "now",
         insertedAt: Date.now(),
-        insertedFrom: 'recurring',
+        insertedFrom: "recurring",
         createdAt: Date.now(),
-      });
-      
-      await db.recurringTasks.update(rt.id, { lastInsertedDate: today });
+      })
+
+      await db.recurringTasks.update(rt.id, { lastInsertedDate: today })
     }
   }
 }
 
 async function populateScheduleSlots(today: string) {
-  const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }); // Monday
-  
+  const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }) // Monday
+
   // Get all default schedule slots
-  const defaults = await db.defaultScheduleSlots.toArray();
-  
+  const defaults = await db.defaultScheduleSlots.toArray()
+
   // Create slots for next 7 days
   for (let i = 0; i < 7; i++) {
-    const date = addDays(new Date(today), i);
-    const dateStr = format(date, 'yyyy-MM-dd');
-    const weekday = format(date, 'eee').toLowerCase() as Weekday;
-    
+    const date = addDays(new Date(today), i)
+    const dateStr = format(date, "yyyy-MM-dd")
+    const weekday = format(date, "eee").toLowerCase() as Weekday
+
     // Find defaults for this weekday
-    const dayDefaults = defaults.filter(d => d.weekday === weekday);
-    
+    const dayDefaults = defaults.filter((d) => d.weekday === weekday)
+
     for (const def of dayDefaults) {
       // Check if slot already exists
       const existing = await db.scheduleSlots
-        .where('[date+scopeId]')
+        .where("[date+scopeId]")
         .equals([dateStr, def.jobId])
-        .first();
-      
+        .first()
+
       if (!existing) {
         await db.scheduleSlots.add({
           id: crypto.randomUUID(),
           date: dateStr,
           weekday,
           scopeId: def.jobId,
-        });
+        })
       }
     }
   }
 }
 
 async function purgeDoneTasks(now: Date) {
-  const cutoff = subDays(now, 7).getTime();
-  
-  await db.tasks
-    .where('completedAt')
-    .below(cutoff)
-    .delete();
+  const cutoff = subDays(now, 7).getTime()
+
+  await db.tasks.where("completedAt").below(cutoff).delete()
 }
 
 async function purgeArchivedScopes(now: Date) {
-  const cutoff = subDays(now, 30).getTime();
-  
-  const toDelete = await db.scopes
-    .where('archivedAt')
-    .below(cutoff)
-    .toArray();
-  
+  const cutoff = subDays(now, 30).getTime()
+
+  const toDelete = await db.scopes.where("archivedAt").below(cutoff).toArray()
+
   for (const scope of toDelete) {
     // Delete scope and its tasks
-    await db.tasks.where('scopeId').equals(scope.id).delete();
-    await db.recurringTasks.where('scopeId').equals(scope.id).delete();
-    await db.scheduleSlots.where('scopeId').equals(scope.id).delete();
-    await db.scopes.delete(scope.id);
+    await db.tasks.where("scopeId").equals(scope.id).delete()
+    await db.recurringTasks.where("scopeId").equals(scope.id).delete()
+    await db.scheduleSlots.where("scopeId").equals(scope.id).delete()
+    await db.scopes.delete(scope.id)
   }
 }
 ```
@@ -391,31 +380,31 @@ Serwist is the modern successor to next-pwa, actively maintained for Next.js 14+
 
 ```typescript
 // next.config.ts
-import withSerwistInit from "@serwist/next";
+import withSerwistInit from "@serwist/next"
 
 const withSerwist = withSerwistInit({
   swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
-});
+})
 
 export default withSerwist({
   // Next.js config
-});
+})
 ```
 
 ```typescript
 // src/app/sw.ts
-import { defaultCache } from "@serwist/next/worker";
-import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { Serwist } from "serwist";
+import { defaultCache } from "@serwist/next/worker"
+import type { PrecacheEntry, SerwistGlobalConfig } from "serwist"
+import { Serwist } from "serwist"
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
-    __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
+    __SW_MANIFEST: (PrecacheEntry | string)[] | undefined
   }
 }
 
-declare const self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
@@ -423,9 +412,9 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: defaultCache,
-});
+})
 
-serwist.addEventListeners();
+serwist.addEventListeners()
 ```
 
 ### 7.2 Web App Manifest
@@ -466,7 +455,8 @@ serwist.addEventListeners();
 
 ## 8. Rich Text Editor (Tiptap)
 
-Tiptap is used for task notes and scope content. It's headless, highly customizable, and has excellent shadcn/ui integrations.
+Tiptap is used for task notes and scope content. It's headless, highly customizable, and has
+excellent shadcn/ui integrations.
 
 ### 8.1 Setup
 
@@ -482,49 +472,51 @@ pnpm add @tiptap/extension-placeholder @tiptap/extension-link @tiptap/extension-
 
 ```typescript
 // src/components/editor/tiptap-editor.tsx
-'use client';
+"use client"
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Placeholder from '@tiptap/extension-placeholder';
-import Link from '@tiptap/extension-link';
-import TaskList from '@tiptap/extension-task-list';
-import TaskItem from '@tiptap/extension-task-item';
+import { useEditor, EditorContent } from "@tiptap/react"
+import StarterKit from "@tiptap/starter-kit"
+import Placeholder from "@tiptap/extension-placeholder"
+import Link from "@tiptap/extension-link"
+import TaskList from "@tiptap/extension-task-list"
+import TaskItem from "@tiptap/extension-task-item"
 
 interface TiptapEditorProps {
-  content: string;
-  onChange: (content: string) => void;
-  placeholder?: string;
+  content: string
+  onChange: (content: string) => void
+  placeholder?: string
 }
 
 export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Placeholder.configure({ placeholder: placeholder ?? 'Add notes...' }),
+      Placeholder.configure({ placeholder: placeholder ?? "Add notes..." }),
       Link.configure({ openOnClick: false }),
       TaskList,
       TaskItem.configure({ nested: true }),
     ],
     content,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      onChange(editor.getHTML())
     },
-  });
+  })
 
-  return <EditorContent editor={editor} className="prose prose-sm max-w-none" />;
+  return <EditorContent editor={editor} className="prose prose-sm max-w-none" />
 }
 ```
 
 ### 8.3 Editor Features
 
 For task notes, we support:
+
 - **Basic formatting**: Bold, italic, strikethrough
 - **Lists**: Bullet, numbered, and task checklists
 - **Links**: URL embedding
 - **Placeholder text**: Contextual hints
 
-> **Note**: Consider using [shadcn-minimal-tiptap](https://github.com/aslam97/shadcn-minimal-tiptap) for a pre-built shadcn-styled toolbar.
+> **Note**: Consider using [shadcn-minimal-tiptap](https://github.com/aslam97/shadcn-minimal-tiptap)
+> for a pre-built shadcn-styled toolbar.
 
 ---
 
@@ -536,25 +528,28 @@ Dexie provides reactive hooks for IndexedDB queries. This is the primary data la
 
 ```typescript
 // src/hooks/use-tasks.ts
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/db';
+import { useLiveQuery } from "dexie-react-hooks"
+import { db } from "@/lib/db"
 
 export function useTasks(scopeId: string | null, status: TaskStatus) {
   return useLiveQuery(
-    () => db.tasks
-      .where({ scopeId, status })
-      .sortBy('position'),
+    () => db.tasks.where({ scopeId, status }).sortBy("position"),
     [scopeId, status]
-  );
+  )
 }
 
 export function useScopes(type?: ScopeType) {
   return useLiveQuery(
-    () => type
-      ? db.scopes.where('type').equals(type).and(s => !s.archivedAt).toArray()
-      : db.scopes.filter(s => !s.archivedAt).toArray(),
+    () =>
+      type
+        ? db.scopes
+            .where("type")
+            .equals(type)
+            .and((s) => !s.archivedAt)
+            .toArray()
+        : db.scopes.filter((s) => !s.archivedAt).toArray(),
     [type]
-  );
+  )
 }
 ```
 
@@ -568,22 +563,22 @@ pnpm add zustand
 
 ```typescript
 // src/stores/ui-store.ts
-import { create } from 'zustand';
+import { create } from "zustand"
 
 interface UIState {
   // Active selections
-  activeTaskId: string | null;
-  activeScopeId: string | null;
-  
+  activeTaskId: string | null
+  activeScopeId: string | null
+
   // Modals
-  isScopeModalOpen: boolean;
-  scopeModalMode: 'create' | 'edit' | null;
-  
+  isScopeModalOpen: boolean
+  scopeModalMode: "create" | "edit" | null
+
   // Actions
-  setActiveTask: (id: string | null) => void;
-  setActiveScope: (id: string | null) => void;
-  openScopeModal: (mode: 'create' | 'edit') => void;
-  closeScopeModal: () => void;
+  setActiveTask: (id: string | null) => void
+  setActiveScope: (id: string | null) => void
+  openScopeModal: (mode: "create" | "edit") => void
+  closeScopeModal: () => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -591,22 +586,22 @@ export const useUIStore = create<UIState>((set) => ({
   activeScopeId: null,
   isScopeModalOpen: false,
   scopeModalMode: null,
-  
+
   setActiveTask: (id) => set({ activeTaskId: id }),
   setActiveScope: (id) => set({ activeScopeId: id }),
   openScopeModal: (mode) => set({ isScopeModalOpen: true, scopeModalMode: mode }),
   closeScopeModal: () => set({ isScopeModalOpen: false, scopeModalMode: null }),
-}));
+}))
 ```
 
 ### 9.3 State Architecture Summary
 
-| State Type | Solution | Examples |
-|------------|----------|----------|
-| **Persistent Data** | Dexie.js + `useLiveQuery` | Tasks, Scopes, ScheduleSlots |
-| **UI State** | Zustand | Active selections, modal state |
-| **Form State** | React Hook Form (optional) | Task editing, scope forms |
-| **Server State** | N/A (local-first) | Sync status handled by Dexie Cloud |
+| State Type          | Solution                   | Examples                           |
+| ------------------- | -------------------------- | ---------------------------------- |
+| **Persistent Data** | Dexie.js + `useLiveQuery`  | Tasks, Scopes, ScheduleSlots       |
+| **UI State**        | Zustand                    | Active selections, modal state     |
+| **Form State**      | React Hook Form (optional) | Task editing, scope forms          |
+| **Server State**    | N/A (local-first)          | Sync status handled by Dexie Cloud |
 
 ---
 
@@ -683,9 +678,11 @@ backboard-v4/
 └── package.json
 ```
 
-> **Note**: Tailwind CSS v4 uses CSS-first configuration. Theme customization is done in your main CSS file using `@theme` blocks, not a separate `tailwind.config.js`.
+> **Note**: Tailwind CSS v4 uses CSS-first configuration. Theme customization is done in your main
+> CSS file using `@theme` blocks, not a separate `tailwind.config.js`.
 
-> **Note**: The `dev/` folder is excluded from ESLint/Prettier to keep specs and scripts lightweight.
+> **Note**: The `dev/` folder is excluded from ESLint/Prettier to keep specs and scripts
+> lightweight.
 
 ---
 
@@ -721,14 +718,7 @@ const eslintConfig = defineConfig([
       "prettier/prettier": "warn",
     },
   },
-  globalIgnores([
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    "node_modules",
-    "dev/*",
-  ]),
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "node_modules", "dev/*"]),
 ])
 
 export default eslintConfig
@@ -739,11 +729,7 @@ export default eslintConfig
 ```json
 // .prettierrc
 {
-  "plugins": [
-    "prettier-plugin-tailwindcss",
-    "prettier-plugin-classnames",
-    "prettier-plugin-merge"
-  ],
+  "plugins": ["prettier-plugin-tailwindcss", "prettier-plugin-classnames", "prettier-plugin-merge"],
   "semi": false,
   "printWidth": 100,
   "proseWrap": "always",
@@ -817,7 +803,8 @@ Recommended VS Code / Cursor settings (`.vscode/settings.json`):
 }
 ```
 
-> **Note**: Always use `@latest` when installing to get the most current versions. The versions above are approximate minimums as of December 2024.
+> **Note**: Always use `@latest` when installing to get the most current versions. The versions
+> above are approximate minimums as of December 2024.
 
 ---
 
@@ -846,43 +833,43 @@ Minimal testing to "check the box":
 
 ```typescript
 // vitest.config.ts
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vitest/config"
+import react from "@vitejs/plugin-react"
 
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
   },
-});
+})
 ```
 
 ### 14.2 Test Coverage
 
-| Area | Coverage |
-|------|----------|
-| Sync jobs | Unit tests for purge logic, recurring insertion |
-| Database operations | Basic CRUD tests with fake-indexeddb |
-| Components | Skip – visual testing via Storybook if needed later |
-| E2E | Skip for MVP |
+| Area                | Coverage                                            |
+| ------------------- | --------------------------------------------------- |
+| Sync jobs           | Unit tests for purge logic, recurring insertion     |
+| Database operations | Basic CRUD tests with fake-indexeddb                |
+| Components          | Skip – visual testing via Storybook if needed later |
+| E2E                 | Skip for MVP                                        |
 
 ```typescript
 // dev/tests/sync.test.ts
-import { describe, it, expect, beforeEach } from 'vitest';
-import 'fake-indexeddb/auto';
-import { db } from '@/lib/db';
+import { describe, it, expect, beforeEach } from "vitest"
+import "fake-indexeddb/auto"
+import { db } from "@/lib/db"
 
-describe('Sync Jobs', () => {
+describe("Sync Jobs", () => {
   beforeEach(async () => {
-    await db.tasks.clear();
-    await db.scopes.clear();
-  });
+    await db.tasks.clear()
+    await db.scopes.clear()
+  })
 
-  it('purges tasks older than 7 days', async () => {
+  it("purges tasks older than 7 days", async () => {
     // ... minimal test
-  });
-});
+  })
+})
 ```
 
 ---
@@ -923,7 +910,7 @@ export default {
   plugins: {
     "@tailwindcss/postcss": {},
   },
-};
+}
 ```
 
 ### 15.3 shadcn/ui Components
@@ -950,13 +937,13 @@ vercel --prod
 
 ## 16. Open Technical Decisions
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Dexie Cloud pricing tier | TBD | Free tier may suffice for MVP |
-| Clerk JWT template setup | TBD | Need to configure for Dexie Cloud |
-| Offline fallback UI | TBD | What to show when truly offline |
-| Data export/import | TBD | User data portability |
-| Analytics | TBD | Vercel Analytics, Plausible, or skip |
+| Item                     | Status | Notes                                |
+| ------------------------ | ------ | ------------------------------------ |
+| Dexie Cloud pricing tier | TBD    | Free tier may suffice for MVP        |
+| Clerk JWT template setup | TBD    | Need to configure for Dexie Cloud    |
+| Offline fallback UI      | TBD    | What to show when truly offline      |
+| Data export/import       | TBD    | User data portability                |
+| Analytics                | TBD    | Vercel Analytics, Plausible, or skip |
 
 ---
 
@@ -970,8 +957,7 @@ vercel --prod
 - [Zustand Docs](https://zustand.docs.pmnd.rs)
 - [Dexie.js Docs](https://dexie.org)
 - [Dexie Cloud Docs](https://dexie.org/cloud)
-- [Dexie React Hooks](https://dexie.org/docs/dexie-react-hooks/useLiveQuery())
+- [Dexie React Hooks](<https://dexie.org/docs/dexie-react-hooks/useLiveQuery()>)
 - [Clerk + Next.js](https://clerk.com/docs/quickstarts/nextjs)
 - [Clerk JWT Templates](https://clerk.com/docs/backend-requests/making/jwt-templates)
 - [Serwist (PWA)](https://serwist.pages.dev/docs/next)
-

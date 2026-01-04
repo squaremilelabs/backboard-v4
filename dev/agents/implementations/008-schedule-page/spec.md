@@ -1,18 +1,20 @@
 # Schedule Page (7-Day View)
 
-| Field | Value |
-|-------|-------|
-| **ID** | 008 |
-| **Status** | ✅ Complete |
-| **Progress** | All steps complete |
-| **Created** | 2026-01-03 |
-| **Last Updated** | 2026-01-03 |
+| Field            | Value              |
+| ---------------- | ------------------ |
+| **ID**           | 008                |
+| **Status**       | ✅ Complete        |
+| **Progress**     | All steps complete |
+| **Created**      | 2026-01-03         |
+| **Last Updated** | 2026-01-03         |
 
 ---
 
 ## Overview
 
-Build the Schedule Page with a 7-day view (Today → +6 days) showing all Jobs and Projects active in the relevant month(s). Users can click cells to toggle `ScheduleSlot` records. Reuses the grid infrastructure from 007.
+Build the Schedule Page with a 7-day view (Today → +6 days) showing all Jobs and Projects active in
+the relevant month(s). Users can click cells to toggle `ScheduleSlot` records. Reuses the grid
+infrastructure from 007.
 
 ---
 
@@ -20,19 +22,20 @@ Build the Schedule Page with a 7-day view (Today → +6 days) showing all Jobs a
 
 Read these before implementing:
 
-| Topic | Source |
-|-------|--------|
-| Schedule page design | `dev/specs/prd.md` §4.2 |
-| ScheduleSlot schema | `dev/specs/trd.md` §4.1 |
-| Visual reference | `dev/specs/visuals/page-schedule.png` |
-| Existing grid components | `src/components/scopes/schedule-cell.tsx`, `scope-grid-row.tsx` |
-| Schedule mutations pattern | `src/lib/schedule-mutations.ts` |
+| Topic                      | Source                                                          |
+| -------------------------- | --------------------------------------------------------------- |
+| Schedule page design       | `dev/specs/prd.md` §4.2                                         |
+| ScheduleSlot schema        | `dev/specs/trd.md` §4.1                                         |
+| Visual reference           | `dev/specs/visuals/page-schedule.png`                           |
+| Existing grid components   | `src/components/scopes/schedule-cell.tsx`, `scope-grid-row.tsx` |
+| Schedule mutations pattern | `src/lib/schedule-mutations.ts`                                 |
 
 ---
 
 ## Scope
 
 ### In Scope
+
 - 7-day grid: Today + next 6 days
 - Date headers: "Mon, Jan 5", "Tue, Jan 6", etc.
 - Rows: All non-archived Jobs + Projects active in current/next month
@@ -44,6 +47,7 @@ Read these before implementing:
 - Scopes listed together (Jobs + Projects mixed), distinguished by dot color
 
 ### Out of Scope
+
 - Auto-population from `DefaultScheduleSlot` (Local Sync Jobs implementation)
 - Showing tasks within cells
 - Drag-and-drop between days
@@ -92,10 +96,7 @@ export async function toggleScheduleSlot(
   date: string // YYYY-MM-DD
 ): Promise<void> {
   // Check if slot exists
-  const existing = await db.scheduleSlots
-    .where("[date+scopeId]")
-    .equals([date, scopeId])
-    .first()
+  const existing = await db.scheduleSlots.where("[date+scopeId]").equals([date, scopeId]).first()
 
   if (existing) {
     await db.scheduleSlots.delete(existing.id)
@@ -116,7 +117,8 @@ export async function toggleScheduleSlot(
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - Function exported from file
 - No TypeScript errors: `pnpm tsc --noEmit`
 
@@ -164,7 +166,8 @@ export function getNext7Days(): Array<{ key: string; label: string; month: strin
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - Functions exported
 - No TypeScript errors
 
@@ -204,7 +207,8 @@ export function ScheduleGridHeader() {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File created at `src/components/schedule/schedule-grid-header.tsx`
 - No TypeScript errors
 
@@ -240,7 +244,12 @@ export function ScheduleGridRow({ scope, scheduleSlots }: ScheduleGridRowProps) 
   const themeClass = isJob ? "theme-gold" : "theme-blue"
 
   return (
-    <div className={cn("group flex min-w-0 items-center transition-colors hover:bg-muted/50", themeClass)}>
+    <div
+      className={cn(
+        "group flex min-w-0 items-center transition-colors hover:bg-muted/50",
+        themeClass
+      )}
+    >
       {/* Title cell - fixed width, sticky on scroll */}
       <div
         className={cn(
@@ -276,7 +285,8 @@ export function ScheduleGridRow({ scope, scheduleSlots }: ScheduleGridRowProps) 
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File created at `src/components/schedule/schedule-grid-row.tsx`
 - No TypeScript errors
 
@@ -284,7 +294,8 @@ export function ScheduleGridRow({ scope, scheduleSlots }: ScheduleGridRowProps) 
 
 ### Step 5: Create useScheduleScopes hook ✅
 
-**Do**: Create a hook that returns all scopes that should appear on the Schedule page (all Jobs + Projects active in relevant months).
+**Do**: Create a hook that returns all scopes that should appear on the Schedule page (all Jobs +
+Projects active in relevant months).
 
 **Modify** `src/hooks/use-scopes.ts` — add this export:
 
@@ -295,30 +306,24 @@ export function ScheduleGridRow({ scope, scheduleSlots }: ScheduleGridRowProps) 
  * - Projects that have a MonthSlot for any of the provided months
  */
 export function useScheduleScopes(activeMonths: string[]) {
-  return useLiveQuery(
-    async () => {
-      // Get all non-archived scopes
-      const allScopes = await db.scopes.filter((s) => !s.archivedAt).toArray()
+  return useLiveQuery(async () => {
+    // Get all non-archived scopes
+    const allScopes = await db.scopes.filter((s) => !s.archivedAt).toArray()
 
-      // Get all month slots
-      const monthSlots = await db.monthSlots.toArray()
-      const activeProjectIds = new Set(
-        monthSlots
-          .filter((ms) => activeMonths.includes(ms.month))
-          .map((ms) => ms.projectId)
-      )
+    // Get all month slots
+    const monthSlots = await db.monthSlots.toArray()
+    const activeProjectIds = new Set(
+      monthSlots.filter((ms) => activeMonths.includes(ms.month)).map((ms) => ms.projectId)
+    )
 
-      // Filter: all Jobs + Projects with active months
-      return allScopes.filter(
-        (scope) => scope.type === "job" || activeProjectIds.has(scope.id)
-      )
-    },
-    [activeMonths.join(",")]
-  )
+    // Filter: all Jobs + Projects with active months
+    return allScopes.filter((scope) => scope.type === "job" || activeProjectIds.has(scope.id))
+  }, [activeMonths.join(",")])
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - Function exported
 - No TypeScript errors
 
@@ -368,11 +373,7 @@ export default function SchedulePage() {
           ) : (
             <div className="flex flex-col">
               {scopes.map((scope) => (
-                <ScheduleGridRow
-                  key={scope.id}
-                  scope={scope}
-                  scheduleSlots={scheduleSlots}
-                />
+                <ScheduleGridRow key={scope.id} scope={scope} scheduleSlots={scheduleSlots} />
               ))}
             </div>
           )}
@@ -383,7 +384,8 @@ export default function SchedulePage() {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File updated
 - No TypeScript errors
 
@@ -394,12 +396,14 @@ export default function SchedulePage() {
 **Do**: Ensure everything compiles and builds.
 
 **Commands**:
+
 ```bash
 pnpm tsc --noEmit
 pnpm build
 ```
 
 **Verify**:
+
 - No TypeScript errors
 - Build succeeds with exit code 0
 
@@ -410,6 +414,7 @@ pnpm build
 **Do**: Test in browser.
 
 **Commands**:
+
 ```bash
 pnpm dev
 ```
@@ -448,17 +453,17 @@ pnpm dev
 
 Run these checks after implementation is complete:
 
-| Check | Command | Expected Result |
-|-------|---------|-----------------|
-| TypeScript | `pnpm tsc --noEmit` | No errors |
-| Linting | `pnpm lint` | No errors |
-| Build | `pnpm build` | Exits with code 0 |
-| Dev server | `pnpm dev` | Starts without errors |
+| Check      | Command             | Expected Result       |
+| ---------- | ------------------- | --------------------- |
+| TypeScript | `pnpm tsc --noEmit` | No errors             |
+| Linting    | `pnpm lint`         | No errors             |
+| Build      | `pnpm build`        | Exits with code 0     |
+| Dev server | `pnpm dev`          | Starts without errors |
 
 Manual checks:
+
 - [ ] Schedule page shows 7-day grid with date headers
 - [ ] All Jobs visible, only active-month Projects visible
 - [ ] Click toggles ScheduleSlot (gold for Jobs, blue for Projects)
 - [ ] Sticky header + sticky title column work correctly
 - [ ] Data persists in IndexedDB across refresh
-

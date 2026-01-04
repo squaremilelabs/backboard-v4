@@ -64,7 +64,7 @@ Resize browser to less than 768px wide (or use DevTools mobile mode).
 
 - [x] Click hamburger → drawer slides in from left
 - [x] Drawer shows "Backboard" title
-- [x]  All nav items visible: Tasks, Schedule, Projects, Jobs
+- [x] All nav items visible: Tasks, Schedule, Projects, Jobs
 - [x] Archive in bottom section with separator
 - [x] Active page is highlighted
 - [x] Click nav item → navigates AND closes drawer
@@ -92,18 +92,22 @@ _Document any issues found during verification. Agent will address these, then y
 ### Round 1
 
 **Issue 1: No sidebar animation**
+
 - Sidebar collapse/expand works but has no transition
 - Requested smooth CSS width animation
 
 **Issue 2: Content too thin when empty**
+
 - Main content has max-width but doesn't fill available screen width
 - Looks too narrow when page content is minimal
 
 **Issue 3: Layout shift on page load**
+
 - Sidebar starts collapsed for a moment, then expands
 - Visible flash/shift during hydration
 
 **Fixes applied:**
+
 - Added `transition-[width] duration-200` to sidebar, animates from `w-64` to `w-0`
 - Restructured layout: content uses `flex-1` to fill width, `max-w-5xl` on inner div
 - Changed initial state to collapsed, uses opacity fade during hydration
@@ -111,6 +115,7 @@ _Document any issues found during verification. Agent will address these, then y
 ### Round 2
 
 **Issue 1: Layout shift still present**
+
 - Sidebar still starts collapsed then expands on page load
 - localStorage read happens after React hydration, causing mismatch
 - Fixing requires blocking script or alternative storage approach
@@ -128,8 +133,8 @@ When all items are checked and no blocking issues remain:
 - [x] All navigation checks pass
 - [x] No blocking issues (1 low-priority issue deferred)
 
-**Verified by**: _______________  
-**Date**: _______________
+**Verified by**: ******\_\_\_******  
+**Date**: ******\_\_\_******
 
 ---
 
@@ -137,7 +142,8 @@ When all items are checked and no blocking issues remain:
 
 _This section is for documentation purposes and can be removed in future implementations._
 
-This file serves as a template for visual verification steps. When creating a new implementation that requires visual verification:
+This file serves as a template for visual verification steps. When creating a new implementation
+that requires visual verification:
 
 1. Copy this file structure
 2. Customize the checklist items for the specific implementation
@@ -145,9 +151,9 @@ This file serves as a template for visual verification steps. When creating a ne
 4. Keep the Issues & Feedback section for iteration
 
 The agent should **not** attempt to run visual verification. Instead:
+
 - Agent runs `pnpm dev` with `required_permissions: ["all"]` to avoid sandbox issues
 - Agent provides this checklist to the user
 - User performs verification and provides feedback
 - Agent addresses any issues
 - Repeat until sign-off
-

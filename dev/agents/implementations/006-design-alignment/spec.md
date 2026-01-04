@@ -1,18 +1,20 @@
 # Design Alignment
 
-| Field | Value |
-|-------|-------|
-| **ID** | 006 |
-| **Status** | ✅ Complete |
-| **Progress** | All steps complete |
-| **Created** | 2025-12-31 |
-| **Last Updated** | 2026-01-03 |
+| Field            | Value              |
+| ---------------- | ------------------ |
+| **ID**           | 006                |
+| **Status**       | ✅ Complete        |
+| **Progress**     | All steps complete |
+| **Created**      | 2025-12-31         |
+| **Last Updated** | 2026-01-03         |
 
 ---
 
 ## Overview
 
-Realign the app's visual design with the original Figma mockups. The core issue: we built an "app shell" pattern with lifted sidebar and header, when the design calls for a flat sidebar/header that blends with the background, with only the page content being the elevated white card.
+Realign the app's visual design with the original Figma mockups. The core issue: we built an "app
+shell" pattern with lifted sidebar and header, when the design calls for a flat sidebar/header that
+blends with the background, with only the page content being the elevated white card.
 
 ---
 
@@ -20,12 +22,12 @@ Realign the app's visual design with the original Figma mockups. The core issue:
 
 Read these before implementing:
 
-| Topic | Source |
-|-------|--------|
-| Original page layouts | `dev/specs/visuals/page-tasks.png`, `page-jobs.png`, `page-projects.png`, `page-schedule.png` |
-| Current screenshots | `dev/agents/implementations/006-design-alignment/screenshots/` |
-| Current layout components | `src/components/layout/` |
-| Current scope components | `src/components/scopes/` |
+| Topic                     | Source                                                                                        |
+| ------------------------- | --------------------------------------------------------------------------------------------- |
+| Original page layouts     | `dev/specs/visuals/page-tasks.png`, `page-jobs.png`, `page-projects.png`, `page-schedule.png` |
+| Current screenshots       | `dev/agents/implementations/006-design-alignment/screenshots/`                                |
+| Current layout components | `src/components/layout/`                                                                      |
+| Current scope components  | `src/components/scopes/`                                                                      |
 
 ---
 
@@ -33,11 +35,14 @@ Read these before implementing:
 
 ### In Scope
 
-1. **Minimal flat header** — 36px height, blends with gray background, contains toggle + "Backboard" text
+1. **Minimal flat header** — 36px height, blends with gray background, contains toggle + "Backboard"
+   text
 2. **Flat sidebar** — Same background color as page shell, no border-right, seamless with header
-3. **White rounded content card** — Page content wrapped in white card with rounded corners (the "lifted" element)
+3. **White rounded content card** — Page content wrapped in white card with rounded corners (the
+   "lifted" element)
 4. **Simplified nav styling** — Lighter active state, remove border separators
-5. **Jobs/Projects grid card** — Unified white card containing scope list column + grid columns as one cohesive unit
+5. **Jobs/Projects grid card** — Unified white card containing scope list column + grid columns as
+   one cohesive unit
 6. **Subtle add inputs** — Less prominent, no full-width colored input borders
 
 ### Out of Scope
@@ -78,7 +83,8 @@ Read these before implementing:
 
 ### Step 1: Update PageShell Structure
 
-**Do**: Restructure the PageShell to have a flat header + sidebar, with content in a white rounded card.
+**Do**: Restructure the PageShell to have a flat header + sidebar, with content in a white rounded
+card.
 
 **Modify** `src/components/layout/page-shell.tsx`:
 
@@ -100,9 +106,11 @@ The new structure should be:
 ```
 
 Key changes:
+
 - Header: 36px (`h-9`), no border-bottom, same bg as shell (`bg-muted/30` or similar)
 - Sidebar: Remove `bg-background` and `border-r`, inherit shell bg
-- Content area: Add a wrapper div with `bg-background rounded-lg` (or `rounded-xl`) and appropriate margin/padding
+- Content area: Add a wrapper div with `bg-background rounded-lg` (or `rounded-xl`) and appropriate
+  margin/padding
 
 ```tsx
 // Conceptual structure (not final code)
@@ -130,7 +138,8 @@ Key changes:
 </div>
 ```
 
-**Verify**: 
+**Verify**:
+
 - Header is 36px, flat, contains toggle + "Backboard"
 - Sidebar has no right border, blends with gray bg
 - Content area is a white rounded card
@@ -145,6 +154,7 @@ Key changes:
 **Modify** `src/components/layout/app-sidebar.tsx`:
 
 Changes:
+
 - Remove `border-r` and `bg-background` from aside element
 - Remove `border-b` from header area (header is now in PageShell)
 - Remove `border-t` separator above Archive — use spacing instead
@@ -160,7 +170,7 @@ function NavItem({ href, label, isActive }: NavItemProps) {
       className={cn(
         "block rounded-md px-3 py-1.5 text-sm transition-colors",
         isActive
-          ? "bg-background/60 font-medium"  // Subtle white tint, not heavy gray
+          ? "bg-background/60 font-medium" // Subtle white tint, not heavy gray
           : "text-muted-foreground hover:text-foreground"
       )}
     >
@@ -171,6 +181,7 @@ function NavItem({ href, label, isActive }: NavItemProps) {
 ```
 
 **Verify**:
+
 - Sidebar blends seamlessly with gray background
 - No visible borders
 - Active state is subtle (slight bg tint)
@@ -192,10 +203,7 @@ interface ContentCardProps {
 
 export function ContentCard({ children, className }: ContentCardProps) {
   return (
-    <div className={cn(
-      "h-full bg-background rounded-xl overflow-hidden",
-      className
-    )}>
+    <div className={cn("h-full overflow-hidden rounded-xl bg-background", className)}>
       {children}
     </div>
   )
@@ -203,6 +211,7 @@ export function ContentCard({ children, className }: ContentCardProps) {
 ```
 
 **Verify**:
+
 - File exists
 - No TypeScript errors
 
@@ -215,6 +224,7 @@ export function ContentCard({ children, className }: ContentCardProps) {
 **Modify** `src/app/jobs/page.tsx`:
 
 The design shows a unified grid where:
+
 - First column: Scope names (sticky)
 - Remaining columns: Day cells (Mon-Sun)
 - All inside one white card
@@ -235,19 +245,12 @@ export default function JobsPage() {
     <ContentCard>
       <div className="theme-gold h-full overflow-auto">
         {/* Grid header */}
-        <ScopeGridHeader 
-          title="Jobs" 
-          columns={days} 
-        />
-        
+        <ScopeGridHeader title="Jobs" columns={days} />
+
         {/* Grid rows */}
         <div className="divide-y">
           {scopes?.map((scope) => (
-            <ScopeGridRow
-              key={scope.id}
-              scope={scope}
-              columns={days}
-            />
+            <ScopeGridRow key={scope.id} scope={scope} columns={days} />
           ))}
         </div>
 
@@ -260,6 +263,7 @@ export default function JobsPage() {
 ```
 
 **Verify**:
+
 - Jobs page renders inside white rounded card
 - Grid feels cohesive (one visual unit)
 - No TypeScript errors
@@ -282,18 +286,13 @@ interface ScopeGridHeaderProps {
 
 export function ScopeGridHeader({ title, columns }: ScopeGridHeaderProps) {
   return (
-    <div className="grid grid-cols-[200px_repeat(auto-fit,minmax(80px,1fr))] border-b bg-muted/30 sticky top-0 z-10">
+    <div className="sticky top-0 z-10 grid grid-cols-[200px_repeat(auto-fit,minmax(80px,1fr))] border-b bg-muted/30">
       {/* Title column */}
-      <div className="px-4 py-2 font-medium text-sm">
-        {title}
-      </div>
-      
+      <div className="px-4 py-2 text-sm font-medium">{title}</div>
+
       {/* Day/Month columns */}
       {columns.map((col) => (
-        <div 
-          key={col} 
-          className="px-2 py-2 text-center text-sm text-muted-foreground"
-        >
+        <div key={col} className="px-2 py-2 text-center text-sm text-muted-foreground">
           {col}
         </div>
       ))}
@@ -303,6 +302,7 @@ export function ScopeGridHeader({ title, columns }: ScopeGridHeaderProps) {
 ```
 
 **Verify**:
+
 - Header renders with title + column labels
 - Sticky behavior works
 - No TypeScript errors
@@ -330,25 +330,26 @@ interface ScopeGridRowProps {
 
 export function ScopeGridRow({ scope, columns, isNested }: ScopeGridRowProps) {
   return (
-    <div className={cn(
-      "grid grid-cols-[200px_repeat(auto-fit,minmax(80px,1fr))] hover:bg-muted/20 transition-colors",
-      isNested && "pl-4"
-    )}>
+    <div
+      className={cn(
+        "grid grid-cols-[200px_repeat(auto-fit,minmax(80px,1fr))] transition-colors hover:bg-muted/20",
+        isNested && "pl-4"
+      )}
+    >
       {/* Scope name column */}
       <div className="flex items-center gap-2 px-4 py-2">
-        <span className={cn(
-          "h-2 w-2 rounded-full",
-          scope.parentId ? "bg-primary" : "border-2 border-primary"
-        )} />
-        <span className="text-sm truncate">{scope.title}</span>
+        <span
+          className={cn(
+            "h-2 w-2 rounded-full",
+            scope.parentId ? "bg-primary" : "border-2 border-primary"
+          )}
+        />
+        <span className="truncate text-sm">{scope.title}</span>
       </div>
-      
+
       {/* Grid cells */}
       {columns.map((col) => (
-        <div 
-          key={col}
-          className="px-1 py-1"
-        >
+        <div key={col} className="px-1 py-1">
           <div className="h-8 rounded border border-dashed border-muted-foreground/20" />
         </div>
       ))}
@@ -358,6 +359,7 @@ export function ScopeGridRow({ scope, columns, isNested }: ScopeGridRowProps) {
 ```
 
 **Verify**:
+
 - Row renders scope name + empty cells
 - Hover state works
 - Nested items are indented
@@ -372,6 +374,7 @@ export function ScopeGridRow({ scope, columns, isNested }: ScopeGridRowProps) {
 **Modify** `src/components/scopes/add-scope-input.tsx`:
 
 Key changes:
+
 - Remove the prominent colored border on focus
 - Use a simple "+ Add" text that transforms to input
 - Input should be minimal, blending with the grid
@@ -394,6 +397,7 @@ Key changes:
 ```
 
 **Verify**:
+
 - Add button is subtle, not prominent
 - Input blends with grid, no colored focus ring
 - Functionality unchanged
@@ -407,6 +411,7 @@ Key changes:
 **Modify** `src/app/projects/page.tsx`:
 
 Same pattern as Jobs, but:
+
 - Columns are months (Dec, Jan, Feb, Mar, Apr, May)
 - Projects can be nested (show parent with children indented)
 
@@ -423,30 +428,29 @@ export default function ProjectsPage() {
   const months = ["Dec", "Jan", "Feb", "Mar", "Apr", "May"]
 
   // Group by parent
-  const parents = scopes?.filter(s => !s.parentId) ?? []
-  const childrenByParent = scopes?.reduce((acc, s) => {
-    if (s.parentId) {
-      acc[s.parentId] = [...(acc[s.parentId] || []), s]
-    }
-    return acc
-  }, {} as Record<string, typeof scopes>) ?? {}
+  const parents = scopes?.filter((s) => !s.parentId) ?? []
+  const childrenByParent =
+    scopes?.reduce(
+      (acc, s) => {
+        if (s.parentId) {
+          acc[s.parentId] = [...(acc[s.parentId] || []), s]
+        }
+        return acc
+      },
+      {} as Record<string, typeof scopes>
+    ) ?? {}
 
   return (
     <ContentCard>
       <div className="theme-blue h-full overflow-auto">
         <ScopeGridHeader title="Projects" columns={months} />
-        
+
         <div>
           {parents.map((parent) => (
             <div key={parent.id}>
               <ScopeGridRow scope={parent} columns={months} />
               {childrenByParent[parent.id]?.map((child) => (
-                <ScopeGridRow 
-                  key={child.id} 
-                  scope={child} 
-                  columns={months}
-                  isNested 
-                />
+                <ScopeGridRow key={child.id} scope={child} columns={months} isNested />
               ))}
             </div>
           ))}
@@ -460,6 +464,7 @@ export default function ProjectsPage() {
 ```
 
 **Verify**:
+
 - Projects page has same cohesive grid layout
 - Nesting works correctly
 - No TypeScript errors
@@ -482,9 +487,7 @@ export default function TasksPage() {
     <ContentCard>
       <div className="p-6">
         <h1 className="text-lg font-semibold">Tasks</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Task management coming soon...
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">Task management coming soon...</p>
       </div>
     </ContentCard>
   )
@@ -494,6 +497,7 @@ export default function TasksPage() {
 Repeat similar pattern for `schedule/page.tsx` and `archive/page.tsx`.
 
 **Verify**:
+
 - All pages render inside white rounded card
 - Consistent visual appearance
 
@@ -504,12 +508,14 @@ Repeat similar pattern for `schedule/page.tsx` and `archive/page.tsx`.
 **Do**: Ensure everything compiles and builds.
 
 **Commands**:
+
 ```bash
 pnpm exec tsc --noEmit
 pnpm build
 ```
 
 **Verify**:
+
 - No TypeScript errors
 - Build succeeds
 
@@ -520,6 +526,7 @@ pnpm build
 **Do**: Test in browser at various screen sizes.
 
 **Commands**:
+
 ```bash
 pnpm dev
 ```
@@ -558,13 +565,14 @@ pnpm dev
 
 ## Verification
 
-| Check | Command | Expected Result |
-|-------|---------|-----------------|
-| TypeScript compiles | `pnpm exec tsc --noEmit` | Exit code 0 |
-| Build succeeds | `pnpm build` | Exit code 0 |
-| Lint passes | `pnpm lint` | Exit code 0 (warnings OK) |
+| Check               | Command                  | Expected Result           |
+| ------------------- | ------------------------ | ------------------------- |
+| TypeScript compiles | `pnpm exec tsc --noEmit` | Exit code 0               |
+| Build succeeds      | `pnpm build`             | Exit code 0               |
+| Lint passes         | `pnpm lint`              | Exit code 0 (warnings OK) |
 
 Manual checks:
+
 - [ ] Header: 36px flat, toggle + "Backboard"
 - [ ] Sidebar: flat, no border, subtle active states
 - [ ] Content: white rounded card on gray background
@@ -589,18 +597,18 @@ Manual checks:
 └─────────────────────────────────────────────────────┘
 ```
 
-The gray shell (header + sidebar + page bg) is the "canvas".
-The white content card is the focused, elevated element.
+The gray shell (header + sidebar + page bg) is the "canvas". The white content card is the focused,
+elevated element.
 
 ### Key CSS Classes
 
-| Element | Classes |
-|---------|---------|
-| Shell bg | `bg-muted/30` (or custom gray) |
-| Header | `h-9 flex items-center px-3` |
-| Sidebar | No border, inherit bg |
+| Element      | Classes                                    |
+| ------------ | ------------------------------------------ |
+| Shell bg     | `bg-muted/30` (or custom gray)             |
+| Header       | `h-9 flex items-center px-3`               |
+| Sidebar      | No border, inherit bg                      |
 | Content card | `bg-background rounded-xl overflow-hidden` |
-| Active nav | `bg-background/60 font-medium` |
+| Active nav   | `bg-background/60 font-medium`             |
 
 ### Grid Structure (Jobs/Projects)
 
@@ -615,4 +623,3 @@ The white content card is the focused, elevated element.
 ```
 
 All in one white card. First column is sticky for scrolling.
-

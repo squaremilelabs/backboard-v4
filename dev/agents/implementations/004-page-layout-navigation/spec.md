@@ -1,18 +1,20 @@
 # Page Layout & Navigation
 
-| Field | Value |
-|-------|-------|
-| **ID** | 004 |
-| **Status** | ✅ Complete |
-| **Progress** | All steps complete |
-| **Created** | 2025-12-30 |
-| **Last Updated** | 2025-12-30 |
+| Field            | Value              |
+| ---------------- | ------------------ |
+| **ID**           | 004                |
+| **Status**       | ✅ Complete        |
+| **Progress**     | All steps complete |
+| **Created**      | 2025-12-30         |
+| **Last Updated** | 2025-12-30         |
 
 ---
 
 ## Overview
 
-Build the app shell with a collapsible sidebar navigation and page layout wrapper. This provides the consistent UI structure that all pages will use. Includes:
+Build the app shell with a collapsible sidebar navigation and page layout wrapper. This provides the
+consistent UI structure that all pages will use. Includes:
+
 - Collapsible sidebar on desktop (toggle to show/hide)
 - Hamburger drawer on mobile
 - Max-width container at `lg` breakpoint to prevent excessive stretching
@@ -23,19 +25,20 @@ Build the app shell with a collapsible sidebar navigation and page layout wrappe
 
 Read these before implementing:
 
-| Topic | Source |
-|-------|--------|
-| App Router structure | `dev/specs/trd.md` §3.2 |
-| Project structure (components) | `dev/specs/trd.md` §10 |
-| Page layouts (visual) | `dev/specs/visuals/page-tasks.png`, `page-schedule.png`, `page-jobs.png`, `page-projects.png` |
-| Navigation routes | `dev/specs/prd.md` §4 (Tasks, Schedule, Projects, Jobs, Archive) |
-| shadcn/ui usage | `components.json` — install components via `pnpm dlx shadcn@latest add <component>` |
+| Topic                          | Source                                                                                        |
+| ------------------------------ | --------------------------------------------------------------------------------------------- |
+| App Router structure           | `dev/specs/trd.md` §3.2                                                                       |
+| Project structure (components) | `dev/specs/trd.md` §10                                                                        |
+| Page layouts (visual)          | `dev/specs/visuals/page-tasks.png`, `page-schedule.png`, `page-jobs.png`, `page-projects.png` |
+| Navigation routes              | `dev/specs/prd.md` §4 (Tasks, Schedule, Projects, Jobs, Archive)                              |
+| shadcn/ui usage                | `components.json` — install components via `pnpm dlx shadcn@latest add <component>`           |
 
 ---
 
 ## Scope
 
 ### In Scope
+
 - `<AppSidebar>` component with navigation links
 - `<PageShell>` wrapper component (sidebar + main content area)
 - Navigation to all 5 routes: Tasks, Schedule, Projects, Jobs, Archive
@@ -49,6 +52,7 @@ Read these before implementing:
 - Install required shadcn/ui components (Sheet, Button, Tooltip)
 
 ### Out of Scope
+
 - Colored activity dots on Tasks nav item (data-dependent — future implementation)
 - Page-specific content (task lists, grids, scope selectors)
 - User authentication UI (Clerk — future implementation)
@@ -86,11 +90,13 @@ Exact files this implementation will create or modify:
 **Do**: Install the Button, Sheet, and Tooltip components.
 
 **Commands**:
+
 ```bash
 pnpm dlx shadcn@latest add button sheet tooltip
 ```
 
-**Verify**: 
+**Verify**:
+
 - `src/components/ui/button.tsx` exists
 - `src/components/ui/sheet.tsx` exists
 - `src/components/ui/tooltip.tsx` exists
@@ -103,11 +109,13 @@ pnpm dlx shadcn@latest add button sheet tooltip
 **Do**: Install lucide-react for icons (hamburger, sidebar toggle, etc.).
 
 **Commands**:
+
 ```bash
 pnpm add lucide-react
 ```
 
-**Verify**: 
+**Verify**:
+
 - `package.json` dependencies include `lucide-react`
 
 ---
@@ -123,12 +131,7 @@ pnpm add lucide-react
 
 import { PanelLeftClose, PanelLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface SidebarToggleProps {
   isCollapsed: boolean
@@ -140,20 +143,13 @@ export function SidebarToggle({ isCollapsed, onToggle }: SidebarToggleProps) {
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggle}
-            className="h-8 w-8"
-          >
+          <Button variant="ghost" size="icon" onClick={onToggle} className="h-8 w-8">
             {isCollapsed ? (
               <PanelLeft className="h-4 w-4" />
             ) : (
               <PanelLeftClose className="h-4 w-4" />
             )}
-            <span className="sr-only">
-              {isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            </span>
+            <span className="sr-only">{isCollapsed ? "Expand sidebar" : "Collapse sidebar"}</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent side="right">
@@ -165,7 +161,8 @@ export function SidebarToggle({ isCollapsed, onToggle }: SidebarToggleProps) {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/components/layout/sidebar-toggle.tsx`
 - No TypeScript errors
 
@@ -192,9 +189,7 @@ const mainNavItems = [
   { href: "/jobs", label: "Jobs" },
 ]
 
-const secondaryNavItems = [
-  { href: "/archive", label: "Archive" },
-]
+const secondaryNavItems = [{ href: "/archive", label: "Archive" }]
 
 interface NavItemProps {
   href: string
@@ -266,7 +261,8 @@ export function AppSidebar({ isCollapsed, onToggle }: AppSidebarProps) {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/components/layout/app-sidebar.tsx`
 - No TypeScript errors
 
@@ -287,13 +283,7 @@ import { Menu } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 
 const mainNavItems = [
   { href: "/tasks", label: "Tasks" },
@@ -302,9 +292,7 @@ const mainNavItems = [
   { href: "/jobs", label: "Jobs" },
 ]
 
-const secondaryNavItems = [
-  { href: "/archive", label: "Archive" },
-]
+const secondaryNavItems = [{ href: "/archive", label: "Archive" }]
 
 interface NavItemProps {
   href: string
@@ -381,7 +369,8 @@ export function MobileNav() {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/components/layout/mobile-nav.tsx`
 - No TypeScript errors
 
@@ -389,7 +378,8 @@ export function MobileNav() {
 
 ### Step 6: Create PageShell Component ✅
 
-**Do**: Create the layout wrapper with collapsible sidebar, max-width container, and responsive behavior. Sidebar state is persisted to localStorage.
+**Do**: Create the layout wrapper with collapsible sidebar, max-width container, and responsive
+behavior. Sidebar state is persisted to localStorage.
 
 **Create file** `src/components/layout/page-shell.tsx`:
 
@@ -446,14 +436,14 @@ export function PageShell({ children }: PageShellProps) {
             <div className="md:hidden">
               <MobileNav />
             </div>
-            
+
             {/* Desktop: sidebar toggle (when collapsed) */}
             {isHydrated && isCollapsed && (
               <div className="hidden md:block">
                 <SidebarToggle isCollapsed={isCollapsed} onToggle={toggleSidebar} />
               </div>
             )}
-            
+
             {/* Title - visible when sidebar is collapsed or on mobile */}
             {(isCollapsed || !isHydrated) && (
               <span className="font-semibold md:block">Backboard</span>
@@ -462,9 +452,7 @@ export function PageShell({ children }: PageShellProps) {
           </header>
 
           {/* Page content */}
-          <main className="flex-1 overflow-auto">
-            {children}
-          </main>
+          <main className="flex-1 overflow-auto">{children}</main>
         </div>
       </div>
     </div>
@@ -472,7 +460,8 @@ export function PageShell({ children }: PageShellProps) {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/components/layout/page-shell.tsx`
 - No TypeScript errors
 
@@ -509,7 +498,8 @@ export default function RootLayout({
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File updated with PageShell wrapper
 - No TypeScript errors
 
@@ -517,7 +507,8 @@ export default function RootLayout({
 
 ### Step 8: Update Page Placeholders ✅
 
-**Do**: Update the placeholder pages to remove their own centering (PageShell handles layout now). Add a simple container with padding.
+**Do**: Update the placeholder pages to remove their own centering (PageShell handles layout now).
+Add a simple container with padding.
 
 **Modify file** `src/app/tasks/page.tsx`:
 
@@ -533,9 +524,11 @@ export default function TasksPage() {
 }
 ```
 
-**Repeat for all other pages** (`schedule`, `jobs`, `projects`, `archive`) with the same pattern, just changing the heading text.
+**Repeat for all other pages** (`schedule`, `jobs`, `projects`, `archive`) with the same pattern,
+just changing the heading text.
 
-**Verify**: 
+**Verify**:
+
 - All 5 page files updated
 - Pages display inside the PageShell layout
 
@@ -546,11 +539,13 @@ export default function TasksPage() {
 **Do**: Ensure the project builds successfully.
 
 **Commands**:
+
 ```bash
 pnpm build
 ```
 
-**Verify**: 
+**Verify**:
+
 - Build exits with code 0
 - No errors
 
@@ -561,6 +556,7 @@ pnpm build
 **Do**: Test the layout in the browser at various screen sizes.
 
 **Commands**:
+
 ```bash
 pnpm dev
 ```
@@ -599,7 +595,8 @@ pnpm dev
    - Active page is highlighted
    - Works in both sidebar and mobile drawer
 
-**Verify**: 
+**Verify**:
+
 - All test checklist items pass
 
 ---
@@ -608,14 +605,15 @@ pnpm dev
 
 Run these checks after implementation is complete:
 
-| Check | Command | Expected Result |
-|-------|---------|-----------------|
-| TypeScript compiles | `pnpm exec tsc --noEmit` | Exit code 0, no errors |
-| Build succeeds | `pnpm build` | Exit code 0 |
-| Lint passes | `pnpm lint` | Exit code 0 (warnings OK) |
-| Dev server runs | `pnpm dev` | Server starts, no console errors |
+| Check               | Command                  | Expected Result                  |
+| ------------------- | ------------------------ | -------------------------------- |
+| TypeScript compiles | `pnpm exec tsc --noEmit` | Exit code 0, no errors           |
+| Build succeeds      | `pnpm build`             | Exit code 0                      |
+| Lint passes         | `pnpm lint`              | Exit code 0 (warnings OK)        |
+| Dev server runs     | `pnpm dev`               | Server starts, no console errors |
 
 Manual checks:
+
 - [ ] Desktop: Sidebar displays with all 5 nav items
 - [ ] Desktop: Toggle button collapses/expands sidebar
 - [ ] Desktop: Sidebar state persists across page refresh (localStorage)
@@ -633,6 +631,7 @@ Manual checks:
 ## Design Notes
 
 ### Breakpoints & Sizing
+
 - **Mobile**: < 768px (`md` breakpoint) — hamburger drawer
 - **Desktop**: ≥ 768px (`md` breakpoint) — collapsible sidebar
 - **Main content max-width**: 1024px / 64rem (`max-w-5xl`)
@@ -640,26 +639,31 @@ Manual checks:
 - **Total width**: computed (sidebar + content), centered with `mx-auto`
 
 ### Sidebar Width
+
 - Fixed 256px (w-64) when expanded
 - 0px when collapsed (fully hidden)
 
 ### Colors
+
 - Background: `bg-background` (white)
 - Page area: `bg-muted/30` (very light gray)
 - Active nav: `bg-secondary` with `text-secondary-foreground`
 - Inactive nav: `text-muted-foreground` with hover states
 
 ### State Management
+
 - Sidebar collapsed state stored in `localStorage` under key `backboard-sidebar-collapsed`
 - Hydration handled to prevent flash of incorrect state
 
 ### Accessibility
+
 - Hamburger button has `sr-only` label
 - Toggle button has `sr-only` label and tooltip
 - Sheet has proper `SheetTitle` for screen readers
 - Links use semantic `<a>` via Next.js `<Link>`
 
 ### Icons Used (from lucide-react)
+
 - `Menu` — hamburger menu
 - `PanelLeft` — expand sidebar
 - `PanelLeftClose` — collapse sidebar

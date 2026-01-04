@@ -1,24 +1,46 @@
 "use client"
 
 import { ContentPanel } from "@/components/layout/content-panel"
+import { TaskListTabs } from "@/components/tasks/task-list-tabs"
+import { ScopeList } from "@/components/tasks/scope-list"
+import { ScopeSelector } from "@/components/tasks/scope-selector"
+import { TaskContentPlaceholder } from "@/components/tasks/task-content-placeholder"
+import { useIsMobile } from "@/hooks/use-media-query"
 
-// Tasks page has a different layout - scope list on gray bg, task list in white panel
-// This will be implemented properly in a future spec
 export default function TasksPage() {
-  return (
-    <div className="flex h-full">
-      {/* Left: Scope list (on gray bg - no panel) */}
-      <div className="w-64 shrink-0 p-4">
-        <p className="text-sm text-muted-foreground">Scope list coming soon...</p>
-      </div>
+  const isMobile = useIsMobile()
 
-      {/* Right: Task list (in ContentPanel) */}
-      <ContentPanel>
-        <div className="p-6">
-          <h1 className="text-lg font-semibold">Tasks</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Task management coming soon...</p>
+  return (
+    <ContentPanel>
+      <div className="flex h-full flex-col overflow-hidden">
+        {/* Tabs (horizontal navigation) */}
+        <TaskListTabs />
+
+        {/* Two-column layout: Scope selector + Content */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left: Scope selector sidebar (desktop) */}
+          {!isMobile && (
+            <aside className="w-64 shrink-0 overflow-y-auto border-r">
+              <ScopeList />
+            </aside>
+          )}
+
+          {/* Right: Main content area */}
+          <main className="flex flex-1 flex-col overflow-hidden">
+            {/* Mobile: Scope selector dropdown */}
+            {isMobile && (
+              <div className="border-b p-3">
+                <ScopeSelector />
+              </div>
+            )}
+
+            {/* Content area (placeholder for now) */}
+            <div className="flex-1 overflow-y-auto">
+              <TaskContentPlaceholder />
+            </div>
+          </main>
         </div>
-      </ContentPanel>
-    </div>
+      </div>
+    </ContentPanel>
   )
 }

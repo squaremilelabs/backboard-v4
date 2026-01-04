@@ -1,18 +1,20 @@
 # Tasks Page Layout Foundation
 
-| Field | Value |
-|-------|-------|
-| **ID** | 009 |
-| **Status** | 🟡 Planning |
-| **Progress** | — |
-| **Created** | 2026-01-04 |
-| **Last Updated** | 2026-01-04 |
+| Field            | Value          |
+| ---------------- | -------------- |
+| **ID**           | 009            |
+| **Status**       | 🟢 In Progress |
+| **Progress**     | Step 8 of 10   |
+| **Created**      | 2026-01-04     |
+| **Last Updated** | 2026-01-04     |
 
 ---
 
 ## Overview
 
-Build the layout foundation for the Tasks page including list type navigation (tabs), scope selector sidebar with contextual fading, and placeholder content area. No actual task rendering or task data logic in this implementation.
+Build the layout foundation for the Tasks page including list type navigation (tabs), scope selector
+sidebar with contextual fading, and placeholder content area. No actual task rendering or task data
+logic in this implementation.
 
 ---
 
@@ -20,14 +22,14 @@ Build the layout foundation for the Tasks page including list type navigation (t
 
 Read these before implementing:
 
-| Topic | Source |
-|-------|--------|
-| Tasks page design | `dev/specs/prd.md` §4.1 |
-| Task lifecycle & list types | `dev/specs/prd.md` §2.2 |
-| Scope visibility rules | `dev/specs/prd.md` §2.2, Table: "List → Behavior" |
-| Visual reference | `dev/specs/visuals/page-tasks.png` |
-| Database schema | `dev/specs/trd.md` §4.1 |
-| nuqs documentation | https://nuqs.47ng.com/ |
+| Topic                       | Source                                            |
+| --------------------------- | ------------------------------------------------- |
+| Tasks page design           | `dev/specs/prd.md` §4.1                           |
+| Task lifecycle & list types | `dev/specs/prd.md` §2.2                           |
+| Scope visibility rules      | `dev/specs/prd.md` §2.2, Table: "List → Behavior" |
+| Visual reference            | `dev/specs/visuals/page-tasks.png`                |
+| Database schema             | `dev/specs/trd.md` §4.1                           |
+| nuqs documentation          | https://nuqs.47ng.com/                            |
 
 ---
 
@@ -95,14 +97,18 @@ Read these before implementing:
 
 Files this implementation will create or modify:
 
-- [ ] `package.json` — Modify: Add `nuqs` dependency
-- [ ] `src/app/tasks/search-params.ts` — Create: nuqs parsers for URL state
-- [ ] `src/hooks/use-task-scopes.ts` — Create: Hook for scopes with fading logic
-- [ ] `src/components/tasks/task-list-tabs.tsx` — Create: Horizontal tab navigation
-- [ ] `src/components/tasks/scope-selector.tsx` — Create: Reusable scope selector dropdown
-- [ ] `src/components/tasks/scope-list.tsx` — Create: Sidebar list of scopes with Triage
-- [ ] `src/components/tasks/task-content-placeholder.tsx` — Create: Placeholder content area
-- [ ] `src/app/tasks/page.tsx` — Rewrite: Full tasks page layout
+- [x] `package.json` — Modify: Add `nuqs` dependency
+- [x] `src/app/layout.tsx` — Modify: Add NuqsAdapter wrapper
+- [x] `src/app/tasks/search-params.ts` — Create: nuqs parsers for URL state
+- [x] `src/hooks/use-task-scopes.ts` — Create: Hook for scopes with fading logic
+- [x] `src/hooks/use-scopes.ts` — Modify: Made type parameter optional
+- [x] `src/components/tasks/task-list-tabs.tsx` — Create: Horizontal tab navigation
+- [x] `src/components/tasks/scope-selector.tsx` — Create: Reusable scope selector dropdown
+- [x] `src/components/tasks/scope-list.tsx` — Create: Sidebar list of scopes with Triage
+- [x] `src/components/tasks/task-content-placeholder.tsx` — Create: Placeholder content area
+- [x] `src/app/tasks/page.tsx` — Rewrite: Full tasks page layout
+- [x] `src/components/ui/command.tsx` — Create: shadcn Command component
+- [x] `src/components/ui/popover.tsx` — Update: shadcn Popover component
 
 ---
 
@@ -113,11 +119,13 @@ Files this implementation will create or modify:
 **Do**: Add nuqs package for URL search params management.
 
 **Commands**:
+
 ```bash
 pnpm add nuqs
 ```
 
 **Verify**:
+
 - `nuqs` added to `package.json` dependencies
 - No installation errors
 
@@ -150,6 +158,7 @@ export const searchParamsCache = createSearchParamsCache(searchParamsParsers)
 ```
 
 **Verify**:
+
 - File created
 - Exports parsers and types
 - No TypeScript errors: `pnpm tsc --noEmit`
@@ -182,9 +191,7 @@ export interface TaskScope extends Scope {
  */
 export function useTaskScopes(listType: TaskListType): TaskScope[] | undefined {
   // Get all non-archived scopes
-  const scopes = useLiveQuery(() =>
-    db.scopes.filter((s) => !s.archivedAt).toArray()
-  )
+  const scopes = useLiveQuery(() => db.scopes.filter((s) => !s.archivedAt).toArray())
 
   // Get today's date for "now" filtering
   const today = useMemo(() => {
@@ -200,17 +207,19 @@ export function useTaskScopes(listType: TaskListType): TaskScope[] | undefined {
 
   // Get schedule slots for today (for "now" fading)
   const todaySlots = useLiveQuery(
-    () => listType === "now"
-      ? db.scheduleSlots.where("date").equals(today).toArray()
-      : Promise.resolve([]),
+    () =>
+      listType === "now"
+        ? db.scheduleSlots.where("date").equals(today).toArray()
+        : Promise.resolve([]),
     [listType, today]
   )
 
   // Get month slots for current month (for "later" fading)
   const monthSlots = useLiveQuery(
-    () => listType === "later"
-      ? db.monthSlots.where("month").equals(currentMonth).toArray()
-      : Promise.resolve([]),
+    () =>
+      listType === "later"
+        ? db.monthSlots.where("month").equals(currentMonth).toArray()
+        : Promise.resolve([]),
     [listType, currentMonth]
   )
 
@@ -248,6 +257,7 @@ export function useTaskScopes(listType: TaskListType): TaskScope[] | undefined {
 ```
 
 **Verify**:
+
 - File created
 - Hook returns scopes with `isFaded` property
 - No TypeScript errors
@@ -289,9 +299,7 @@ export function TaskListTabs() {
             onClick={() => setActiveListType(value)}
             className={cn(
               "relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors",
-              isActive
-                ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             {label}
@@ -300,9 +308,7 @@ export function TaskListTabs() {
             {/* TODO: Show colored dots when scope has tasks in this list */}
 
             {/* Active indicator bar */}
-            {isActive && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
-            )}
+            {isActive && <span className="absolute right-0 bottom-0 left-0 h-0.5 bg-primary" />}
           </button>
         )
       })}
@@ -312,6 +318,7 @@ export function TaskListTabs() {
 ```
 
 **Verify**:
+
 - File created
 - Tabs render and switch active state
 - URL updates when tab is clicked
@@ -324,6 +331,7 @@ export function TaskListTabs() {
 **Do**: Create a reusable scope selector using shadcn Popover + Command pattern.
 
 **Commands**:
+
 ```bash
 pnpm dlx shadcn@latest add popover
 pnpm dlx shadcn@latest add command
@@ -349,11 +357,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 export function ScopeSelector() {
   const [open, setOpen] = useState(false)
@@ -366,10 +370,10 @@ export function ScopeSelector() {
   const showTriage = ["now", "later", "backlog"].includes(activeListType)
 
   // Find current selected scope
-  const selectedScope = activeScopeId !== "triage"
-    ? scopes?.find((s) => s.id === activeScopeId)
-    : null
-  const selectedLabel = activeScopeId === "triage" ? "Triage" : selectedScope?.title || "Select scope..."
+  const selectedScope =
+    activeScopeId !== "triage" ? scopes?.find((s) => s.id === activeScopeId) : null
+  const selectedLabel =
+    activeScopeId === "triage" ? "Triage" : selectedScope?.title || "Select scope..."
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -446,6 +450,7 @@ export function ScopeSelector() {
 ```
 
 **Verify**:
+
 - Component renders
 - Dropdown shows Triage + all scopes
 - Faded scopes have 50% opacity
@@ -532,6 +537,7 @@ export function ScopeList() {
 ```
 
 **Verify**:
+
 - Sidebar list renders
 - Triage appears at top (when applicable)
 - Scopes are faded correctly
@@ -558,18 +564,18 @@ export function TaskContentPlaceholder() {
   const [activeScopeId] = useQueryState("scope", searchParamsParsers.scope)
   const scopes = useScopes()
 
-  const scopeName = activeScopeId === "triage"
-    ? "Triage"
-    : scopes?.find((s) => s.id === activeScopeId)?.title || "Unknown"
+  const scopeName =
+    activeScopeId === "triage"
+      ? "Triage"
+      : scopes?.find((s) => s.id === activeScopeId)?.title || "Unknown"
 
   return (
     <div className="flex h-full items-center justify-center p-8">
       <div className="text-center">
-        <p className="text-sm text-muted-foreground">
-          Task list component will appear here
-        </p>
+        <p className="text-sm text-muted-foreground">Task list component will appear here</p>
         <p className="mt-2 text-xs text-muted-foreground/60">
-          List: <span className="font-medium">{activeListType}</span> • Scope: <span className="font-medium">{scopeName}</span>
+          List: <span className="font-medium">{activeListType}</span> • Scope:{" "}
+          <span className="font-medium">{scopeName}</span>
         </p>
         {/* TODO: Replace with actual TaskList component in next implementation */}
       </div>
@@ -579,6 +585,7 @@ export function TaskContentPlaceholder() {
 ```
 
 **Verify**:
+
 - Placeholder renders
 - Shows current list type and scope from URL
 - No TypeScript errors
@@ -641,6 +648,7 @@ export default function TasksPage() {
 ```
 
 **Verify**:
+
 - Page renders with tabs at top
 - Desktop: scope list in left sidebar
 - Mobile: scope dropdown above content
@@ -654,12 +662,14 @@ export default function TasksPage() {
 **Do**: Ensure everything compiles and builds.
 
 **Commands**:
+
 ```bash
 pnpm tsc --noEmit
 pnpm build
 ```
 
 **Verify**:
+
 - No TypeScript errors
 - Build succeeds with exit code 0
 
@@ -670,6 +680,7 @@ pnpm build
 **Do**: Test in browser at various screen sizes.
 
 **Commands**:
+
 ```bash
 pnpm dev
 ```
@@ -720,14 +731,15 @@ pnpm dev
 
 Run these checks after implementation is complete:
 
-| Check | Command | Expected Result |
-|-------|---------|-----------------|
-| TypeScript | `pnpm tsc --noEmit` | No errors |
-| Linting | `pnpm lint` | No errors |
-| Build | `pnpm build` | Exits with code 0 |
-| Dev server | `pnpm dev` | Starts without errors |
+| Check      | Command             | Expected Result       |
+| ---------- | ------------------- | --------------------- |
+| TypeScript | `pnpm tsc --noEmit` | No errors             |
+| Linting    | `pnpm lint`         | No errors             |
+| Build      | `pnpm build`        | Exits with code 0     |
+| Dev server | `pnpm dev`          | Starts without errors |
 
 Manual checks:
+
 - [ ] Tasks page loads with tabs + scope selector + placeholder
 - [ ] Tabs switch list type correctly
 - [ ] Scope selector shows/hides Triage based on list type

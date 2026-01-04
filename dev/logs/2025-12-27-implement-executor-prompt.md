@@ -9,7 +9,9 @@
 
 ## Summary
 
-Extended the implementation workflow with an executor prompt. Previously we had `new-implementation.md` for creating specs — now we have `implement.md` for running them. This completes the planning-to-execution loop for AI agents.
+Extended the implementation workflow with an executor prompt. Previously we had
+`new-implementation.md` for creating specs — now we have `implement.md` for running them. This
+completes the planning-to-execution loop for AI agents.
 
 ---
 
@@ -19,14 +21,14 @@ Extended the implementation workflow with an executor prompt. Previously we had 
 
 Created `dev/agents/prompts/implement.md` with a six-phase workflow:
 
-| Phase | Purpose |
-|-------|---------|
-| 1. Identify | Ask which spec to implement, list available specs with status |
-| 2. Assess | Check current status, find completed items, determine starting point |
-| 3. Git Branch | Create or switch to implementation branch |
-| 4. Execute | Run through steps, commit atomically, handle failures |
-| 5. Verification | Run verification commands, complete manual checks |
-| 6. Wrap Up | Update spec status, provide summary, offer next actions |
+| Phase           | Purpose                                                              |
+| --------------- | -------------------------------------------------------------------- |
+| 1. Identify     | Ask which spec to implement, list available specs with status        |
+| 2. Assess       | Check current status, find completed items, determine starting point |
+| 3. Git Branch   | Create or switch to implementation branch                            |
+| 4. Execute      | Run through steps, commit atomically, handle failures                |
+| 5. Verification | Run verification commands, complete manual checks                    |
+| 6. Wrap Up      | Update spec status, provide summary, offer next actions              |
 
 ### Phase 2: Key Features
 
@@ -38,18 +40,19 @@ Created `dev/agents/prompts/implement.md` with a six-phase workflow:
 
 ### Phase 3: Log Updates
 
-Updated `2025-12-26-agent-optimized-specs.md` to include the new prompt creation, then created this log for the new day.
+Updated `2025-12-26-agent-optimized-specs.md` to include the new prompt creation, then created this
+log for the new day.
 
 ---
 
 ## Key Decisions Made
 
-| Decision | Rationale |
-|----------|-----------|
-| Six-phase workflow | Covers full lifecycle from spec selection to completion |
-| Branch = folder name | Simple, predictable, easy to correlate |
-| Resume via checkboxes | Leverages existing spec structure, no separate state file needed |
-| Atomic commits per step | Enables easy rollback if issues arise |
+| Decision                | Rationale                                                        |
+| ----------------------- | ---------------------------------------------------------------- |
+| Six-phase workflow      | Covers full lifecycle from spec selection to completion          |
+| Branch = folder name    | Simple, predictable, easy to correlate                           |
+| Resume via checkboxes   | Leverages existing spec structure, no separate state file needed |
+| Atomic commits per step | Enables easy rollback if issues arise                            |
 
 ---
 
@@ -66,11 +69,11 @@ dev/logs/2025-12-26-agent-optimized-specs.md   (updated with Phase 4)
 
 The implementation workflow now has three prompts:
 
-| Prompt | Purpose |
-|--------|---------|
+| Prompt                  | Purpose                          |
+| ----------------------- | -------------------------------- |
 | `new-implementation.md` | Create a new implementation spec |
-| `implement.md` | Execute an implementation spec |
-| `add-log.md` | Document development sessions |
+| `implement.md`          | Execute an implementation spec   |
+| `add-log.md`            | Document development sessions    |
 
 ---
 
@@ -82,5 +85,4 @@ The implementation workflow now has three prompts:
 
 ---
 
-*End of log*
-
+_End of log_

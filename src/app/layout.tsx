@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 import "./globals.css"
 import { PageShell } from "@/components/layout/page-shell"
 
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <PageShell>{children}</PageShell>
+        <NuqsAdapter>
+          <PageShell>{children}</PageShell>
+        </NuqsAdapter>
       </body>
     </html>
   )

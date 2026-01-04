@@ -1,18 +1,20 @@
 # Initial Project Setup
 
-| Field | Value |
-|-------|-------|
-| **ID** | 001 |
-| **Status** | ✅ Complete |
-| **Progress** | All steps complete |
-| **Created** | 2025-12-24 |
-| **Last Updated** | 2025-12-27 |
+| Field            | Value              |
+| ---------------- | ------------------ |
+| **ID**           | 001                |
+| **Status**       | ✅ Complete        |
+| **Progress**     | All steps complete |
+| **Created**      | 2025-12-24         |
+| **Last Updated** | 2025-12-27         |
 
 ---
 
 ## Overview
 
-Scaffold the Next.js 16 application with foundational dependencies, configuration files, folder structure, and placeholder pages. This establishes the project skeleton that all subsequent implementations will build upon.
+Scaffold the Next.js 16 application with foundational dependencies, configuration files, folder
+structure, and placeholder pages. This establishes the project skeleton that all subsequent
+implementations will build upon.
 
 ---
 
@@ -20,23 +22,25 @@ Scaffold the Next.js 16 application with foundational dependencies, configuratio
 
 Read these before implementing:
 
-| Topic | Source |
-|-------|--------|
-| Project structure | `dev/specs/trd.md` §10 |
-| ESLint flat config | `dev/specs/trd.md` §11.1 — copy config verbatim |
-| Prettier config | `dev/specs/trd.md` §11.2 — copy config verbatim |
-| IDE settings | `dev/specs/trd.md` §11.3 — copy config verbatim |
-| Tailwind v4 setup | `dev/specs/trd.md` §15.2 |
-| App Router structure | `dev/specs/trd.md` §3.2 |
-| Dependency versions | `dev/specs/trd.md` §12 |
+| Topic                | Source                                          |
+| -------------------- | ----------------------------------------------- |
+| Project structure    | `dev/specs/trd.md` §10                          |
+| ESLint flat config   | `dev/specs/trd.md` §11.1 — copy config verbatim |
+| Prettier config      | `dev/specs/trd.md` §11.2 — copy config verbatim |
+| IDE settings         | `dev/specs/trd.md` §11.3 — copy config verbatim |
+| Tailwind v4 setup    | `dev/specs/trd.md` §15.2                        |
+| App Router structure | `dev/specs/trd.md` §3.2                         |
+| Dependency versions  | `dev/specs/trd.md` §12                          |
 
 ---
 
 ## Scope
 
 ### In Scope
+
 - Initialize Next.js 16 project with TypeScript and App Router
-- Install foundational dependencies (Next.js, React 19, TypeScript, Tailwind CSS 4, ESLint, Prettier)
+- Install foundational dependencies (Next.js, React 19, TypeScript, Tailwind CSS 4, ESLint,
+  Prettier)
 - Configure ESLint flat config per TRD §11.1
 - Configure Prettier per TRD §11.2
 - Set up PostCSS for Tailwind CSS v4
@@ -48,6 +52,7 @@ Read these before implementing:
 - Create `.env.example` template
 
 ### Out of Scope
+
 - Dexie.js database setup (future implementation)
 - shadcn/ui initialization (deferred until first UI components needed)
 - Zustand store setup (deferred until UI state needed)
@@ -72,12 +77,14 @@ None — this is the first implementation.
 Exact files this implementation will create or modify:
 
 ### Base Project Files (Step 1)
+
 - [x] `package.json`
 - [x] `tsconfig.json`
 - [x] `next.config.ts`
 - [x] `.gitignore`
 
 ### Config Files (project root)
+
 - [x] `eslint.config.mjs`
 - [x] `.prettierrc`
 - [x] `postcss.config.mjs`
@@ -85,6 +92,7 @@ Exact files this implementation will create or modify:
 - [x] `.vscode/settings.json`
 
 ### App Files
+
 - [x] `src/app/globals.css`
 - [x] `src/app/layout.tsx` ✅
 - [x] `src/app/page.tsx` ✅
@@ -95,6 +103,7 @@ Exact files this implementation will create or modify:
 - [x] `src/app/archive/page.tsx`
 
 ### Empty Directories
+
 - [x] `src/components/`
 - [x] `src/components/ui/`
 - [x] `src/lib/`
@@ -107,16 +116,21 @@ Exact files this implementation will create or modify:
 
 ### Step 1: Initialize Next.js Project ✅
 
-**Do**: Create new Next.js 16 project with TypeScript, App Router, and `src/` directory. Do NOT use the `--tailwind` flag — we'll configure Tailwind v4 manually.
+**Do**: Create new Next.js 16 project with TypeScript, App Router, and `src/` directory. Do NOT use
+the `--tailwind` flag — we'll configure Tailwind v4 manually.
 
 **Commands**:
+
 ```bash
 pnpm create next-app@latest . --typescript --eslint --app --src-dir --import-alias "@/*"
 ```
 
-**Note**: Due to existing files in directory, project was manually scaffolded instead of using `create-next-app`. Created `package.json`, `tsconfig.json`, `next.config.ts`, `next-env.d.ts`, and initial `src/app/` structure.
+**Note**: Due to existing files in directory, project was manually scaffolded instead of using
+`create-next-app`. Created `package.json`, `tsconfig.json`, `next.config.ts`, `next-env.d.ts`, and
+initial `src/app/` structure.
 
-**Verify**: 
+**Verify**:
+
 - ✅ `package.json` exists with `next`, `react`, `react-dom` dependencies
 - ✅ `src/app/` directory exists
 - ✅ `tsconfig.json` exists
@@ -128,12 +142,15 @@ pnpm create next-app@latest . --typescript --eslint --app --src-dir --import-ali
 **Do**: Install Tailwind v4 and its PostCSS plugin.
 
 **Commands**:
+
 ```bash
 pnpm add -D tailwindcss @tailwindcss/postcss
 ```
 
-**Verify**: 
-- ✅ `package.json` devDependencies includes `tailwindcss` (4.1.18) and `@tailwindcss/postcss` (4.1.18)
+**Verify**:
+
+- ✅ `package.json` devDependencies includes `tailwindcss` (4.1.18) and `@tailwindcss/postcss`
+  (4.1.18)
 
 ---
 
@@ -142,24 +159,28 @@ pnpm add -D tailwindcss @tailwindcss/postcss
 **Do**: Create `postcss.config.mjs` per TRD §15.2.
 
 **Create file** `postcss.config.mjs`:
+
 ```javascript
 export default {
   plugins: {
     "@tailwindcss/postcss": {},
   },
-};
+}
 ```
 
-**Verify**: 
+**Verify**:
+
 - ✅ File exists at project root
 
 ---
 
 ### Step 4: Configure globals.css ✅
 
-**Do**: Replace `src/app/globals.css` with Tailwind v4 setup per TRD §15.2. Remove all default Next.js CSS.
+**Do**: Replace `src/app/globals.css` with Tailwind v4 setup per TRD §15.2. Remove all default
+Next.js CSS.
 
 **Create file** `src/app/globals.css`:
+
 ```css
 @import "tailwindcss";
 
@@ -171,7 +192,8 @@ export default {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - ✅ File contains `@import "tailwindcss";` and `@theme` block
 
 ---
@@ -181,11 +203,13 @@ export default {
 **Do**: Install Prettier with Tailwind plugin and supporting plugins.
 
 **Commands**:
+
 ```bash
 pnpm add -D prettier prettier-plugin-tailwindcss prettier-plugin-classnames prettier-plugin-merge eslint-plugin-prettier
 ```
 
-**Verify**: 
+**Verify**:
+
 - ✅ prettier 3.7.4
 - ✅ prettier-plugin-tailwindcss 0.7.2
 - ✅ prettier-plugin-classnames 0.8.6
@@ -196,11 +220,14 @@ pnpm add -D prettier prettier-plugin-tailwindcss prettier-plugin-classnames pret
 
 ### Step 6: Configure ESLint ✅
 
-**Do**: Configure ESLint flat config per Next.js 16 docs. Use ESLint CLI directly (not deprecated `next lint`).
+**Do**: Configure ESLint flat config per Next.js 16 docs. Use ESLint CLI directly (not deprecated
+`next lint`).
 
-**Note**: Updated from TRD §11.1 to use Next.js 16 recommended approach with `eslint-config-next@16` and `eslint-config-prettier/flat`.
+**Note**: Updated from TRD §11.1 to use Next.js 16 recommended approach with `eslint-config-next@16`
+and `eslint-config-prettier/flat`.
 
 **Create file** `eslint.config.mjs`:
+
 ```javascript
 import { defineConfig, globalIgnores } from "eslint/config"
 import nextVitals from "eslint-config-next/core-web-vitals"
@@ -224,14 +251,7 @@ const eslintConfig = defineConfig([
       ],
     },
   },
-  globalIgnores([
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    "node_modules",
-    "dev/*",
-  ]),
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "node_modules", "dev/*"]),
 ])
 
 export default eslintConfig
@@ -239,7 +259,8 @@ export default eslintConfig
 
 **Also**: Updated `package.json` scripts to use `eslint .` instead of deprecated `next lint`.
 
-**Verify**: 
+**Verify**:
+
 - ✅ `pnpm lint` completes (warnings OK, no errors)
 
 ---
@@ -249,13 +270,10 @@ export default eslintConfig
 **Do**: Create `.prettierrc` per TRD §11.2.
 
 **Create file** `.prettierrc`:
+
 ```json
 {
-  "plugins": [
-    "prettier-plugin-tailwindcss",
-    "prettier-plugin-classnames",
-    "prettier-plugin-merge"
-  ],
+  "plugins": ["prettier-plugin-tailwindcss", "prettier-plugin-classnames", "prettier-plugin-merge"],
   "semi": false,
   "printWidth": 100,
   "proseWrap": "always",
@@ -265,7 +283,8 @@ export default eslintConfig
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - ✅ File exists at project root
 
 ---
@@ -277,6 +296,7 @@ export default eslintConfig
 **Note**: User prefers manual formatting/linting, not auto-on-save.
 
 **Create file** `.vscode/settings.json`:
+
 ```json
 {
   "tailwindCSS.experimental.configFile": "src/app/globals.css",
@@ -290,7 +310,8 @@ export default eslintConfig
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - ✅ File exists at `.vscode/settings.json`
 
 ---
@@ -300,13 +321,15 @@ export default eslintConfig
 **Do**: Create empty directories for future use per TRD §10.
 
 **Commands**:
+
 ```bash
 mkdir -p src/components/ui src/lib src/hooks src/stores
 ```
 
 **Note**: Added `.gitkeep` files so empty directories are tracked by git.
 
-**Verify**: 
+**Verify**:
+
 - ✅ All directories exist under `src/`
 
 ---
@@ -316,6 +339,7 @@ mkdir -p src/components/ui src/lib src/hooks src/stores
 **Do**: Update `src/app/layout.tsx` with minimal shell. Import globals.css.
 
 **Create file** `src/app/layout.tsx`:
+
 ```tsx
 import type { Metadata } from "next"
 import "./globals.css"
@@ -338,7 +362,8 @@ export default function RootLayout({
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - ✅ File exists and imports `globals.css`
 
 ---
@@ -348,6 +373,7 @@ export default function RootLayout({
 **Do**: Create `src/app/page.tsx` that redirects to `/tasks`.
 
 **Create file** `src/app/page.tsx`:
+
 ```tsx
 import { redirect } from "next/navigation"
 
@@ -356,16 +382,19 @@ export default function Home() {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - ✅ File created (redirect tested in Step 13 verification)
 
 ---
 
 ### Step 12: Create Placeholder Pages ✅
 
-**Do**: Create minimal placeholder pages for each route. Each should be a client component showing the page name.
+**Do**: Create minimal placeholder pages for each route. Each should be a client component showing
+the page name.
 
 **Create file** `src/app/tasks/page.tsx`:
+
 ```tsx
 "use client"
 
@@ -379,6 +408,7 @@ export default function TasksPage() {
 ```
 
 **Create file** `src/app/schedule/page.tsx`:
+
 ```tsx
 "use client"
 
@@ -392,6 +422,7 @@ export default function SchedulePage() {
 ```
 
 **Create file** `src/app/jobs/page.tsx`:
+
 ```tsx
 "use client"
 
@@ -405,6 +436,7 @@ export default function JobsPage() {
 ```
 
 **Create file** `src/app/projects/page.tsx`:
+
 ```tsx
 "use client"
 
@@ -418,6 +450,7 @@ export default function ProjectsPage() {
 ```
 
 **Create file** `src/app/archive/page.tsx`:
+
 ```tsx
 "use client"
 
@@ -430,7 +463,8 @@ export default function ArchivePage() {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - ✅ Each file exists in its respective directory under `src/app/`
 
 ---
@@ -440,6 +474,7 @@ export default function ArchivePage() {
 **Do**: Create `.env.example` with placeholder variables for future use.
 
 **Create file** `.env.example`:
+
 ```bash
 # Clerk Authentication (future implementation)
 # NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
@@ -451,7 +486,8 @@ export default function ArchivePage() {
 # NEXT_PUBLIC_DEXIE_CLOUD_URL=https://your-db.dexie.cloud
 ```
 
-**Verify**: 
+**Verify**:
+
 - ✅ File exists at project root
 
 ---
@@ -460,14 +496,15 @@ export default function ArchivePage() {
 
 Run these checks after implementation is complete:
 
-| Check | Command | Expected Result |
-|-------|---------|-----------------|
-| Dev server starts | `pnpm dev` | Server runs at localhost:3000, no errors in terminal |
-| Build succeeds | `pnpm build` | Exit code 0, `.next/` directory created |
-| Lint passes | `pnpm lint` | Exit code 0 (warnings OK) |
-| Tailwind works | Visit any page | Text renders with Tailwind classes (centered, bold) |
+| Check             | Command        | Expected Result                                      |
+| ----------------- | -------------- | ---------------------------------------------------- |
+| Dev server starts | `pnpm dev`     | Server runs at localhost:3000, no errors in terminal |
+| Build succeeds    | `pnpm build`   | Exit code 0, `.next/` directory created              |
+| Lint passes       | `pnpm lint`    | Exit code 0 (warnings OK)                            |
+| Tailwind works    | Visit any page | Text renders with Tailwind classes (centered, bold)  |
 
 Manual checks:
+
 - [x] Visit `http://localhost:3000/` → redirects to `/tasks`
 - [x] Visit `http://localhost:3000/tasks` → shows "Tasks" heading
 - [x] Visit `http://localhost:3000/schedule` → shows "Schedule" heading

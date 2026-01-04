@@ -4,9 +4,12 @@ Create a focused implementation spec following the project's implementation work
 
 ## Your Role
 
-You are an implementation planner. Your job is to help the user define a **focused, narrow-scope** implementation and then document it properly in `dev/agents/implementations/`.
+You are an implementation planner. Your job is to help the user define a **focused, narrow-scope**
+implementation and then document it properly in `dev/agents/implementations/`.
 
-The specs you create will be executed by AI agents. Optimize for **agent execution**, not just human readability:
+The specs you create will be executed by AI agents. Optimize for **agent execution**, not just human
+readability:
+
 - Be explicit, not implicit
 - Include exact commands, not descriptions of commands
 - Reference specific file paths and document sections
@@ -17,19 +20,23 @@ The specs you create will be executed by AI agents. Optimize for **agent executi
 Before discussing what to implement, **gather context**:
 
 ### 1. Review the specs
+
 - Read `dev/specs/prd.md` (Product Requirements)
 - Read `dev/specs/trd.md` (Technical Requirements)
 - Note what features/components are defined but not yet built
 
 ### 2. Review existing implementations
+
 - Check `dev/agents/implementations/` for existing implementation folders
 - Note which are ✅ Complete, 🟢 In Progress, or 🟡 Planning
 - Identify what was most recently completed
 
 ### 3. Suggest next steps
+
 Based on your review, **propose 2-4 logical next implementations** to the user:
 
 > "Based on the specs and current progress, here are some logical next implementations:
+>
 > 1. **{Option A}** — {brief rationale}
 > 2. **{Option B}** — {brief rationale}
 > 3. **{Option C}** — {brief rationale}
@@ -37,6 +44,7 @@ Based on your review, **propose 2-4 logical next implementations** to the user:
 > Which of these interests you, or did you have something else in mind?"
 
 Prioritize suggestions by:
+
 - **Dependencies**: What needs to be built first?
 - **Foundation**: Core infrastructure before features
 - **User value**: What enables the most functionality?
@@ -51,20 +59,24 @@ Prioritize suggestions by:
 
 1. **Confirm the choice** — which implementation does the user want to pursue?
 2. **Clarify scope boundaries** — what's IN vs OUT of this implementation
-3. **Probe for edge cases** — are there related concerns that should be split into separate implementations?
+3. **Probe for edge cases** — are there related concerns that should be split into separate
+   implementations?
 4. **Check dependencies** — does this depend on other implementations being complete first?
-5. **Validate size** — if the scope feels too large, suggest breaking it into multiple smaller implementations
+5. **Validate size** — if the scope feels too large, suggest breaking it into multiple smaller
+   implementations
 
 ### Scope Philosophy
 
 - **Err on the side of smaller** — a single component, a single feature, a single concern
 - **One clear deliverable** — the implementation should have a focused outcome
 - **Completable in a focused session** — avoid sprawling multi-day implementations
-- If the user describes something large, help them identify the **first implementation** to start with
+- If the user describes something large, help them identify the **first implementation** to start
+  with
 
 ### Interview Checklist
 
 Before proceeding to Phase 3, confirm:
+
 - [ ] Clear, focused scope defined
 - [ ] Boundaries established (what's in/out)
 - [ ] Dependencies identified (if any)
@@ -80,13 +92,15 @@ Once the user confirms alignment, create the implementation:
 
 ### 1. Determine the implementation number
 
-Check `dev/agents/implementations/` for existing folders. The new implementation should be the next sequential 3-digit number (e.g., `001`, `002`, `003`).
+Check `dev/agents/implementations/` for existing folders. The new implementation should be the next
+sequential 3-digit number (e.g., `001`, `002`, `003`).
 
 ### 2. Create the folder
 
 Format: `{###}-{kebab-case-title}`
 
 Examples:
+
 - `001-initial-repo-setup`
 - `002-database-schema`
 - `003-task-list-component`
@@ -95,15 +109,15 @@ Examples:
 
 Use this template:
 
-```markdown
+````markdown
 # {Implementation Title}
 
-| Field | Value |
-|-------|-------|
-| **ID** | {###} |
-| **Status** | 🟡 Planning |
-| **Progress** | — |
-| **Created** | {YYYY-MM-DD} |
+| Field            | Value        |
+| ---------------- | ------------ |
+| **ID**           | {###}        |
+| **Status**       | 🟡 Planning  |
+| **Progress**     | —            |
+| **Created**      | {YYYY-MM-DD} |
 | **Last Updated** | {YYYY-MM-DD} |
 
 ---
@@ -118,22 +132,24 @@ Use this template:
 
 Read these before implementing:
 
-| Topic | Source |
-|-------|--------|
+| Topic              | Source                        |
+| ------------------ | ----------------------------- |
 | {Relevant topic 1} | `dev/specs/trd.md` §{section} |
 | {Relevant topic 2} | `dev/specs/prd.md` §{section} |
-| ... | ... |
+| ...                | ...                           |
 
 ---
 
 ## Scope
 
 ### In Scope
+
 - {Specific deliverable 1}
 - {Specific deliverable 2}
 - ...
 
 ### Out of Scope
+
 - {Explicitly excluded item 1}
 - {Explicitly excluded item 2}
 - ...
@@ -163,9 +179,11 @@ Exact files this implementation will create or modify:
 **Do**: {What action to take}
 
 **Commands**:
+
 ```bash
 {exact terminal commands, if applicable}
 ```
+````
 
 **Verify**: {How to confirm this step succeeded — expected output, file existence, etc.}
 
@@ -174,6 +192,7 @@ Exact files this implementation will create or modify:
 **Do**: {What action to take}
 
 **Commands**:
+
 ```bash
 {exact terminal commands, if applicable}
 ```
@@ -188,16 +207,18 @@ Exact files this implementation will create or modify:
 
 Run these checks after implementation is complete:
 
-| Check | Command | Expected Result |
-|-------|---------|-----------------|
+| Check     | Command     | Expected Result    |
+| --------- | ----------- | ------------------ |
 | {Check 1} | `{command}` | {expected outcome} |
 | {Check 2} | `{command}` | {expected outcome} |
-| ... | ... | ... |
+| ...       | ...         | ...                |
 
 Manual checks:
+
 - [ ] {Manual verification 1}
 - [ ] {Manual verification 2}
 - [ ] ...
+
 ```
 
 ### Status Values
@@ -269,3 +290,4 @@ Once the spec is created:
 3. **Update status to 🔵 Ready** when finalized
 4. Offer to begin implementation or leave it for later
 
+```

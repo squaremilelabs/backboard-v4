@@ -1,20 +1,24 @@
 # Scope Management (Jobs & Projects)
 
-| Field | Value |
-|-------|-------|
-| **ID** | 005 |
-| **Status** | ✅ Complete |
-| **Progress** | Core CRUD complete. Visual design deferred to 006. |
-| **Created** | 2025-12-31 |
-| **Last Updated** | 2025-12-31 |
+| Field            | Value                                              |
+| ---------------- | -------------------------------------------------- |
+| **ID**           | 005                                                |
+| **Status**       | ✅ Complete                                        |
+| **Progress**     | Core CRUD complete. Visual design deferred to 006. |
+| **Created**      | 2025-12-31                                         |
+| **Last Updated** | 2025-12-31                                         |
 
-> **Note**: This implementation delivers core CRUD functionality (add, edit, archive) for Jobs and Projects. However, the visual layout does not yet match the Figma designs (grid structure, sticky columns, etc.). A follow-up implementation (006) will focus on design alignment.
+> **Note**: This implementation delivers core CRUD functionality (add, edit, archive) for Jobs and
+> Projects. However, the visual layout does not yet match the Figma designs (grid structure, sticky
+> columns, etc.). A follow-up implementation (006) will focus on design alignment.
 
 ---
 
 ## Overview
 
-Build the Jobs and Projects pages with full CRUD for scopes (add, edit title, archive). Includes a responsive modal (dialog on desktop, full-screen sheet on mobile), inline title editing on desktop, and a placeholder for the scheduling grids. Projects support 1-level nesting.
+Build the Jobs and Projects pages with full CRUD for scopes (add, edit title, archive). Includes a
+responsive modal (dialog on desktop, full-screen sheet on mobile), inline title editing on desktop,
+and a placeholder for the scheduling grids. Projects support 1-level nesting.
 
 ---
 
@@ -22,20 +26,21 @@ Build the Jobs and Projects pages with full CRUD for scopes (add, edit title, ar
 
 Read these before implementing:
 
-| Topic | Source |
-|-------|--------|
-| Scope data model | `dev/specs/trd.md` §4.1 — `Scope` interface |
-| Jobs page layout | `dev/specs/prd.md` §4.3 |
-| Projects page layout | `dev/specs/prd.md` §4.4 |
-| Project nesting | `dev/specs/prd.md` §2.1 — "1-level nesting" |
-| Database operations | `src/lib/db.ts` — `db.scopes` table |
-| Theme classes | `src/app/globals.css` — `.theme-gold` (Jobs), `.theme-blue` (Projects) |
+| Topic                | Source                                                                 |
+| -------------------- | ---------------------------------------------------------------------- |
+| Scope data model     | `dev/specs/trd.md` §4.1 — `Scope` interface                            |
+| Jobs page layout     | `dev/specs/prd.md` §4.3                                                |
+| Projects page layout | `dev/specs/prd.md` §4.4                                                |
+| Project nesting      | `dev/specs/prd.md` §2.1 — "1-level nesting"                            |
+| Database operations  | `src/lib/db.ts` — `db.scopes` table                                    |
+| Theme classes        | `src/app/globals.css` — `.theme-gold` (Jobs), `.theme-blue` (Projects) |
 
 ---
 
 ## Scope
 
 ### In Scope
+
 - **Jobs page**: Two-panel layout (list left, grid placeholder right)
 - **Projects page**: Two-panel layout with nested project display
 - **Add scope**: Inline input at bottom of list
@@ -50,6 +55,7 @@ Read these before implementing:
 - **Responsive behavior**: List-only on mobile (grid hidden)
 
 ### Out of Scope
+
 - Weekly template grid (DefaultScheduleSlots) — future implementation
 - 6-month timeline grid (MonthSlots) — future implementation
 - Rich text editor for scope content (Tiptap) — future implementation
@@ -72,11 +78,13 @@ Read these before implementing:
 Exact files this implementation will create or modify:
 
 ### shadcn/ui Components (created by CLI)
+
 - [x] `src/components/ui/dialog.tsx`
 - [x] `src/components/ui/input.tsx`
 - [x] `src/components/ui/alert-dialog.tsx`
 
 ### Scope Components
+
 - [x] `src/components/scopes/scope-modal.tsx` — Responsive modal (dialog/sheet)
 - [x] `src/components/scopes/scope-list-item.tsx` — List item with inline edit
 - [x] `src/components/scopes/add-scope-input.tsx` — Inline add input
@@ -84,13 +92,16 @@ Exact files this implementation will create or modify:
 - [x] `src/components/scopes/grid-placeholder.tsx` — Placeholder for future grid
 
 ### Hooks
+
 - [x] `src/hooks/use-media-query.ts` — Detect mobile vs desktop
 - [x] `src/hooks/use-scopes.ts` — Dexie live queries for scopes (read only)
 
 ### Lib
+
 - [x] `src/lib/scope-mutations.ts` — Scope mutation functions (create, update, archive)
 
 ### Pages (modify existing)
+
 - [x] `src/app/jobs/page.tsx` — Jobs page with scope list
 - [x] `src/app/projects/page.tsx` — Projects page with nested list
 
@@ -103,11 +114,13 @@ Exact files this implementation will create or modify:
 **Do**: Install Dialog, Input, and AlertDialog components.
 
 **Commands**:
+
 ```bash
 pnpm dlx shadcn@latest add dialog input alert-dialog
 ```
 
-**Verify**: 
+**Verify**:
+
 - `src/components/ui/dialog.tsx` exists
 - `src/components/ui/input.tsx` exists
 - `src/components/ui/alert-dialog.tsx` exists
@@ -131,7 +144,7 @@ export function useMediaQuery(query: string): boolean {
 
   useEffect(() => {
     const media = window.matchMedia(query)
-    
+
     // Set initial value
     setMatches(media.matches)
 
@@ -153,7 +166,8 @@ export function useIsMobile(): boolean {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/hooks/use-media-query.ts`
 - No TypeScript errors
 
@@ -161,7 +175,8 @@ export function useIsMobile(): boolean {
 
 ### Step 3: Create useScopes Hook
 
-**Do**: Create Dexie live query hooks for fetching scopes. These are read-only queries — mutations live in a separate file.
+**Do**: Create Dexie live query hooks for fetching scopes. These are read-only queries — mutations
+live in a separate file.
 
 **Create file** `src/hooks/use-scopes.ts`:
 
@@ -184,14 +199,12 @@ export function useScopes(type: ScopeType) {
 }
 
 export function useScope(id: string | null) {
-  return useLiveQuery(
-    () => (id ? db.scopes.get(id) : undefined),
-    [id]
-  )
+  return useLiveQuery(() => (id ? db.scopes.get(id) : undefined), [id])
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/hooks/use-scopes.ts`
 - No TypeScript errors
 
@@ -199,7 +212,8 @@ export function useScope(id: string | null) {
 
 ### Step 4: Create Scope Mutations
 
-**Do**: Create mutation functions for scope operations. These are plain async functions (not hooks) that write to the database.
+**Do**: Create mutation functions for scope operations. These are plain async functions (not hooks)
+that write to the database.
 
 **Create file** `src/lib/scope-mutations.ts`:
 
@@ -231,7 +245,8 @@ export async function archiveScope(id: string): Promise<void> {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/lib/scope-mutations.ts`
 - No TypeScript errors
 
@@ -254,9 +269,7 @@ interface GridPlaceholderProps {
 
 export function GridPlaceholder({ type }: GridPlaceholderProps) {
   const message =
-    type === "jobs"
-      ? "Weekly schedule template coming soon"
-      : "6-month timeline coming soon"
+    type === "jobs" ? "Weekly schedule template coming soon" : "6-month timeline coming soon"
 
   return (
     <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
@@ -267,7 +280,8 @@ export function GridPlaceholder({ type }: GridPlaceholderProps) {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/components/scopes/grid-placeholder.tsx`
 - No TypeScript errors
 
@@ -294,13 +308,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -375,9 +383,7 @@ export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
 
         {/* Placeholder for future rich text content */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">
-            Notes
-          </label>
+          <label className="text-sm font-medium text-muted-foreground">Notes</label>
           <div className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">
             Rich text notes coming soon
           </div>
@@ -388,10 +394,7 @@ export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
 
   const footer = (
     <div className="flex w-full items-center justify-between">
-      <Button
-        variant="destructive"
-        onClick={() => setShowArchiveConfirm(true)}
-      >
+      <Button variant="destructive" onClick={() => setShowArchiveConfirm(true)}>
         Archive
       </Button>
       <div className="flex gap-2">
@@ -412,8 +415,8 @@ export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
         <AlertDialogHeader>
           <AlertDialogTitle>Archive {typeLabel}?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will move &quot;{scope?.title}&quot; to the archive. You can restore it
-            from the Archive page within 30 days.
+            This will move &quot;{scope?.title}&quot; to the archive. You can restore it from the
+            Archive page within 30 days.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -458,7 +461,8 @@ export function ScopeModal({ scope, open, onOpenChange }: ScopeModalProps) {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/components/scopes/scope-modal.tsx`
 - No TypeScript errors
 
@@ -488,11 +492,7 @@ interface ScopeListItemProps {
   onOpenModal: (scope: Scope) => void
 }
 
-export function ScopeListItem({
-  scope,
-  isNested = false,
-  onOpenModal,
-}: ScopeListItemProps) {
+export function ScopeListItem({ scope, isNested = false, onOpenModal }: ScopeListItemProps) {
   const isMobile = useIsMobile()
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(scope.title)
@@ -563,7 +563,7 @@ export function ScopeListItem({
             onClick={handleTitleClick}
             className={cn(
               "block truncate text-sm font-medium",
-              !isMobile && "cursor-text hover:bg-muted/50 rounded px-1 -mx-1"
+              !isMobile && "-mx-1 cursor-text rounded px-1 hover:bg-muted/50"
             )}
           >
             {scope.title}
@@ -576,7 +576,7 @@ export function ScopeListItem({
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100"
           onClick={(e) => {
             e.stopPropagation()
             onOpenModal(scope)
@@ -591,7 +591,8 @@ export function ScopeListItem({
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/components/scopes/scope-list-item.tsx`
 - No TypeScript errors
 
@@ -620,19 +621,13 @@ interface AddScopeInputProps {
   placeholder?: string
 }
 
-export function AddScopeInput({
-  type,
-  parentId,
-  placeholder,
-}: AddScopeInputProps) {
+export function AddScopeInput({ type, parentId, placeholder }: AddScopeInputProps) {
   const [isAdding, setIsAdding] = useState(false)
   const [value, setValue] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
   const typeLabel = type === "job" ? "job" : "project"
-  const defaultPlaceholder = parentId
-    ? `Add sub-${typeLabel}...`
-    : `Add ${typeLabel}...`
+  const defaultPlaceholder = parentId ? `Add sub-${typeLabel}...` : `Add ${typeLabel}...`
 
   const handleSubmit = async () => {
     if (!value.trim()) {
@@ -660,10 +655,7 @@ export function AddScopeInput({
       <Button
         variant="ghost"
         size="sm"
-        className={cn(
-          "w-full justify-start gap-2 text-muted-foreground",
-          parentId && "ml-6"
-        )}
+        className={cn("w-full justify-start gap-2 text-muted-foreground", parentId && "ml-6")}
         onClick={() => {
           setIsAdding(true)
           // Focus after state update
@@ -692,7 +684,8 @@ export function AddScopeInput({
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/components/scopes/add-scope-input.tsx`
 - No TypeScript errors
 
@@ -736,9 +729,7 @@ export function ScopeList({ type }: ScopeListProps) {
   }
 
   if (scopes === undefined) {
-    return (
-      <div className="p-4 text-sm text-muted-foreground">Loading...</div>
-    )
+    return <div className="p-4 text-sm text-muted-foreground">Loading...</div>
   }
 
   // For jobs: simple flat list
@@ -748,20 +739,12 @@ export function ScopeList({ type }: ScopeListProps) {
       <>
         <div className="flex flex-col gap-1 p-2">
           {scopes.map((scope) => (
-            <ScopeListItem
-              key={scope.id}
-              scope={scope}
-              onOpenModal={handleOpenModal}
-            />
+            <ScopeListItem key={scope.id} scope={scope} onOpenModal={handleOpenModal} />
           ))}
           <AddScopeInput type="job" />
         </div>
 
-        <ScopeModal
-          scope={modalScope}
-          open={isModalOpen}
-          onOpenChange={handleCloseModal}
-        />
+        <ScopeModal scope={modalScope} open={isModalOpen} onOpenChange={handleCloseModal} />
       </>
     )
   }
@@ -786,18 +769,10 @@ export function ScopeList({ type }: ScopeListProps) {
       <div className="flex flex-col gap-1 p-2">
         {parentProjects.map((project) => (
           <div key={project.id}>
-            <ScopeListItem
-              scope={project}
-              onOpenModal={handleOpenModal}
-            />
+            <ScopeListItem scope={project} onOpenModal={handleOpenModal} />
             {/* Nested children */}
             {childrenByParent[project.id]?.map((child) => (
-              <ScopeListItem
-                key={child.id}
-                scope={child}
-                isNested
-                onOpenModal={handleOpenModal}
-              />
+              <ScopeListItem key={child.id} scope={child} isNested onOpenModal={handleOpenModal} />
             ))}
             {/* Add child project */}
             <AddScopeInput type="project" parentId={project.id} />
@@ -806,17 +781,14 @@ export function ScopeList({ type }: ScopeListProps) {
         <AddScopeInput type="project" />
       </div>
 
-      <ScopeModal
-        scope={modalScope}
-        open={isModalOpen}
-        onOpenChange={handleCloseModal}
-      />
+      <ScopeModal scope={modalScope} open={isModalOpen} onOpenChange={handleCloseModal} />
     </>
   )
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File exists at `src/components/scopes/scope-list.tsx`
 - No TypeScript errors
 
@@ -856,7 +828,8 @@ export default function JobsPage() {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File updated at `src/app/jobs/page.tsx`
 - No TypeScript errors
 
@@ -896,7 +869,8 @@ export default function ProjectsPage() {
 }
 ```
 
-**Verify**: 
+**Verify**:
+
 - File updated at `src/app/projects/page.tsx`
 - No TypeScript errors
 
@@ -907,11 +881,13 @@ export default function ProjectsPage() {
 **Do**: Ensure the project builds successfully.
 
 **Commands**:
+
 ```bash
 pnpm build
 ```
 
-**Verify**: 
+**Verify**:
+
 - Build exits with code 0
 - No errors
 
@@ -922,6 +898,7 @@ pnpm build
 **Do**: Test all functionality in the browser.
 
 **Commands**:
+
 ```bash
 pnpm dev
 ```
@@ -994,14 +971,15 @@ pnpm dev
 
 Run these checks after implementation is complete:
 
-| Check | Command | Expected Result |
-|-------|---------|-----------------|
-| TypeScript compiles | `pnpm exec tsc --noEmit` | Exit code 0, no errors |
-| Build succeeds | `pnpm build` | Exit code 0 |
-| Lint passes | `pnpm lint` | Exit code 0 (warnings OK) |
-| Dev server runs | `pnpm dev` | Server starts, no console errors |
+| Check               | Command                  | Expected Result                  |
+| ------------------- | ------------------------ | -------------------------------- |
+| TypeScript compiles | `pnpm exec tsc --noEmit` | Exit code 0, no errors           |
+| Build succeeds      | `pnpm build`             | Exit code 0                      |
+| Lint passes         | `pnpm lint`              | Exit code 0 (warnings OK)        |
+| Dev server runs     | `pnpm dev`               | Server starts, no console errors |
 
 Manual checks:
+
 - [ ] Jobs page: add, inline edit, modal edit, archive
 - [ ] Projects page: add, nested add, inline edit, modal edit, archive
 - [ ] Desktop: inline editing works
@@ -1015,14 +993,14 @@ Manual checks:
 
 ### Responsive Behavior Summary
 
-| Feature | Desktop (≥768px) | Mobile (<768px) |
-|---------|-----------------|-----------------|
-| Layout | Two-panel (list + grid placeholder) | List only |
-| Grid placeholder | Visible | Hidden |
-| Title editing | Inline click-to-edit | In modal |
-| More button | Visible on hover | Hidden |
-| Row click | No action | Opens modal |
-| Modal style | Centered dialog | Full-screen sheet |
+| Feature          | Desktop (≥768px)                    | Mobile (<768px)   |
+| ---------------- | ----------------------------------- | ----------------- |
+| Layout           | Two-panel (list + grid placeholder) | List only         |
+| Grid placeholder | Visible                             | Hidden            |
+| Title editing    | Inline click-to-edit                | In modal          |
+| More button      | Visible on hover                    | Hidden            |
+| Row click        | No action                           | Opens modal       |
+| Modal style      | Centered dialog                     | Full-screen sheet |
 
 ### Component Architecture
 
@@ -1046,8 +1024,8 @@ No manual state management for scope data — Dexie's reactive queries handle it
 ### Theme Classes
 
 Pages wrap their content in theme classes:
+
 - Jobs: `<div className="theme-gold">...</div>`
 - Projects: `<div className="theme-blue">...</div>`
 
 This scopes the primary/secondary colors for all child components.
-
