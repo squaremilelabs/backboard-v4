@@ -1,12 +1,12 @@
 # Task Drag and Drop
 
-| Field            | Value        |
-| ---------------- | ------------ |
-| **ID**           | 014          |
-| **Status**       | 🔵 Ready     |
-| **Progress**     | —            |
-| **Created**      | 2026-01-05   |
-| **Last Updated** | 2026-01-05   |
+| Field            | Value                |
+| ---------------- | -------------------- |
+| **ID**           | 014                  |
+| **Status**       | 🟢 In Progress       |
+| **Progress**     | Part 1 complete (6/17) |
+| **Created**      | 2026-01-05           |
+| **Last Updated** | 2026-01-05           |
 
 ---
 
@@ -78,12 +78,12 @@ Read these before implementing:
 
 ### Part 1: Tasklist Refactor
 
-- [ ] `src/lib/db.ts` — Add Tasklist interface, update schema to v2
-- [ ] `src/lib/tasklist-helpers.ts` — Create: ID derivation, CRUD helpers
-- [ ] `src/lib/task-mutations.ts` — Update all mutations to maintain tasklists
-- [ ] `src/lib/recurring-task-mutations.ts` — Update all mutations to maintain tasklists
-- [ ] `src/hooks/use-tasks.ts` — Fetch in tasklist order
-- [ ] `src/hooks/use-recurring-tasks.ts` — Fetch in tasklist order
+- [x] `src/lib/db.ts` — Add Tasklist interface, update schema to v2 ✅
+- [x] `src/lib/tasklist-helpers.ts` — Create: ID derivation, CRUD helpers ✅
+- [x] `src/lib/task-mutations.ts` — Update all mutations to maintain tasklists ✅
+- [x] `src/lib/recurring-task-mutations.ts` — Update all mutations to maintain tasklists ✅
+- [x] `src/hooks/use-tasks.ts` — Fetch in tasklist order ✅
+- [x] `src/hooks/use-recurring-tasks.ts` — Fetch in tasklist order ✅
 
 ### Part 2: Drag and Drop
 
