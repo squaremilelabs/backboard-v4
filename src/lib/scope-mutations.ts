@@ -1,18 +1,20 @@
-import { db, type ScopeType } from "@/lib/db"
+import { db, type Scope, type ScopeType } from "@/lib/db"
+
+// Note: With Dexie Cloud's @id schema, IDs are auto-generated on add()
+// The add() method returns the generated ID
 
 export async function createScope(
   type: ScopeType,
   title: string,
   parentId?: string
 ): Promise<string> {
-  const id = crypto.randomUUID()
-  await db.scopes.add({
-    id,
+  // With @id schema, Dexie auto-generates the ID and returns it
+  const id = (await db.scopes.add({
     type,
     title,
     parentId,
     createdAt: Date.now(),
-  })
+  } as Scope)) as string
   return id
 }
 

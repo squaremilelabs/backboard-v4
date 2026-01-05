@@ -4,23 +4,32 @@ import {
   moveTaskBetweenLists,
   reorderTasklist,
 } from "./tasklist-helpers"
-import { db, type RecurringTask, type RecurringTaskAction, type FrequencyValue } from "@/lib/db"
+import {
+  db,
+  type Task,
+  type RecurringTask,
+  type RecurringTaskAction,
+  type FrequencyValue,
+} from "@/lib/db"
+
+// Note: With Dexie Cloud's @id schema, IDs are auto-generated on add()
+// The add() method returns the generated ID
 
 /**
  * Create a new recurring task (starts as template with no frequency)
  */
 export async function createRecurringTask(title: string, scopeId: string): Promise<string> {
-  const id = crypto.randomUUID()
   const now = Date.now()
+  let id: string = ""
 
   await db.transaction("rw", [db.recurringTasks, db.tasklists], async () => {
-    await db.recurringTasks.add({
-      id,
+    // With @id schema, Dexie auto-generates the ID and returns it
+    id = (await db.recurringTasks.add({
       scopeId,
       title: title.trim(),
-      frequency: [], // Empty = template mode
+      frequency: [],
       createdAt: now,
-    })
+    } as unknown as RecurringTask)) as string
 
     await prependToTasklist(scopeId, "recurring", id)
   })
@@ -104,9 +113,8 @@ export async function commitRecurringTaskPendingActions(scopeId: string): Promis
 
     // Handle inserts
     for (const recurringTask of toInsert) {
-      const newTaskId = crypto.randomUUID()
-      await db.tasks.add({
-        id: newTaskId,
+      // With @id schema, Dexie auto-generates the ID and returns it
+      const newTaskId = (await db.tasks.add({
         scopeId: recurringTask.scopeId,
         title: recurringTask.title,
         content: recurringTask.content,
@@ -114,7 +122,7 @@ export async function commitRecurringTaskPendingActions(scopeId: string): Promis
         insertedAt: now,
         insertedFrom: "recurring",
         createdAt: now,
-      })
+      } as Task)) as string
 
       // Add to "now" tasklist
       await prependToTasklist(recurringTask.scopeId, "now", newTaskId)
@@ -154,13 +162,12 @@ export async function insertRecurringTaskNow(
   recurringTask: RecurringTask,
   updateLastInserted: boolean = false
 ): Promise<string> {
-  const id = crypto.randomUUID()
   const now = Date.now()
+  let id: string = ""
 
   await db.transaction("rw", [db.tasks, db.recurringTasks, db.tasklists], async () => {
-    // Create new task from template
-    await db.tasks.add({
-      id,
+    // Create new task from template - Dexie auto-generates the ID
+    id = (await db.tasks.add({
       scopeId: recurringTask.scopeId,
       title: recurringTask.title,
       content: recurringTask.content,
@@ -168,7 +175,7 @@ export async function insertRecurringTaskNow(
       insertedAt: now,
       insertedFrom: "recurring",
       createdAt: now,
-    })
+    } as Task)) as string
 
     // Add to "now" tasklist
     await prependToTasklist(recurringTask.scopeId, "now", id)

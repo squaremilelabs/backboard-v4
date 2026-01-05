@@ -1,6 +1,15 @@
 import { format, subDays, addDays } from "date-fns"
 import { prependToTasklist, removeManyFromTasklist } from "./tasklist-helpers"
-import { db, type Weekday, type RecurringTask, type TaskStatus } from "@/lib/db"
+import {
+  db,
+  type Weekday,
+  type RecurringTask,
+  type TaskStatus,
+  type Task,
+  type ScheduleSlot,
+} from "@/lib/db"
+
+// Note: With Dexie Cloud's @id schema, IDs are auto-generated on add()
 
 export interface SyncResult {
   recurringTasksInserted: number
@@ -94,13 +103,11 @@ async function insertRecurringTaskToNow(
   recurringTask: RecurringTask,
   today: string
 ): Promise<void> {
-  const id = crypto.randomUUID()
   const now = Date.now()
 
   await db.transaction("rw", [db.tasks, db.recurringTasks, db.tasklists], async () => {
-    // Create new task from template
-    await db.tasks.add({
-      id,
+    // Create new task from template - Dexie auto-generates the ID
+    const id = (await db.tasks.add({
       scopeId: recurringTask.scopeId,
       title: recurringTask.title,
       content: recurringTask.content,
@@ -108,7 +115,7 @@ async function insertRecurringTaskToNow(
       insertedAt: now,
       insertedFrom: "recurring",
       createdAt: now,
-    })
+    } as Task)) as string
 
     // Add to "now" tasklist
     await prependToTasklist(recurringTask.scopeId, "now", id)
@@ -143,12 +150,12 @@ async function populateScheduleSlots(today: string): Promise<number> {
         .first()
 
       if (!existing) {
+        // With @id schema, Dexie auto-generates the ID
         await db.scheduleSlots.add({
-          id: crypto.randomUUID(),
           date: dateStr,
           weekday,
           scopeId: def.jobId,
-        })
+        } as ScheduleSlot)
         createdCount++
       }
     }

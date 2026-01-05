@@ -1,4 +1,12 @@
-import { db, type Weekday } from "@/lib/db"
+import {
+  db,
+  type Weekday,
+  type DefaultScheduleSlot,
+  type MonthSlot,
+  type ScheduleSlot,
+} from "@/lib/db"
+
+// Note: With Dexie Cloud's @id schema, IDs are auto-generated on add()
 
 // ============================================================================
 // DefaultScheduleSlot (Jobs weekly template)
@@ -14,11 +22,11 @@ export async function toggleDefaultScheduleSlot(jobId: string, weekday: Weekday)
   if (existing) {
     await db.defaultScheduleSlots.delete(existing.id)
   } else {
+    // With @id schema, Dexie auto-generates the ID
     await db.defaultScheduleSlots.add({
-      id: crypto.randomUUID(),
       weekday,
       jobId,
-    })
+    } as DefaultScheduleSlot)
   }
 }
 
@@ -36,11 +44,11 @@ export async function toggleMonthSlot(
   if (existing) {
     await db.monthSlots.delete(existing.id)
   } else {
+    // With @id schema, Dexie auto-generates the ID
     await db.monthSlots.add({
-      id: crypto.randomUUID(),
       month,
       projectId,
-    })
+    } as MonthSlot)
   }
 }
 
@@ -64,11 +72,11 @@ export async function toggleScheduleSlot(
     const weekdays: Weekday[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
     const weekday = weekdays[weekdayIndex]
 
+    // With @id schema, Dexie auto-generates the ID
     await db.scheduleSlots.add({
-      id: crypto.randomUUID(),
       date,
       weekday,
       scopeId,
-    })
+    } as ScheduleSlot)
   }
 }

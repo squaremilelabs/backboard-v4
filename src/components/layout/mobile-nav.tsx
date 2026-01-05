@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
 import { useState } from "react"
 import { SyncButton } from "./sync-button"
+import { UserMenu } from "@/components/auth/user-menu"
+import { LoginDialog } from "@/components/auth/login-dialog"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
@@ -74,8 +76,9 @@ export function MobileNav() {
             ))}
           </nav>
 
-          {/* Secondary navigation (Sync + Archive) */}
+          {/* Secondary navigation (Auth + Sync + Archive) */}
           <nav className="space-y-1 border-t p-4">
+            <UserMenu variant="mobile" />
             <SyncButton variant="mobile" />
             {secondaryNavItems.map((item) => (
               <NavItem
@@ -89,6 +92,9 @@ export function MobileNav() {
           </nav>
         </div>
       </SheetContent>
+
+      {/* Login dialog - renders when login flow is triggered */}
+      <LoginDialog />
     </Sheet>
   )
 }

@@ -7,6 +7,9 @@ import {
 } from "./tasklist-helpers"
 import { db, type Task, type TaskStatus } from "@/lib/db"
 
+// Note: With Dexie Cloud's @id schema, IDs are auto-generated on add()
+// The add() method returns the generated ID
+
 /**
  * Create a new task in a specific scope and status
  */
@@ -15,19 +18,19 @@ export async function createTask(
   scopeId: string | null,
   status: TaskStatus
 ): Promise<string> {
-  const id = crypto.randomUUID()
   const now = Date.now()
+  let id: string = ""
 
   await db.transaction("rw", [db.tasks, db.tasklists], async () => {
-    await db.tasks.add({
-      id,
+    // With @id schema, Dexie auto-generates the ID and returns it
+    id = (await db.tasks.add({
       scopeId,
       title: title.trim(),
       status,
       insertedAt: now,
       insertedFrom: status,
       createdAt: now,
-    })
+    } as Task)) as string
 
     // Add to tasklist (at top)
     await prependToTasklist(scopeId, status, id)
