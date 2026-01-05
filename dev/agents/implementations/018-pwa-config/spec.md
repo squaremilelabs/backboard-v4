@@ -3,8 +3,8 @@
 | Field            | Value       |
 | ---------------- | ----------- |
 | **ID**           | 018         |
-| **Status**       | 🟡 Planning |
-| **Progress**     | —           |
+| **Status**       | ✅ Complete |
+| **Progress**     | All steps complete |
 | **Created**      | 2026-01-05  |
 | **Last Updated** | 2026-01-05  |
 | **Note**         | Updated for Next.js 16 PWA best practices |
@@ -66,21 +66,21 @@ None - standalone implementation
 
 Exact files this implementation will create or modify:
 
-- [ ] `next.config.ts` — Add Serwist plugin + security headers
-- [ ] `src/app/sw.ts` — Service worker with default caching
-- [ ] `app/manifest.ts` — Web app manifest (TypeScript)
-- [ ] `public/icons/icon-192.png` — Placeholder 192x192 icon
-- [ ] `public/icons/icon-512.png` — Placeholder 512x512 icon
-- [ ] `public/icons/ICON-REPLACEMENT.md` — Instructions for replacing icons
-- [ ] `src/app/offline/page.tsx` — Minimal offline fallback page
-- [ ] `src/app/layout.tsx` — Update with PWA metadata
-- [ ] `package.json` — Add @serwist/next and serwist dependencies
+- [x] `next.config.ts` — Add Serwist plugin + security headers
+- [x] `src/app/sw.ts` — Service worker with default caching
+- [x] `src/app/manifest.ts` — Web app manifest (TypeScript)
+- [x] `public/icons/icon-192.png` — Placeholder 192x192 icon
+- [x] `public/icons/icon-512.png` — Placeholder 512x512 icon
+- [x] `public/icons/ICON-REPLACEMENT.md` — Instructions for replacing icons
+- [x] `src/app/offline/page.tsx` — Minimal offline fallback page
+- [x] `src/app/layout.tsx` — Update with PWA metadata
+- [x] `package.json` — Add @serwist/next and serwist dependencies
 
 ---
 
 ## Implementation Plan
 
-### Step 1: Install Serwist dependencies
+### Step 1: Install Serwist dependencies ✅
 
 **Do**: Add PWA packages to the project.
 
@@ -95,7 +95,7 @@ pnpm add @serwist/next serwist
 
 ---
 
-### Step 2: Create service worker file
+### Step 2: Create service worker file ✅
 
 **Do**: Create the service worker with default caching configuration from TRD §7.1.
 
@@ -129,7 +129,7 @@ serwist.addEventListeners()
 
 ---
 
-### Step 3: Update Next.js config with Serwist and security headers
+### Step 3: Update Next.js config with Serwist and security headers ✅
 
 **Do**: Integrate Serwist plugin and add security headers per Next.js PWA best practices.
 
@@ -198,7 +198,7 @@ export default withSerwist({
 
 ---
 
-### Step 4: Create placeholder app icons
+### Step 4: Create placeholder app icons ✅
 
 **Do**: Generate simple placeholder icons for PWA installation.
 
@@ -223,7 +223,7 @@ convert -size 512x512 xc:#1a1a1a -gravity center -pointsize 128 -fill white -ann
 
 ---
 
-### Step 5: Create icon replacement instructions
+### Step 5: Create icon replacement instructions ✅
 
 **Do**: Add documentation for easy icon replacement later.
 
@@ -266,9 +266,9 @@ Also consider updating `public/favicon.ico` to match your icon design.
 
 ---
 
-### Step 6: Create web app manifest (TypeScript)
+### Step 6: Create web app manifest (TypeScript) ✅
 
-**Do**: Create `app/manifest.ts` per Next.js 16 best practices (type-safe manifest).
+**Do**: Create `src/app/manifest.ts` per Next.js 16 best practices (type-safe manifest).
 
 **Create** `app/manifest.ts`:
 
@@ -309,7 +309,7 @@ export default function manifest(): MetadataRoute.Manifest {
 
 ---
 
-### Step 7: Create offline fallback page
+### Step 7: Create offline fallback page ✅
 
 **Do**: Create a minimal offline page for when the user has no connection.
 
@@ -345,7 +345,7 @@ export default function OfflinePage() {
 
 ---
 
-### Step 8: Update root layout with PWA metadata
+### Step 8: Update root layout with PWA metadata ✅
 
 **Do**: Add PWA meta tags to enable installation (manifest auto-discovered by Next.js).
 
@@ -379,7 +379,7 @@ export const metadata = {
 
 ---
 
-### Step 9: Build and test PWA functionality
+### Step 9: Build and test PWA functionality ✅
 
 **Do**: Build the app and verify PWA features are working.
 
@@ -435,7 +435,7 @@ pnpm dev --experimental-https
 
 ---
 
-### Step 10: Add PWA setup notes to project
+### Step 10: Add PWA setup notes to project ✅
 
 **Do**: Document the PWA setup for future reference (optional but recommended).
 
