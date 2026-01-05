@@ -3,8 +3,8 @@
 | Field            | Value       |
 | ---------------- | ----------- |
 | **ID**           | 018         |
-| **Status**       | 🟡 Planning |
-| **Progress**     | —           |
+| **Status**       | 🟢 In Progress |
+| **Progress**     | Step 3 of 10 complete |
 | **Created**      | 2026-01-05  |
 | **Last Updated** | 2026-01-05  |
 | **Note**         | Updated for Next.js 16 PWA best practices |
@@ -66,21 +66,21 @@ None - standalone implementation
 
 Exact files this implementation will create or modify:
 
-- [ ] `next.config.ts` — Add Serwist plugin + security headers
-- [ ] `src/app/sw.ts` — Service worker with default caching
+- [x] `next.config.ts` — Add Serwist plugin + security headers
+- [x] `src/app/sw.ts` — Service worker with default caching
 - [ ] `app/manifest.ts` — Web app manifest (TypeScript)
 - [ ] `public/icons/icon-192.png` — Placeholder 192x192 icon
 - [ ] `public/icons/icon-512.png` — Placeholder 512x512 icon
 - [ ] `public/icons/ICON-REPLACEMENT.md` — Instructions for replacing icons
 - [ ] `src/app/offline/page.tsx` — Minimal offline fallback page
 - [ ] `src/app/layout.tsx` — Update with PWA metadata
-- [ ] `package.json` — Add @serwist/next and serwist dependencies
+- [x] `package.json` — Add @serwist/next and serwist dependencies
 
 ---
 
 ## Implementation Plan
 
-### Step 1: Install Serwist dependencies
+### Step 1: Install Serwist dependencies ✅
 
 **Do**: Add PWA packages to the project.
 
@@ -95,7 +95,7 @@ pnpm add @serwist/next serwist
 
 ---
 
-### Step 2: Create service worker file
+### Step 2: Create service worker file ✅
 
 **Do**: Create the service worker with default caching configuration from TRD §7.1.
 
@@ -129,7 +129,7 @@ serwist.addEventListeners()
 
 ---
 
-### Step 3: Update Next.js config with Serwist and security headers
+### Step 3: Update Next.js config with Serwist and security headers ✅
 
 **Do**: Integrate Serwist plugin and add security headers per Next.js PWA best practices.
 
