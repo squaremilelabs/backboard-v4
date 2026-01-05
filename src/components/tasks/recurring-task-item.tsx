@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react"
 import { GripVertical, ArrowLeftToLine, X } from "lucide-react"
+import { FrequencyIndicator } from "./frequency-indicator"
+import { FrequencyPicker } from "./frequency-picker"
 import {
   updateRecurringTaskTitle,
   updateRecurringTaskFrequency,
@@ -11,8 +13,6 @@ import {
 import { useUserTimezone } from "@/hooks/use-recurring-tasks"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
-import { FrequencyIndicator } from "./frequency-indicator"
-import { FrequencyPicker } from "./frequency-picker"
 import { cn } from "@/lib/utils"
 import type { RecurringTask, FrequencyValue, RecurringTaskAction } from "@/lib/db"
 
@@ -38,13 +38,6 @@ export function RecurringTaskItem({ task, themeClass }: RecurringTaskItemProps) 
       inputRef.current.select()
     }
   }, [isEditing])
-
-  // Sync edit value when task changes externally
-  useEffect(() => {
-    if (!isEditing) {
-      setEditValue(task.title)
-    }
-  }, [task.title, isEditing])
 
   const startEditing = () => {
     if (isPendingDelete) return // Don't allow editing if pending delete
@@ -220,7 +213,8 @@ function RecurringTaskPendingIndicator({ action, onClear }: RecurringTaskPending
           className={cn(
             "flex h-7 w-7 items-center justify-center rounded",
             isInsert
-              ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+              ? `bg-primary text-primary-foreground hover:bg-primary/90
+                hover:text-primary-foreground`
               : "bg-muted text-muted-foreground hover:bg-muted/90"
           )}
         >

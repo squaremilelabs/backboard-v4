@@ -67,7 +67,8 @@ export const FrequencyIndicator = forwardRef<HTMLButtonElement, FrequencyIndicat
         {orderedActiveDays.map(({ key }) => (
           <span
             key={key}
-            className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground"
+            className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px]
+              font-medium text-primary-foreground"
           >
             {WEEKDAY_LABELS[key]}
           </span>

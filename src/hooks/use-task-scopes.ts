@@ -118,23 +118,20 @@ export function useTaskScopes(
   }, [statusForQuery, listType])
 
   // Get recurring task counts by scope (only for recurring list)
-  const recurringData = useLiveQuery(
-    async () => {
-      if (listType !== "recurring") {
-        return { counts: new Map<string, number>() }
-      }
+  const recurringData = useLiveQuery(async () => {
+    if (listType !== "recurring") {
+      return { counts: new Map<string, number>() }
+    }
 
-      const recurringTasks = await db.recurringTasks.toArray()
-      const counts = new Map<string, number>()
+    const recurringTasks = await db.recurringTasks.toArray()
+    const counts = new Map<string, number>()
 
-      for (const task of recurringTasks) {
-        counts.set(task.scopeId, (counts.get(task.scopeId) ?? 0) + 1)
-      }
+    for (const task of recurringTasks) {
+      counts.set(task.scopeId, (counts.get(task.scopeId) ?? 0) + 1)
+    }
 
-      return { counts }
-    },
-    [listType]
-  )
+    return { counts }
+  }, [listType])
 
   // Compute scopes with filtering and grouping
   const taskScopeData = useMemo((): TaskScopeData | undefined => {

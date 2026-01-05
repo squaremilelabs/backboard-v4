@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { Plus, Trash2, Clock } from "lucide-react"
+import { WEEKDAYS } from "./frequency-indicator"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { WEEKDAYS } from "./frequency-indicator"
 import { cn } from "@/lib/utils"
 import type { FrequencyValue, Weekday } from "@/lib/db"
 
@@ -104,9 +104,7 @@ export function FrequencyPicker({
           {/* Header */}
           <div className="border-b px-4 py-3">
             <h4 className="text-sm font-medium">Schedule</h4>
-            <p className="text-xs text-muted-foreground">
-              Set when this task should repeat
-            </p>
+            <p className="text-xs text-muted-foreground">Set when this task should repeat</p>
           </div>
 
           {/* Timezone selector */}
@@ -119,7 +117,7 @@ export function FrequencyPicker({
               onChange={(e) => setLocalTimezone(e.target.value)}
               className={cn(
                 "w-full rounded-md border bg-background px-3 py-1.5 text-sm",
-                "focus:outline-none focus:ring-2 focus:ring-ring"
+                "focus:ring-2 focus:ring-ring focus:outline-none"
               )}
             >
               {/* Add current timezone if not in list */}
@@ -191,12 +189,7 @@ interface FrequencyEntryProps {
   onRemove: () => void
 }
 
-function FrequencyEntry({
-  entry,
-  onWeekdayChange,
-  onTimeChange,
-  onRemove,
-}: FrequencyEntryProps) {
+function FrequencyEntry({ entry, onWeekdayChange, onTimeChange, onRemove }: FrequencyEntryProps) {
   return (
     <div className="flex flex-col gap-2 rounded-lg border p-2">
       {/* Weekday selector */}
@@ -210,7 +203,8 @@ function FrequencyEntry({
                 type="button"
                 onClick={() => onWeekdayChange(key)}
                 className={cn(
-                  "flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium transition-colors",
+                  `flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium
+                  transition-colors`,
                   isActive
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"

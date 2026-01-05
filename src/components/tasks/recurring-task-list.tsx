@@ -1,12 +1,15 @@
 "use client"
 
 import { useQueryState } from "nuqs"
+import { RecurringTaskItem } from "./recurring-task-item"
+import { AddRecurringTaskInput } from "./add-recurring-task-input"
 import { searchParamsParsers } from "@/app/tasks/search-params"
 import { useRecurringTasks, useRecurringTaskPendingCount } from "@/hooks/use-recurring-tasks"
 import { useScope } from "@/hooks/use-scopes"
-import { commitRecurringTaskPendingActions, clearRecurringTaskPendingActions } from "@/lib/recurring-task-mutations"
-import { RecurringTaskItem } from "./recurring-task-item"
-import { AddRecurringTaskInput } from "./add-recurring-task-input"
+import {
+  commitRecurringTaskPendingActions,
+  clearRecurringTaskPendingActions,
+} from "@/lib/recurring-task-mutations"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -36,11 +39,7 @@ function RecurringTaskListContent({ scopeId }: { scopeId: string }) {
 
   // Determine theme class based on scope type
   const themeClass =
-    scope?.type === "job"
-      ? "theme-gold"
-      : scope?.type === "project"
-        ? "theme-blue"
-        : ""
+    scope?.type === "job" ? "theme-gold" : scope?.type === "project" ? "theme-blue" : ""
 
   // Fetch recurring tasks for this scope
   const tasks = useRecurringTasks(scopeId)
@@ -91,7 +90,7 @@ interface RecurringTaskPendingFooterProps {
   pendingCount: number
 }
 
-function RecurringTaskPendingFooter({ scopeId, pendingCount }: RecurringTaskPendingFooterProps) {
+function RecurringTaskPendingFooter({ scopeId }: RecurringTaskPendingFooterProps) {
   const handleClear = async () => {
     await clearRecurringTaskPendingActions(scopeId)
   }

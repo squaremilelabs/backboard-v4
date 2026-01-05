@@ -4,8 +4,8 @@ import "./globals.css"
 import { PageShell } from "@/components/layout/page-shell"
 
 export const metadata: Metadata = {
-  title: "Backboard",
-  description: "Task management for what's current",
+  title: "Backboard V4 (Prototype)",
+  description: "Prototype",
 }
 
 export default function RootLayout({
