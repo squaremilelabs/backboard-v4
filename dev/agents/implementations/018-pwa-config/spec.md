@@ -4,7 +4,7 @@
 | ---------------- | ----------- |
 | **ID**           | 018         |
 | **Status**       | 🟢 In Progress |
-| **Progress**     | Step 3 of 10 complete |
+| **Progress**     | Step 6 of 10 complete |
 | **Created**      | 2026-01-05  |
 | **Last Updated** | 2026-01-05  |
 | **Note**         | Updated for Next.js 16 PWA best practices |
@@ -68,10 +68,10 @@ Exact files this implementation will create or modify:
 
 - [x] `next.config.ts` — Add Serwist plugin + security headers
 - [x] `src/app/sw.ts` — Service worker with default caching
-- [ ] `app/manifest.ts` — Web app manifest (TypeScript)
-- [ ] `public/icons/icon-192.png` — Placeholder 192x192 icon
-- [ ] `public/icons/icon-512.png` — Placeholder 512x512 icon
-- [ ] `public/icons/ICON-REPLACEMENT.md` — Instructions for replacing icons
+- [x] `src/app/manifest.ts` — Web app manifest (TypeScript)
+- [x] `public/icons/icon-192.png` — Placeholder 192x192 icon
+- [x] `public/icons/icon-512.png` — Placeholder 512x512 icon
+- [x] `public/icons/ICON-REPLACEMENT.md` — Instructions for replacing icons
 - [ ] `src/app/offline/page.tsx` — Minimal offline fallback page
 - [ ] `src/app/layout.tsx` — Update with PWA metadata
 - [x] `package.json` — Add @serwist/next and serwist dependencies
@@ -198,7 +198,7 @@ export default withSerwist({
 
 ---
 
-### Step 4: Create placeholder app icons
+### Step 4: Create placeholder app icons ✅
 
 **Do**: Generate simple placeholder icons for PWA installation.
 
@@ -223,7 +223,7 @@ convert -size 512x512 xc:#1a1a1a -gravity center -pointsize 128 -fill white -ann
 
 ---
 
-### Step 5: Create icon replacement instructions
+### Step 5: Create icon replacement instructions ✅
 
 **Do**: Add documentation for easy icon replacement later.
 
@@ -266,9 +266,9 @@ Also consider updating `public/favicon.ico` to match your icon design.
 
 ---
 
-### Step 6: Create web app manifest (TypeScript)
+### Step 6: Create web app manifest (TypeScript) ✅
 
-**Do**: Create `app/manifest.ts` per Next.js 16 best practices (type-safe manifest).
+**Do**: Create `src/app/manifest.ts` per Next.js 16 best practices (type-safe manifest).
 
 **Create** `app/manifest.ts`:
 
