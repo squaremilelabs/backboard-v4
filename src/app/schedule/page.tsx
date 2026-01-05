@@ -1,11 +1,13 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState, useEffect, useRef } from "react"
 import { ContentPanel } from "@/components/layout/content-panel"
 import { ScheduleGridHeader } from "@/components/schedule/schedule-grid-header"
 import { ScheduleGridRow } from "@/components/schedule/schedule-grid-row"
-import { useScheduleScopes } from "@/hooks/use-scopes"
-import { useScheduleSlots, useDefaultScheduleSlots, getNext7Days } from "@/hooks/use-schedule-slots"
+import { useScheduleScopes, type ScheduleScopeData } from "@/hooks/use-scopes"
+import { useScheduleSlots, useDefaultScheduleSlots, useMonthSlots, getNext7Days } from "@/hooks/use-schedule-slots"
+import { sortJobsBySchedule, sortProjectGroupsBySchedule, type ProjectGroup } from "@/lib/scope-sorting"
+import type { Scope } from "@/lib/db"
 
 export default function SchedulePage() {
   // Get the months covered by the 7-day range
@@ -18,8 +20,73 @@ export default function SchedulePage() {
   const scopeData = useScheduleScopes(activeMonths)
   const scheduleSlots = useScheduleSlots()
   const defaultScheduleSlots = useDefaultScheduleSlots()
+  const monthSlots = useMonthSlots()
+
+  // Store the initial sorted order - only computed once on first data load
+  const [sortedJobIds, setSortedJobIds] = useState<string[] | null>(null)
+  const [sortedProjectGroups, setSortedProjectGroups] = useState<ProjectGroup[] | null>(null)
+  const initialSortDoneRef = useRef(false)
+
+  // Compute initial sort order when data first loads
+  useEffect(() => {
+    if (
+      initialSortDoneRef.current ||
+      scopeData === undefined ||
+      defaultScheduleSlots === undefined ||
+      monthSlots === undefined
+    ) {
+      return
+    }
+
+    // Sort jobs by default schedule slots (weekday-based)
+    const sortedJobs = sortJobsBySchedule(scopeData.jobs, defaultScheduleSlots)
+    setSortedJobIds(sortedJobs.map((j) => j.id))
+
+    // Sort project groups by month slots
+    const sorted = sortProjectGroupsBySchedule(scopeData.projectGroups, monthSlots, activeMonths)
+    setSortedProjectGroups(sorted)
+    initialSortDoneRef.current = true
+  }, [scopeData, defaultScheduleSlots, monthSlots, activeMonths])
 
   const hasContent = scopeData && (scopeData.jobs.length > 0 || scopeData.projectGroups.length > 0)
+
+  // Create a lookup map for jobs
+  const jobMap = useMemo(() => {
+    if (!scopeData) return new Map<string, Scope>()
+    return new Map(scopeData.jobs.map((j) => [j.id, j]))
+  }, [scopeData])
+
+  // Get display jobs in sorted order
+  const displayJobs = useMemo(() => {
+    if (!scopeData) return []
+    if (!sortedJobIds) return scopeData.jobs
+
+    const sorted = sortedJobIds
+      .map((id) => jobMap.get(id))
+      .filter((j): j is Scope => j !== undefined)
+
+    // Include any new jobs not in the sorted list
+    const newJobs = scopeData.jobs.filter((j) => !sortedJobIds.includes(j.id))
+    return [...sorted, ...newJobs]
+  }, [scopeData, sortedJobIds, jobMap])
+
+  // Get display project groups in sorted order
+  const displayProjectGroups = useMemo(() => {
+    if (!scopeData) return []
+    if (!sortedProjectGroups) return scopeData.projectGroups
+
+    // Map sorted groups back to current data
+    const groupMap = new Map(scopeData.projectGroups.map((g) => [g.parent.id, g]))
+    const sorted = sortedProjectGroups
+      .map((g) => groupMap.get(g.parent.id))
+      .filter((g): g is ScheduleScopeData["projectGroups"][number] => g !== undefined)
+
+    // Include any new groups not in the sorted list
+    const sortedParentIds = new Set(sortedProjectGroups.map((g) => g.parent.id))
+    const newGroups = scopeData.projectGroups.filter((g) => !sortedParentIds.has(g.parent.id))
+
+    return [...sorted, ...newGroups]
+  }, [scopeData, sortedProjectGroups])
 
   return (
     <ContentPanel>
@@ -40,7 +107,7 @@ export default function SchedulePage() {
             ) : (
               <div className="flex flex-col">
                 {/* Jobs first */}
-                {scopeData.jobs.map((job) => (
+                {displayJobs.map((job) => (
                   <ScheduleGridRow
                     key={job.id}
                     scope={job}
@@ -50,7 +117,7 @@ export default function SchedulePage() {
                 ))}
 
                 {/* Then projects, grouped by parent/children */}
-                {scopeData.projectGroups.map(({ parent, parentIsActive, children }) => (
+                {displayProjectGroups.map(({ parent, parentIsActive, children }) => (
                   <div key={parent.id}>
                     {/* Parent project row */}
                     <ScheduleGridRow
