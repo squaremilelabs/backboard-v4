@@ -1,12 +1,12 @@
 # Task UI Updates: Recent List & Scope Toggle
 
-| Field            | Value       |
-| ---------------- | ----------- |
-| **ID**           | 012         |
-| **Status**       | 🔵 Ready    |
-| **Progress**     | —           |
-| **Created**      | 2026-01-05  |
-| **Last Updated** | 2026-01-05  |
+| Field            | Value          |
+| ---------------- | -------------- |
+| **ID**           | 012            |
+| **Status**       | ✅ Complete    |
+| **Progress**     | Step 10 of 10  |
+| **Created**      | 2026-01-05     |
+| **Last Updated** | 2026-01-05     |
 
 ---
 
@@ -70,13 +70,12 @@ Read these before implementing:
 
 Files this implementation will create or modify:
 
-- [ ] `src/components/tasks/task-list.tsx` — Modify: Handle "recent" list type, conditionally hide add input
-- [ ] `src/components/tasks/recent-task-list.tsx` — Create: Specialized component for Recent list
-- [ ] `src/components/tasks/scope-list.tsx` — Modify: Add toggle at bottom
-- [ ] `src/components/tasks/scope-toggle.tsx` — Create: Toggle component
-- [ ] `src/hooks/use-task-scopes.ts` — Modify: Add filtering for recent scopes, add toggle support
-- [ ] `src/app/tasks/page.tsx` — Modify: Render Recent list properly
-- [ ] `src/app/tasks/search-params.ts` — Modify: Add showUnfocused param (optional)
+- [x] `src/components/tasks/recent-task-list.tsx` — Create: Specialized component for Recent list
+- [x] `src/components/tasks/scope-list.tsx` — Modify: Add toggle at bottom
+- [x] `src/components/tasks/scope-toggle.tsx` — Create: Toggle component
+- [x] `src/hooks/use-task-scopes.ts` — Modify: Add filtering for recent scopes, add toggle support
+- [x] `src/hooks/use-tasks.ts` — Modify: Add useRecentTasks hook
+- [x] `src/app/tasks/page.tsx` — Modify: Render Recent list properly
 
 ---
 

@@ -8,6 +8,7 @@ import { TaskListTabs } from "@/components/tasks/task-list-tabs"
 import { ScopeList } from "@/components/tasks/scope-list"
 import { ScopeSelector } from "@/components/tasks/scope-selector"
 import { TaskList } from "@/components/tasks/task-list"
+import { RecentTaskList } from "@/components/tasks/recent-task-list"
 import { TaskContentPlaceholder } from "@/components/tasks/task-content-placeholder"
 import { useIsMobile } from "@/hooks/use-media-query"
 
@@ -37,8 +38,9 @@ function TasksPageContent() {
   const isMobile = useIsMobile()
   const [listType] = useQueryState("list", searchParamsParsers.list)
 
-  // Show TaskList for now/later/backlog, placeholder for recurring/recent
+  // Show appropriate list based on type
   const isActiveList = ["now", "later", "backlog"].includes(listType)
+  const isRecentList = listType === "recent"
 
   return (
     <ContentPanel>
@@ -66,7 +68,13 @@ function TasksPageContent() {
 
             {/* Content area */}
             <div className="flex-1 overflow-hidden">
-              {isActiveList ? <TaskList /> : <TaskContentPlaceholder />}
+              {isActiveList ? (
+                <TaskList />
+              ) : isRecentList ? (
+                <RecentTaskList />
+              ) : (
+                <TaskContentPlaceholder />
+              )}
             </div>
           </main>
         </div>
