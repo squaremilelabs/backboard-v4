@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
 import { useState } from "react"
+import { SyncButton } from "./sync-button"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
@@ -73,8 +74,9 @@ export function MobileNav() {
             ))}
           </nav>
 
-          {/* Secondary navigation (Archive) */}
-          <nav className="border-t p-4">
+          {/* Secondary navigation (Sync + Archive) */}
+          <nav className="space-y-1 border-t p-4">
+            <SyncButton variant="mobile" />
             {secondaryNavItems.map((item) => (
               <NavItem
                 key={item.href}
