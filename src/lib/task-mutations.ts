@@ -198,3 +198,34 @@ export async function reorderTasks(
 ): Promise<void> {
   await reorderTasklist(scopeId, status, taskIds)
 }
+
+/**
+ * Move all LATER tasks for a scope to NOW (pull from later)
+ */
+export async function moveAllFromLaterToNow(scopeId: string | null): Promise<void> {
+  const tasks = await db.tasks
+    .where("status")
+    .equals("later")
+    .filter((t) => t.scopeId === scopeId)
+    .toArray()
+
+  if (tasks.length === 0) return
+
+  const now = Date.now()
+  const taskIds = tasks.map((t) => t.id)
+
+  await db.transaction("rw", [db.tasks, db.tasklists], async () => {
+    for (const task of tasks) {
+      await db.tasks.update(task.id, {
+        status: "now",
+        pendingAction: null,
+        insertedAt: now,
+        insertedFrom: "later",
+      })
+    }
+
+    // Move all from later to now, preserving order
+    await removeManyFromTasklist(scopeId, "later", taskIds)
+    await prependManyToTasklist(scopeId, "now", taskIds)
+  })
+}

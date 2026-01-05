@@ -3,8 +3,8 @@
 | Field            | Value        |
 | ---------------- | ------------ |
 | **ID**           | 017          |
-| **Status**       | 🔵 Ready     |
-| **Progress**     | —            |
+| **Status**       | ✅ Complete  |
+| **Progress**     | All steps    |
 | **Created**      | 2026-01-05   |
 | **Last Updated** | 2026-01-05   |
 
@@ -93,28 +93,28 @@ Read these before implementing:
 ## Files Created/Modified
 
 ### Feature 1: Move from Later
-- [ ] `src/hooks/use-tasks.ts` — Add: `useLaterTaskCount()` hook
-- [ ] `src/lib/task-mutations.ts` — Add: `moveAllFromLaterToNow()` function  
-- [ ] `src/components/tasks/task-list.tsx` — Add: "Move from Later" button in empty state
+- [x] `src/hooks/use-tasks.ts` — Add: `useLaterTaskCount()` hook
+- [x] `src/lib/task-mutations.ts` — Add: `moveAllFromLaterToNow()` function  
+- [x] `src/components/tasks/task-list.tsx` — Add: "Move from Later" button in empty state
 
 ### Feature 2: Unschedule Protection
-- [ ] `src/lib/db.ts` — Add: `excludedScheduleSlots` table (version 4)
-- [ ] `src/lib/schedule-mutations.ts` — Modify: `toggleScheduleSlot()` to manage exclusions
-- [ ] `src/lib/sync.ts` — Modify: `populateScheduleSlots()` to respect exclusions + cleanup
+- [x] `src/lib/db.ts` — Add: `excludedScheduleSlots` table (version 4)
+- [x] `src/lib/schedule-mutations.ts` — Modify: `toggleScheduleSlot()` to manage exclusions
+- [x] `src/lib/sync.ts` — Modify: `populateScheduleSlots()` to respect exclusions + cleanup
 
 ### Feature 3: Archive Page
-- [ ] `src/hooks/use-scopes.ts` — Add: `useArchivedScopes()` hook
-- [ ] `src/lib/scope-mutations.ts` — Add: `unarchiveScope()` function
-- [ ] `src/app/archive/page.tsx` — Rebuild: Functional archive list with unarchive
+- [x] `src/hooks/use-scopes.ts` — Add: `useArchivedScopes()` hook
+- [x] `src/lib/scope-mutations.ts` — Add: `unarchiveScope()` function
+- [x] `src/app/archive/page.tsx` — Rebuild: Functional archive list with unarchive
 
 ### Feature 4: Mobile Scope Selector Toggle
-- [ ] `src/components/tasks/scope-selector.tsx` — Add: showUnfocused state and ScopeToggle
+- [x] `src/components/tasks/scope-selector.tsx` — Add: showUnfocused state and ScopeToggle
 
 ---
 
 ## Implementation Plan
 
-### Step 1: Add `useLaterTaskCount()` hook
+### Step 1: Add `useLaterTaskCount()` hook ✅
 
 **Do**: Create a hook to count tasks in the Later list for a given scope.
 
@@ -144,7 +144,7 @@ export function useLaterTaskCount(scopeId: string | "triage"): number | undefine
 
 ---
 
-### Step 2: Add `moveAllFromLaterToNow()` mutation
+### Step 2: Add `moveAllFromLaterToNow()` mutation ✅
 
 **Do**: Create a function to batch move all Later tasks to Now for a scope.
 
@@ -190,7 +190,7 @@ export async function moveAllFromLaterToNow(scopeId: string | null): Promise<voi
 
 ---
 
-### Step 3: Update TaskList component with "Move from Later" button
+### Step 3: Update TaskList component with "Move from Later" button ✅
 
 **Do**: Add a button that appears when Now is empty but Later has tasks.
 
@@ -240,7 +240,7 @@ import { ArrowUp } from "lucide-react"
 
 ---
 
-### Step 4: Add `excludedScheduleSlots` table to database
+### Step 4: Add `excludedScheduleSlots` table to database ✅
 
 **Do**: Add a new table to track schedule slots that the user explicitly removed.
 
@@ -281,7 +281,7 @@ export interface ExcludedScheduleSlot {
 
 ---
 
-### Step 5: Update `toggleScheduleSlot()` to manage exclusions
+### Step 5: Update `toggleScheduleSlot()` to manage exclusions ✅
 
 **Do**: When toggling off a schedule slot for today, add an exclusion. When toggling on, remove any exclusion.
 
@@ -367,7 +367,7 @@ import {
 
 ---
 
-### Step 6: Update `populateScheduleSlots()` to respect exclusions
+### Step 6: Update `populateScheduleSlots()` to respect exclusions ✅
 
 **Do**: Modify the sync function to skip creating slots that the user explicitly excluded.
 
@@ -443,7 +443,7 @@ async function populateScheduleSlots(today: string): Promise<number> {
 
 ---
 
-### Step 7: Add `useArchivedScopes()` hook
+### Step 7: Add `useArchivedScopes()` hook ✅
 
 **Do**: Create a hook to fetch all archived scopes, sorted by archive date.
 
@@ -472,7 +472,7 @@ export function useArchivedScopes(): Scope[] | undefined {
 
 ---
 
-### Step 8: Add `unarchiveScope()` mutation
+### Step 8: Add `unarchiveScope()` mutation ✅
 
 **Do**: Create a function to restore an archived scope.
 
@@ -491,7 +491,7 @@ export async function unarchiveScope(id: string): Promise<void> {
 
 ---
 
-### Step 9: Rebuild Archive page
+### Step 9: Rebuild Archive page ✅
 
 **Do**: Replace the placeholder archive page with a functional list of archived scopes.
 
@@ -613,7 +613,7 @@ function ArchivedScopeItem({ id, title, type, archivedAt }: ArchivedScopeItemPro
 
 ---
 
-### Step 10: Add toggle to mobile ScopeSelector
+### Step 10: Add toggle to mobile ScopeSelector ✅
 
 **Do**: Add the "Show unfocused scopes" toggle to the mobile scope selector popover.
 

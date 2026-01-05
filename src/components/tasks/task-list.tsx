@@ -1,13 +1,20 @@
 "use client"
 
+import { ArrowUp } from "lucide-react"
 import { useQueryState } from "nuqs"
 import { SortableTaskList } from "./sortable-task-list"
 import { AddTaskInput } from "./add-task-input"
 import { PendingActionsFooter } from "./pending-actions-footer"
 import { UnfocusedWarningLabel, MoveAllToLaterButton } from "./unfocused-warning"
 import { searchParamsParsers } from "@/app/tasks/search-params"
-import { useTasks, usePendingActionCount, useIsScopeScheduledToday } from "@/hooks/use-tasks"
+import {
+  useTasks,
+  usePendingActionCount,
+  useIsScopeScheduledToday,
+  useLaterTaskCount,
+} from "@/hooks/use-tasks"
 import { useScope } from "@/hooks/use-scopes"
+import { moveAllFromLaterToNow } from "@/lib/task-mutations"
 import { cn } from "@/lib/utils"
 import type { TaskStatus } from "@/lib/db"
 
@@ -46,6 +53,12 @@ export function TaskList() {
   const showUnfocusedWarning =
     isNowList && tasks !== undefined && tasks.length > 0 && isScheduledToday === false
 
+  // Count Later tasks (only check when viewing NOW list)
+  const laterTaskCount = useLaterTaskCount(scopeId)
+
+  // Show "Move from Later" when: NOW list + empty + Later has tasks
+  const showMoveFromLater = isNowList && tasks?.length === 0 && (laterTaskCount ?? 0) > 0
+
   // Loading state
   if (tasks === undefined) {
     return (
@@ -68,6 +81,18 @@ export function TaskList() {
         {tasks.length === 0 ? (
           <div className="px-4 py-8 text-center">
             <p className="text-sm text-muted-foreground">No tasks</p>
+            {showMoveFromLater && (
+              <button
+                onClick={() => moveAllFromLaterToNow(actualScopeId)}
+                className={cn(
+                  "mt-4 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium",
+                  "bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+                )}
+              >
+                <ArrowUp className="h-4 w-4" />
+                Move {laterTaskCount} from Later
+              </button>
+            )}
           </div>
         ) : (
           <SortableTaskList

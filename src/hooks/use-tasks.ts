@@ -104,3 +104,18 @@ export function useRecentTasks(scopeId: string | "triage"): Task[] | undefined {
     return tasks.sort((a, b) => (b.completedAt ?? 0) - (a.completedAt ?? 0))
   }, [scopeId])
 }
+
+/**
+ * Count tasks in the Later list for a specific scope
+ */
+export function useLaterTaskCount(scopeId: string | "triage"): number | undefined {
+  return useLiveQuery(async () => {
+    const actualScopeId = scopeId === "triage" ? null : scopeId
+
+    return db.tasks
+      .where("status")
+      .equals("later")
+      .filter((task) => task.scopeId === actualScopeId)
+      .count()
+  }, [scopeId])
+}

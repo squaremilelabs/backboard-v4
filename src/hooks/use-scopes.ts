@@ -93,3 +93,17 @@ export function useScheduleScopes(activeMonths: string[]): ScheduleScopeData | u
     return { jobs, projectGroups }
   }, [activeMonths.join(",")])
 }
+
+/**
+ * Get all archived scopes, sorted by archivedAt descending (most recent first)
+ */
+export function useArchivedScopes(): Scope[] | undefined {
+  return useLiveQuery(async () => {
+    const archived = await db.scopes
+      .filter((scope) => scope.archivedAt !== undefined && scope.archivedAt > 0)
+      .toArray()
+
+    // Sort by archivedAt descending (most recently archived first)
+    return archived.sort((a, b) => (b.archivedAt ?? 0) - (a.archivedAt ?? 0))
+  }, [])
+}

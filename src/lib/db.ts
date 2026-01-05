@@ -84,6 +84,12 @@ export interface AppMeta {
   timezone: string
 }
 
+export interface ExcludedScheduleSlot {
+  id: string
+  date: string // YYYY-MM-DD
+  scopeId: string
+}
+
 // =============================================================================
 // Database
 // =============================================================================
@@ -97,6 +103,7 @@ class BackboardDB extends Dexie {
   monthSlots!: Table<MonthSlot>
   defaultScheduleSlots!: Table<DefaultScheduleSlot>
   appMeta!: Table<AppMeta>
+  excludedScheduleSlots!: Table<ExcludedScheduleSlot>
 
   constructor() {
     super("backboard", { addons: [dexieCloud] })
@@ -173,6 +180,19 @@ class BackboardDB extends Dexie {
       monthSlots: "@id, month, projectId, [month+projectId]",
       defaultScheduleSlots: "@id, weekday, jobId, [weekday+jobId]",
       appMeta: "id", // Keep manual ID (singleton record)
+    })
+
+    // Version 4: Add excludedScheduleSlots for user unschedule protection
+    this.version(4).stores({
+      tasks: "@id, scopeId, status, createdAt, completedAt",
+      recurringTasks: "@id, scopeId",
+      tasklists: "id, scopeId, type",
+      scopes: "@id, type, archivedAt",
+      scheduleSlots: "@id, date, scopeId, [date+scopeId]",
+      monthSlots: "@id, month, projectId, [month+projectId]",
+      defaultScheduleSlots: "@id, weekday, jobId, [weekday+jobId]",
+      appMeta: "id",
+      excludedScheduleSlots: "@id, date, scopeId, [date+scopeId]",
     })
 
     // Configure Dexie Cloud only if URL is provided

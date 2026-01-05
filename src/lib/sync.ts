@@ -127,10 +127,24 @@ async function insertRecurringTaskToNow(
 
 /**
  * Populate schedule slots for the next 7 days from default schedule slots
+ * Respects user exclusions (manually removed today's slots)
+ * Also cleans up stale exclusions (dates before today)
  */
 async function populateScheduleSlots(today: string): Promise<number> {
+  // Clean up stale exclusions first (dates before today)
+  const staleExclusions = await db.excludedScheduleSlots.where("date").below(today).toArray()
+
+  if (staleExclusions.length > 0) {
+    await db.excludedScheduleSlots.bulkDelete(staleExclusions.map((e) => e.id))
+  }
+
   // Get all default schedule slots
   const defaults = await db.defaultScheduleSlots.toArray()
+
+  // Get current exclusions (only today matters since we're populating forward)
+  const exclusions = await db.excludedScheduleSlots.toArray()
+  const exclusionSet = new Set(exclusions.map((e) => `${e.date}:${e.scopeId}`))
+
   let createdCount = 0
 
   // Create slots for next 7 days
@@ -143,6 +157,12 @@ async function populateScheduleSlots(today: string): Promise<number> {
     const dayDefaults = defaults.filter((d) => d.weekday === weekday)
 
     for (const def of dayDefaults) {
+      // Skip if user excluded this slot
+      const exclusionKey = `${dateStr}:${def.jobId}`
+      if (exclusionSet.has(exclusionKey)) {
+        continue
+      }
+
       // Check if slot already exists using compound index
       const existing = await db.scheduleSlots
         .where("[date+scopeId]")

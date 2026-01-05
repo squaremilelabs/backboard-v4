@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useQueryState } from "nuqs"
+import { ScopeToggle } from "./scope-toggle"
 import { searchParamsParsers } from "@/app/tasks/search-params"
 import { useTaskScopes, findTaskScope, type TaskScope } from "@/hooks/use-task-scopes"
 import { cn } from "@/lib/utils"
@@ -19,10 +20,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 export function ScopeSelector() {
   const [open, setOpen] = useState(false)
+  const [showUnfocused, setShowUnfocused] = useState(false)
   const [activeListType] = useQueryState("list", searchParamsParsers.list)
   const [activeScopeId, setActiveScopeId] = useQueryState("scope", searchParamsParsers.scope)
 
-  const scopeData = useTaskScopes(activeListType)
+  // Show toggle only for now/later/backlog (not recurring/recent)
+  const showToggle = ["now", "later", "backlog"].includes(activeListType)
+
+  const scopeData = useTaskScopes(activeListType, showUnfocused)
 
   // Show Triage in Now/Later/Backlog only
   const showTriage = ["now", "later", "backlog"].includes(activeListType)
@@ -129,6 +134,13 @@ export function ScopeSelector() {
               ))}
             </CommandGroup>
           </CommandList>
+
+          {/* Toggle at bottom - only for now/later/backlog */}
+          {showToggle && (
+            <div className="border-t p-2">
+              <ScopeToggle checked={showUnfocused} onChange={setShowUnfocused} />
+            </div>
+          )}
         </Command>
       </PopoverContent>
     </Popover>

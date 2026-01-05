@@ -25,3 +25,7 @@ export async function updateScopeTitle(id: string, title: string): Promise<void>
 export async function archiveScope(id: string): Promise<void> {
   await db.scopes.update(id, { archivedAt: Date.now() })
 }
+
+export async function unarchiveScope(id: string): Promise<void> {
+  await db.scopes.update(id, { archivedAt: undefined })
+}

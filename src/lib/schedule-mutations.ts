@@ -1,9 +1,11 @@
+import { format } from "date-fns"
 import {
   db,
   type Weekday,
   type DefaultScheduleSlot,
   type MonthSlot,
   type ScheduleSlot,
+  type ExcludedScheduleSlot,
 } from "@/lib/db"
 
 // Note: With Dexie Cloud's @id schema, IDs are auto-generated on add()
@@ -60,13 +62,32 @@ export async function toggleScheduleSlot(
   scopeId: string,
   date: string // YYYY-MM-DD
 ): Promise<void> {
+  const today = format(new Date(), "yyyy-MM-dd")
+  const isToday = date === today
+
   // Check if slot exists
   const existing = await db.scheduleSlots.where("[date+scopeId]").equals([date, scopeId]).first()
 
   if (existing) {
+    // Removing a slot - delete it
     await db.scheduleSlots.delete(existing.id)
+
+    // If removing today's slot, add exclusion to prevent sync re-adding it
+    if (isToday) {
+      const existingExclusion = await db.excludedScheduleSlots
+        .where("[date+scopeId]")
+        .equals([date, scopeId])
+        .first()
+
+      if (!existingExclusion) {
+        await db.excludedScheduleSlots.add({
+          date,
+          scopeId,
+        } as ExcludedScheduleSlot)
+      }
+    }
   } else {
-    // Derive weekday from date
+    // Adding a slot - create it
     const dateObj = new Date(date + "T00:00:00")
     const weekdayIndex = dateObj.getDay() // 0 = Sunday
     const weekdays: Weekday[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
@@ -78,5 +99,17 @@ export async function toggleScheduleSlot(
       weekday,
       scopeId,
     } as ScheduleSlot)
+
+    // If adding today's slot, remove any exclusion
+    if (isToday) {
+      const existingExclusion = await db.excludedScheduleSlots
+        .where("[date+scopeId]")
+        .equals([date, scopeId])
+        .first()
+
+      if (existingExclusion) {
+        await db.excludedScheduleSlots.delete(existingExclusion.id)
+      }
+    }
   }
 }
