@@ -1,8 +1,9 @@
 import { useLiveQuery } from "dexie-react-hooks"
 import { db, type Task, type TaskStatus } from "@/lib/db"
+import { getTasklistId } from "@/lib/tasklist-helpers"
 
 /**
- * Get tasks for a specific scope and status, sorted by createdAt descending (newest first)
+ * Get tasks for a specific scope and status, in tasklist order
  *
  * @param scopeId - The scope ID, or "triage" for tasks with null scopeId
  * @param status - The task status (now, later, backlog)
@@ -10,15 +11,41 @@ import { db, type Task, type TaskStatus } from "@/lib/db"
 export function useTasks(scopeId: string | "triage", status: TaskStatus): Task[] | undefined {
   return useLiveQuery(async () => {
     const actualScopeId = scopeId === "triage" ? null : scopeId
+    const tasklistId = getTasklistId(actualScopeId, status)
 
+    // Get tasklist for ordering
+    const tasklist = await db.tasklists.get(tasklistId)
+    const orderedIds = tasklist?.taskIds ?? []
+
+    // Get all tasks for this scope+status
     const tasks = await db.tasks
       .where("status")
       .equals(status)
       .filter((task) => task.scopeId === actualScopeId)
       .toArray()
 
-    // Sort by createdAt descending (newest first)
-    return tasks.sort((a, b) => b.createdAt - a.createdAt)
+    // Create lookup map
+    const taskMap = new Map(tasks.map((t) => [t.id, t]))
+
+    // Return tasks in tasklist order
+    // Include any tasks not in tasklist at the end (safety net)
+    const orderedTasks: Task[] = []
+    const seenIds = new Set<string>()
+
+    for (const id of orderedIds) {
+      const task = taskMap.get(id)
+      if (task) {
+        orderedTasks.push(task)
+        seenIds.add(id)
+      }
+    }
+
+    // Add any orphaned tasks at the end (sorted by createdAt desc)
+    const orphanedTasks = tasks
+      .filter((t) => !seenIds.has(t.id))
+      .sort((a, b) => b.createdAt - a.createdAt)
+
+    return [...orderedTasks, ...orphanedTasks]
   }, [scopeId, status])
 }
 

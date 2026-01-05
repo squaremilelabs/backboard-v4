@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryState } from "nuqs"
-import { TaskItem } from "./task-item"
+import { SortableTaskList } from "./sortable-task-list"
 import { AddTaskInput } from "./add-task-input"
 import { PendingActionsFooter } from "./pending-actions-footer"
 import { UnfocusedWarningLabel, MoveAllToLaterButton } from "./unfocused-warning"
@@ -70,16 +70,12 @@ export function TaskList() {
             <p className="text-sm text-muted-foreground">No tasks</p>
           </div>
         ) : (
-          <div className="flex flex-col">
-            {tasks.map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                currentStatus={listType as TaskStatus}
-                themeClass={themeClass}
-              />
-            ))}
-          </div>
+          <SortableTaskList
+            tasks={tasks}
+            scopeId={actualScopeId}
+            status={listType as TaskStatus}
+            themeClass={themeClass}
+          />
         )}
       </div>
 

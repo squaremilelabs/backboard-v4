@@ -1,12 +1,12 @@
 # Task Drag and Drop
 
-| Field            | Value        |
-| ---------------- | ------------ |
-| **ID**           | 014          |
-| **Status**       | 🔵 Ready     |
-| **Progress**     | —            |
-| **Created**      | 2026-01-05   |
-| **Last Updated** | 2026-01-05   |
+| Field            | Value                |
+| ---------------- | -------------------- |
+| **ID**           | 014                  |
+| **Status**       | ✅ Complete          |
+| **Progress**     | All steps complete   |
+| **Created**      | 2026-01-05           |
+| **Last Updated** | 2026-01-05           |
 
 ---
 
@@ -78,22 +78,27 @@ Read these before implementing:
 
 ### Part 1: Tasklist Refactor
 
-- [ ] `src/lib/db.ts` — Add Tasklist interface, update schema to v2
-- [ ] `src/lib/tasklist-helpers.ts` — Create: ID derivation, CRUD helpers
-- [ ] `src/lib/task-mutations.ts` — Update all mutations to maintain tasklists
-- [ ] `src/lib/recurring-task-mutations.ts` — Update all mutations to maintain tasklists
-- [ ] `src/hooks/use-tasks.ts` — Fetch in tasklist order
-- [ ] `src/hooks/use-recurring-tasks.ts` — Fetch in tasklist order
+- [x] `src/lib/db.ts` — Add Tasklist interface, update schema to v2 ✅
+- [x] `src/lib/tasklist-helpers.ts` — Create: ID derivation, CRUD helpers ✅
+- [x] `src/lib/task-mutations.ts` — Update all mutations to maintain tasklists ✅
+- [x] `src/lib/recurring-task-mutations.ts` — Update all mutations to maintain tasklists ✅
+- [x] `src/hooks/use-tasks.ts` — Fetch in tasklist order ✅
+- [x] `src/hooks/use-recurring-tasks.ts` — Fetch in tasklist order ✅
 
 ### Part 2: Drag and Drop
 
-- [ ] `package.json` — Add @dnd-kit dependencies
-- [ ] `src/components/tasks/draggable-task-list.tsx` — Create: DnD wrapper for task lists
-- [ ] `src/components/tasks/draggable-task-item.tsx` — Create: Draggable task row
-- [ ] `src/components/tasks/draggable-recurring-task-item.tsx` — Create: Draggable recurring task row
-- [ ] `src/components/tasks/task-list.tsx` — Integrate draggable components
-- [ ] `src/components/tasks/recurring-task-list.tsx` — Integrate draggable components
-- [ ] `src/components/tasks/scope-list.tsx` — Add drop targets for scope change
+- [x] `package.json` — Add @dnd-kit dependencies ✅
+- [x] `src/components/tasks/task-dnd-provider.tsx` — Create: Shared DnD context with scope-change handling ✅
+- [x] `src/components/tasks/sortable-task-list.tsx` — Create: Sortable wrapper for task lists ✅
+- [x] `src/components/tasks/draggable-task-item.tsx` — Create: Draggable task row ✅
+- [x] `src/components/tasks/sortable-recurring-task-list.tsx` — Create: Sortable wrapper for recurring lists ✅
+- [x] `src/components/tasks/draggable-recurring-task-item.tsx` — Create: Draggable recurring task row ✅
+- [x] `src/components/tasks/task-item.tsx` — Add drag handle props ✅
+- [x] `src/components/tasks/recurring-task-item.tsx` — Add drag handle props ✅
+- [x] `src/components/tasks/task-list.tsx` — Integrate sortable components ✅
+- [x] `src/components/tasks/recurring-task-list.tsx` — Integrate sortable components ✅
+- [x] `src/components/tasks/scope-list.tsx` — Add drop targets for scope change ✅
+- [x] `src/app/tasks/page.tsx` — Wrap with TaskDndProvider ✅
 
 ---
 

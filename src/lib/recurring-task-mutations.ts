@@ -1,21 +1,28 @@
+import {
+  prependToTasklist,
+  removeFromTasklist,
+  moveTaskBetweenLists,
+  reorderTasklist,
+} from "./tasklist-helpers"
 import { db, type RecurringTask, type RecurringTaskAction, type FrequencyValue } from "@/lib/db"
 
 /**
  * Create a new recurring task (starts as template with no frequency)
  */
-export async function createRecurringTask(
-  title: string,
-  scopeId: string
-): Promise<string> {
+export async function createRecurringTask(title: string, scopeId: string): Promise<string> {
   const id = crypto.randomUUID()
   const now = Date.now()
 
-  await db.recurringTasks.add({
-    id,
-    scopeId,
-    title: title.trim(),
-    frequency: [], // Empty = template mode
-    createdAt: now,
+  await db.transaction("rw", [db.recurringTasks, db.tasklists], async () => {
+    await db.recurringTasks.add({
+      id,
+      scopeId,
+      title: title.trim(),
+      frequency: [], // Empty = template mode
+      createdAt: now,
+    })
+
+    await prependToTasklist(scopeId, "recurring", id)
   })
 
   return id
@@ -24,10 +31,7 @@ export async function createRecurringTask(
 /**
  * Update a recurring task's title
  */
-export async function updateRecurringTaskTitle(
-  taskId: string,
-  title: string
-): Promise<void> {
+export async function updateRecurringTaskTitle(taskId: string, title: string): Promise<void> {
   await db.recurringTasks.update(taskId, { title: title.trim() })
 }
 
@@ -45,7 +49,13 @@ export async function updateRecurringTaskFrequency(
  * Delete a recurring task
  */
 export async function deleteRecurringTask(taskId: string): Promise<void> {
-  await db.recurringTasks.delete(taskId)
+  const task = await db.recurringTasks.get(taskId)
+  if (!task) return
+
+  await db.transaction("rw", [db.recurringTasks, db.tasklists], async () => {
+    await db.recurringTasks.delete(taskId)
+    await removeFromTasklist(task.scopeId, "recurring", taskId)
+  })
 }
 
 /**
@@ -68,27 +78,49 @@ export async function commitRecurringTaskPendingActions(scopeId: string): Promis
     .filter((t) => t.pendingAction != null)
     .toArray()
 
-  await db.transaction("rw", [db.tasks, db.recurringTasks], async () => {
-    for (const task of tasks) {
-      if (task.pendingAction === "delete") {
-        await db.recurringTasks.delete(task.id)
-      } else if (task.pendingAction === "insert") {
-        // Insert into Now list
-        const id = crypto.randomUUID()
-        const now = Date.now()
-        await db.tasks.add({
-          id,
-          scopeId: task.scopeId,
-          title: task.title,
-          content: task.content,
-          status: "now",
-          insertedAt: now,
-          insertedFrom: "recurring",
-          createdAt: now,
-        })
-        // Clear the pending action (don't delete the recurring task)
-        await db.recurringTasks.update(task.id, { pendingAction: null })
+  const now = Date.now()
+  const toDelete: string[] = []
+  const toInsert: RecurringTask[] = []
+
+  for (const task of tasks) {
+    if (task.pendingAction === "delete") {
+      toDelete.push(task.id)
+    } else if (task.pendingAction === "insert") {
+      toInsert.push(task)
+    }
+  }
+
+  await db.transaction("rw", [db.tasks, db.recurringTasks, db.tasklists], async () => {
+    // Handle deletes
+    for (const taskId of toDelete) {
+      await db.recurringTasks.delete(taskId)
+    }
+    if (toDelete.length > 0) {
+      // Remove from recurring tasklist
+      for (const taskId of toDelete) {
+        await removeFromTasklist(scopeId, "recurring", taskId)
       }
+    }
+
+    // Handle inserts
+    for (const recurringTask of toInsert) {
+      const newTaskId = crypto.randomUUID()
+      await db.tasks.add({
+        id: newTaskId,
+        scopeId: recurringTask.scopeId,
+        title: recurringTask.title,
+        content: recurringTask.content,
+        status: "now",
+        insertedAt: now,
+        insertedFrom: "recurring",
+        createdAt: now,
+      })
+
+      // Add to "now" tasklist
+      await prependToTasklist(recurringTask.scopeId, "now", newTaskId)
+
+      // Clear pending action
+      await db.recurringTasks.update(recurringTask.id, { pendingAction: null })
     }
   })
 }
@@ -125,7 +157,7 @@ export async function insertRecurringTaskNow(
   const id = crypto.randomUUID()
   const now = Date.now()
 
-  await db.transaction("rw", [db.tasks, db.recurringTasks], async () => {
+  await db.transaction("rw", [db.tasks, db.recurringTasks, db.tasklists], async () => {
     // Create new task from template
     await db.tasks.add({
       id,
@@ -137,6 +169,9 @@ export async function insertRecurringTaskNow(
       insertedFrom: "recurring",
       createdAt: now,
     })
+
+    // Add to "now" tasklist
+    await prependToTasklist(recurringTask.scopeId, "now", id)
 
     // Update lastInsertedDate if requested (for sync job)
     if (updateLastInserted) {
@@ -165,4 +200,25 @@ export async function setUserTimezone(timezone: string): Promise<void> {
     lastSyncedAt: Date.now(),
     timezone,
   })
+}
+
+/**
+ * Change a recurring task's scope
+ */
+export async function changeRecurringTaskScope(taskId: string, newScopeId: string): Promise<void> {
+  const task = await db.recurringTasks.get(taskId)
+  if (!task) return
+  if (task.scopeId === newScopeId) return
+
+  await db.transaction("rw", [db.recurringTasks, db.tasklists], async () => {
+    await db.recurringTasks.update(taskId, { scopeId: newScopeId })
+    await moveTaskBetweenLists(taskId, task.scopeId, "recurring", newScopeId, "recurring")
+  })
+}
+
+/**
+ * Reorder recurring tasks within a tasklist
+ */
+export async function reorderRecurringTasks(scopeId: string, taskIds: string[]): Promise<void> {
+  await reorderTasklist(scopeId, "recurring", taskIds)
 }

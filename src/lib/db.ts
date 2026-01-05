@@ -42,6 +42,13 @@ export interface RecurringTask {
   pendingAction?: RecurringTaskAction | null
 }
 
+export interface Tasklist {
+  id: string // Derived: `${scopeId ?? 'triage'}:${type}`
+  scopeId: string | null // null = Triage
+  type: TasklistType // 'now' | 'later' | 'backlog' | 'done' | 'recurring'
+  taskIds: string[] // Ordered array of task/recurring-task IDs
+}
+
 export interface Scope {
   id: string
   type: ScopeType
@@ -84,6 +91,7 @@ export interface AppMeta {
 class BackboardDB extends Dexie {
   tasks!: Table<Task>
   recurringTasks!: Table<RecurringTask>
+  tasklists!: Table<Tasklist>
   scopes!: Table<Scope>
   scheduleSlots!: Table<ScheduleSlot>
   monthSlots!: Table<MonthSlot>
@@ -103,6 +111,55 @@ class BackboardDB extends Dexie {
       defaultScheduleSlots: "id, weekday, jobId, [weekday+jobId]",
       appMeta: "id",
     })
+
+    this.version(2)
+      .stores({
+        tasks: "id, scopeId, status, createdAt, completedAt",
+        recurringTasks: "id, scopeId",
+        tasklists: "id, scopeId, type",
+        scopes: "id, type, archivedAt",
+        scheduleSlots: "id, date, scopeId, [date+scopeId]",
+        monthSlots: "id, month, projectId, [month+projectId]",
+        defaultScheduleSlots: "id, weekday, jobId, [weekday+jobId]",
+        appMeta: "id",
+      })
+      .upgrade(async (tx) => {
+        // Migration: create tasklists from existing tasks
+        const tasks = await tx.table("tasks").toArray()
+        const recurringTasks = await tx.table("recurringTasks").toArray()
+
+        // Group tasks by scopeId + status
+        const tasklistMap = new Map<
+          string,
+          { scopeId: string | null; type: string; taskIds: string[] }
+        >()
+
+        for (const task of tasks) {
+          const id = `${task.scopeId ?? "triage"}:${task.status}`
+          if (!tasklistMap.has(id)) {
+            tasklistMap.set(id, { scopeId: task.scopeId, type: task.status, taskIds: [] })
+          }
+          tasklistMap.get(id)!.taskIds.push(task.id)
+        }
+
+        // Group recurring tasks by scopeId
+        for (const task of recurringTasks) {
+          const id = `${task.scopeId}:recurring`
+          if (!tasklistMap.has(id)) {
+            tasklistMap.set(id, { scopeId: task.scopeId, type: "recurring", taskIds: [] })
+          }
+          tasklistMap.get(id)!.taskIds.push(task.id)
+        }
+
+        // Sort each tasklist by createdAt descending (to match current behavior)
+        const allTasks = [...tasks, ...recurringTasks]
+        const taskCreatedAt = new Map(allTasks.map((t) => [t.id, t.createdAt]))
+
+        for (const [id, data] of tasklistMap) {
+          data.taskIds.sort((a, b) => (taskCreatedAt.get(b) ?? 0) - (taskCreatedAt.get(a) ?? 0))
+          await tx.table("tasklists").add({ id, ...data })
+        }
+      })
 
     // Configure Dexie Cloud only if URL is provided
     // Without URL: pure local database (no sync)

@@ -12,9 +12,10 @@ interface TaskItemProps {
   task: Task
   currentStatus: TaskStatus
   themeClass?: string
+  dragHandleProps?: React.HTMLAttributes<HTMLDivElement>
 }
 
-export function TaskItem({ task, currentStatus, themeClass }: TaskItemProps) {
+export function TaskItem({ task, currentStatus, themeClass, dragHandleProps }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(task.title)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -70,8 +71,14 @@ export function TaskItem({ task, currentStatus, themeClass }: TaskItemProps) {
         themeClass
       )}
     >
-      {/* Drag handle - for future drag-and-drop */}
-      <GripVertical className="h-4 w-4 shrink-0 cursor-grab text-muted-foreground/50" />
+      {/* Drag handle */}
+      <div
+        {...dragHandleProps}
+        className="flex h-8 w-8 shrink-0 cursor-grab items-center justify-center rounded
+          hover:bg-muted active:cursor-grabbing"
+      >
+        <GripVertical className="h-4 w-4 text-muted-foreground/50" />
+      </div>
 
       {/* Task title - editable */}
       <div className="min-w-0 flex-1">

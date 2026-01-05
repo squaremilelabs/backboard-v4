@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useQueryState } from "nuqs"
+import { useDroppable } from "@dnd-kit/core"
 import { ScopeToggle } from "./scope-toggle"
 import { searchParamsParsers } from "@/app/tasks/search-params"
 import { useTaskScopes, findTaskScope, type TaskScope } from "@/hooks/use-task-scopes"
@@ -106,41 +107,45 @@ export function ScopeList() {
 
           {/* Jobs (theme-gold) */}
           {scopeData.jobs.map((job) => (
-            <ScopeButton
-              key={job.id}
-              scope={job}
-              isActive={activeScopeId === job.id}
-              onClick={() => setActiveScopeId(job.id)}
-              themeClass="theme-gold"
-              dotVariant="gold"
-              isNowList={isNowList}
-            />
+            <DroppableScope key={job.id} scopeId={job.id}>
+              <ScopeButton
+                scope={job}
+                isActive={activeScopeId === job.id}
+                onClick={() => setActiveScopeId(job.id)}
+                themeClass="theme-gold"
+                dotVariant="gold"
+                isNowList={isNowList}
+              />
+            </DroppableScope>
           ))}
 
           {/* Projects (theme-blue) - grouped by parent/child */}
           {scopeData.projectGroups.map((group) => (
             <div key={group.parent.id}>
               {/* Parent project */}
-              <ScopeButton
-                scope={group.parent}
-                isActive={activeScopeId === group.parent.id}
-                onClick={() => setActiveScopeId(group.parent.id)}
-                themeClass="theme-blue"
-                dotVariant="blue"
-                isNowList={isNowList}
-              />
-              {/* Child projects (indented) */}
-              {group.children.map((child) => (
+              <DroppableScope scopeId={group.parent.id}>
                 <ScopeButton
-                  key={child.project.id}
-                  scope={child.project}
-                  isActive={activeScopeId === child.project.id}
-                  onClick={() => setActiveScopeId(child.project.id)}
+                  scope={group.parent}
+                  isActive={activeScopeId === group.parent.id}
+                  onClick={() => setActiveScopeId(group.parent.id)}
                   themeClass="theme-blue"
                   dotVariant="blue"
                   isNowList={isNowList}
-                  isChild
                 />
+              </DroppableScope>
+              {/* Child projects (indented) */}
+              {group.children.map((child) => (
+                <DroppableScope key={child.project.id} scopeId={child.project.id}>
+                  <ScopeButton
+                    scope={child.project}
+                    isActive={activeScopeId === child.project.id}
+                    onClick={() => setActiveScopeId(child.project.id)}
+                    themeClass="theme-blue"
+                    dotVariant="blue"
+                    isNowList={isNowList}
+                    isChild
+                  />
+                </DroppableScope>
               ))}
             </div>
           ))}
@@ -153,6 +158,28 @@ export function ScopeList() {
           <ScopeToggle checked={showUnfocused} onChange={setShowUnfocused} />
         </div>
       )}
+    </div>
+  )
+}
+
+// Droppable wrapper for scope items - allows tasks to be dropped to change scope
+interface DroppableScopeProps {
+  scopeId: string
+  children: React.ReactNode
+}
+
+function DroppableScope({ scopeId, children }: DroppableScopeProps) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: `scope-drop-${scopeId}`,
+    data: { scopeId },
+  })
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn("rounded-md transition-all", isOver && "bg-primary/10 ring-2 ring-primary")}
+    >
+      {children}
     </div>
   )
 }
