@@ -201,24 +201,6 @@ Exact files this implementation will create or modify:
 
 {Continue as needed...}
 
----
-
-## Verification
-
-Run these checks after implementation is complete:
-
-| Check     | Command     | Expected Result    |
-| --------- | ----------- | ------------------ |
-| {Check 1} | `{command}` | {expected outcome} |
-| {Check 2} | `{command}` | {expected outcome} |
-| ...       | ...         | ...                |
-
-Manual checks:
-
-- [ ] {Manual verification 1}
-- [ ] {Manual verification 2}
-- [ ] ...
-
 ```
 
 ### Status Values
@@ -228,7 +210,7 @@ Manual checks:
 | 🟡 Planning | Spec is being drafted |
 | 🔵 Ready | Spec is complete, ready to implement |
 | 🟢 In Progress | Implementation underway (see Progress field for current step) |
-| ✅ Complete | All steps and verification finished |
+| ✅ Complete | All steps finished |
 | ❌ Cancelled | Implementation was cancelled |
 
 ### Progress Field
@@ -263,12 +245,6 @@ When filling out the template, remember:
 - If copying config from TRD, say "Copy from TRD §X" rather than duplicating
 - If config needs modifications from TRD, specify what changes
 - Steps are marked complete by appending ✅ to the step title (e.g., `### Step 1: Initialize Project ✅`)
-
-### Verification Section
-- Prefer **executable commands** over descriptive criteria
-- Good: `pnpm build` → exits with code 0
-- Bad: "The project should build successfully"
-- Include both automated checks (commands) and manual checks (visual verification, etc.)
 
 ---
 

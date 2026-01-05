@@ -82,7 +82,6 @@ Look for checked boxes `[x]` in these sections:
 
 - **Files Created** — which files already exist?
 - **Implementation Plan** — are any steps marked complete?
-- **Verification** — have any checks passed?
 
 ### 3. Determine starting point
 
@@ -96,8 +95,7 @@ Report to user:
 
 > "This implementation is **{status}**.
 >
-> **Completed**: Steps 1-3, 5 files created **Remaining**: Steps 4-8, 3 files to create,
-> verification pending
+> **Completed**: Steps 1-3, 5 files created **Remaining**: Steps 4-8, 3 files to create
 >
 > Ready to continue from Step 4?"
 
@@ -252,61 +250,25 @@ Commit each step atomically, then report:
 > - `{hash2}` — Step {X+1}: {title}
 > - ...
 >
-> **Progress**: Step {Y} of {M} **Next**: Step {Y+1}: {next step title} (or "Verification" if all
+> **Progress**: Step {Y} of {M} **Next**: Step {Y+1}: {next step title} (or "Wrap up" if all
 > steps done)
 >
 > Continue with `/implement {ID}` when ready.
 
 ---
 
-## Phase 5: Verification (Final Step Only)
-
-**Only run this phase after completing the LAST step** in the implementation plan.
-
-After all steps are complete:
-
-### 1. Run verification commands
-
-Execute each command in the **Verification** table and confirm expected results.
-
-### 2. Complete manual checks
-
-Go through each manual check item and verify.
-
-### 3. Report results
-
-> "**Verification Results**:
->
-> | Check        | Result                             |
-> | ------------ | ---------------------------------- |
-> | `pnpm dev`   | ✅ Server starts on localhost:3000 |
-> | `pnpm build` | ✅ Exits with code 0               |
-> | `pnpm lint`  | ✅ No errors                       |
->
-> **Manual checks**:
->
-> - [x] Homepage redirects to /tasks
-> - [x] All 5 pages render
-> - [x] Tailwind classes applied
->
-> All checks passed!"
-
-### 4. Update spec status
-
-If all verification passes:
-
-- Update status to ✅ Complete
-- Update "Last Updated" date
-
----
-
-## Phase 6: Wrap Up
+## Phase 5: Wrap Up
 
 ### 1. Final commit
 
 Ensure all changes are committed.
 
-### 2. Summary
+### 2. Update spec status
+
+- Update status to ✅ Complete
+- Update "Last Updated" date
+
+### 3. Summary
 
 Provide a summary to the user:
 
@@ -319,7 +281,7 @@ Provide a summary to the user:
 > - Merge branch to main (or open PR)
 > - Proceed to next implementation"
 
-### 3. Offer next actions
+### 4. Offer next actions
 
 - Merge to main?
 - Open a PR? (if remote exists)
@@ -346,126 +308,6 @@ Provide a summary to the user:
 2. Share what you've tried
 3. Ask user for guidance
 4. Don't proceed past errors without resolution
-
----
-
-## Visual Verification Steps
-
-Some implementation steps require visual verification (testing UI in a browser, checking responsive
-layouts, etc.). **Do NOT attempt to fully automate these steps** — visual verification is inherently
-human work.
-
-### When you encounter a visual verification step:
-
-1. **Check for a `visual-verification.md` file** in the implementation folder
-   - If it exists, point the user to it
-   - If it doesn't exist, offer to create one based on the step's test checklist
-
-2. **Hand off to the user**:
-
-   > "This step requires visual verification. Please:
-   >
-   > 1. Run `pnpm dev` in your terminal
-   > 2. Open http://localhost:3000 in your browser
-   > 3. Go through the checklist in `visual-verification.md`
-   > 4. Mark items as verified or add feedback for any issues
-   >
-   > Once complete, reply with your results."
-
-3. **Address any issues** the user reports, then have them re-verify
-
-4. **When sign-off is complete**, mark the step done and proceed
-
-### Why agents shouldn't do visual verification:
-
-- Browser automation tools are unreliable for visual testing
-- Sandbox restrictions interfere with dev servers
-- Human judgment is required for "looks right" checks
-- Viewport/rendering inconsistencies across tools
-
-### Checklist markers
-
-The `visual-verification.md` file uses these markers:
-
-| Marker | Meaning                                 |
-| ------ | --------------------------------------- |
-| `[x]`  | Verified, works as expected             |
-| `[!]`  | Issue found (user adds feedback inline) |
-| `[~]`  | Known issue, deferred (not blocking)    |
-| `[ ]`  | Not yet checked                         |
-
-### Agent responsibilities during verification
-
-When user reports issues (items marked `[!]`):
-
-1. **Document the issues** in the Issues & Feedback section under the current round
-   - Summarize each issue briefly
-   - Note what the user reported
-
-2. **Implement fixes** for the reported issues
-
-3. **Reset fixed items** — change `[!]` back to `[ ]` for re-verification
-   - Update the checklist item wording if expectations changed
-   - Remove inline user comments (they're now documented in the round)
-
-4. **Report fixes** and ask user to re-verify
-
-### Rounds workflow
-
-Each verification pass is a "round":
-
-```
-Round 1: User verifies → reports issues → agent fixes
-Round 2: User re-verifies fixed items → may report new issues
-Round 3: ...continues until all items pass or are deferred
-```
-
-Document each round in the Issues & Feedback section:
-
-```markdown
-### Round 1
-
-**Issue 1: {brief title}**
-
-- {what user reported}
-
-**Issue 2: {brief title}**
-
-- {what user reported}
-
-**Fixes applied:**
-
-- {what was changed}
-
-### Round 2
-
-**Issue 1: {if any persist or new issues found}** ...
-
-**Resolution:** {Fixed / Deferred — reason}
-```
-
-### Deferring issues
-
-Some issues may be low priority or require significant refactoring. It's valid to defer:
-
-1. **Ask user** if they want to defer vs. fix now
-2. **Mark item** with `[~]` and add note: `_(known issue, deferred — {reason})_`
-3. **Document** in the round as "Resolution: Deferred — {reason}"
-4. **Update sign-off** to reflect deferred items exist
-
-**Important**: Don't over-engineer fixes without checking with the user first. If a fix requires
-significant complexity, ask before implementing.
-
-### Sign-off criteria
-
-Update sign-off section when complete:
-
-```markdown
-- [x] All desktop checks pass (N deferred issues)
-- [x] All mobile checks pass
-- [x] All navigation checks pass
-- [x] No blocking issues (N low-priority issues deferred)
-```
 
 ---
 
@@ -498,9 +340,7 @@ terminal.
 - **Atomic commits are mandatory** — one commit per step, even in batch mode
 - **Always update the spec** — mark steps complete, update Progress field
 - **Ask when uncertain** — better to clarify than to guess wrong
-- **Visual verification = user task** — don't automate browser testing, hand it off
 - **Don't over-engineer** — if a fix requires significant complexity, ask user before implementing
-- **Deferring is valid** — low-priority issues can be marked `[~]` and documented for later
 
 ---
 
