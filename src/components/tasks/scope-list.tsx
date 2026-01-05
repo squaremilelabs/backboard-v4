@@ -87,15 +87,33 @@ function ScopeButton({ scope, isActive, onClick, themeClass, isChild }: ScopeBut
   const isProject = scope.type === "project"
   const dotClass = isProject && isChild ? "border-2 border-primary bg-transparent" : "bg-primary"
 
+  // isFaded means this parent is only shown for visual grouping (not selectable)
+  const isDisabled = scope.isFaded
+
+  if (isDisabled) {
+    // Render as non-interactive label for visual grouping
+    return (
+      <div
+        className={cn(
+          "flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm",
+          "text-muted-foreground",
+          isChild && "pl-6"
+        )}
+      >
+        <span className={cn(themeClass, "opacity-50")}>
+          <span className={cn("block h-2.5 w-2.5 shrink-0 rounded-full", dotClass)} />
+        </span>
+        <span className="truncate">{scope.title}</span>
+      </div>
+    )
+  }
+
   return (
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors",
-        isActive
-          ? "bg-muted font-medium"
-          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
-        scope.isFaded && "opacity-50",
+        "flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors",
+        isActive ? "bg-muted font-medium" : "text-foreground hover:bg-muted hover:text-foreground",
         isChild && "pl-6" // Indent children
       )}
     >

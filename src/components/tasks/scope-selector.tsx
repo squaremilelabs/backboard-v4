@@ -149,11 +149,34 @@ function ScopeItem({ scope, isSelected, onSelect, themeClass, isChild }: ScopeIt
   const dotClass =
     isProject && isChild ? "border-2 border-primary bg-transparent" : "bg-primary"
 
+  // isFaded means this parent is only shown for visual grouping (not selectable)
+  const isDisabled = scope.isFaded
+
+  if (isDisabled) {
+    // Render as non-interactive label for visual grouping
+    return (
+      <div
+        className={cn(
+          "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm",
+          "text-muted-foreground/60",
+          isChild && "pl-8"
+        )}
+      >
+        {/* Empty space where check would be */}
+        <span className="mr-2 h-4 w-4" />
+        <span className={cn(themeClass, "opacity-50")}>
+          <span className={cn("mr-2 block h-2 w-2 shrink-0 rounded-full", dotClass)} />
+        </span>
+        {scope.title}
+      </div>
+    )
+  }
+
   return (
     <CommandItem
       value={scope.id}
       onSelect={onSelect}
-      className={cn(scope.isFaded && "opacity-50", isChild && "pl-8")}
+      className={cn(isChild && "pl-8")}
     >
       <Check className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
       <span className={themeClass}>
