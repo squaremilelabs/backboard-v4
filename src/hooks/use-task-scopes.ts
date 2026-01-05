@@ -34,11 +34,16 @@ export interface TaskScopeData {
  * Filtering rules:
  * - "now": Show scheduled scopes + unscheduled scopes that have NOW tasks
  * - "later": Jobs always shown + Projects with MonthSlot + any scope with Later tasks
- * - "backlog", "recurring", "recent": Show all scopes + any with tasks
+ * - "backlog", "recurring": Show all scopes + any with tasks
+ * - "recent": Show ONLY scopes that have done tasks within last 7 days
  *
+ * @param showAllScopes - When true, show all non-archived scopes regardless of scheduling (only for now/later/backlog)
  * Returns scopes sorted: Jobs first, then Projects grouped by parent/child
  */
-export function useTaskScopes(listType: TaskListType): TaskScopeData | undefined {
+export function useTaskScopes(
+  listType: TaskListType,
+  showAllScopes: boolean = false
+): TaskScopeData | undefined {
   // Get all non-archived scopes
   const scopes = useLiveQuery(() => db.scopes.filter((s) => !s.archivedAt).toArray())
 
@@ -89,7 +94,14 @@ export function useTaskScopes(listType: TaskListType): TaskScopeData | undefined
       }
     }
 
-    const tasks = await db.tasks.where("status").equals(statusForQuery).toArray()
+    let tasks = await db.tasks.where("status").equals(statusForQuery).toArray()
+
+    // For "recent" list, filter to only tasks completed within last 7 days
+    if (listType === "recent") {
+      const recentCutoff = Date.now() - 7 * 24 * 60 * 60 * 1000
+      tasks = tasks.filter((task) => (task.completedAt ?? 0) >= recentCutoff)
+    }
+
     const counts = new Map<string, number>()
     const pendingCounts = new Map<string, number>()
 
@@ -102,7 +114,7 @@ export function useTaskScopes(listType: TaskListType): TaskScopeData | undefined
     }
 
     return { counts, pendingCounts }
-  }, [statusForQuery])
+  }, [statusForQuery, listType])
 
   // Compute scopes with filtering and grouping
   const taskScopeData = useMemo((): TaskScopeData | undefined => {
@@ -138,7 +150,13 @@ export function useTaskScopes(listType: TaskListType): TaskScopeData | undefined
 
     // Helper to check if a scope should be included
     const shouldInclude = (scope: Scope): boolean => {
-      // Include if scheduled OR has tasks in current list
+      // For recent list: ONLY show scopes with recent tasks
+      if (listType === "recent") {
+        return hasTasks(scope.id)
+      }
+      // When showAllScopes is true, include all non-archived scopes
+      if (showAllScopes) return true
+      // Otherwise: include if scheduled OR has tasks in current list
       return isScheduled(scope) || hasTasks(scope.id)
     }
 
@@ -205,7 +223,7 @@ export function useTaskScopes(listType: TaskListType): TaskScopeData | undefined
     const triageHasPendingActions = hasPending("triage")
 
     return { jobs, projectGroups, triageHasTasks, triageHasPendingActions }
-  }, [scopes, listType, todaySlots, monthSlots, taskData])
+  }, [scopes, listType, todaySlots, monthSlots, taskData, showAllScopes])
 
   return taskScopeData
 }
