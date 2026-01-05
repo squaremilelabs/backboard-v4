@@ -9,6 +9,7 @@ import { ScopeList } from "@/components/tasks/scope-list"
 import { ScopeSelector } from "@/components/tasks/scope-selector"
 import { TaskList } from "@/components/tasks/task-list"
 import { RecentTaskList } from "@/components/tasks/recent-task-list"
+import { RecurringTaskList } from "@/components/tasks/recurring-task-list"
 import { TaskContentPlaceholder } from "@/components/tasks/task-content-placeholder"
 import { useIsMobile } from "@/hooks/use-media-query"
 
@@ -41,6 +42,7 @@ function TasksPageContent() {
   // Show appropriate list based on type
   const isActiveList = ["now", "later", "backlog"].includes(listType)
   const isRecentList = listType === "recent"
+  const isRecurringList = listType === "recurring"
 
   return (
     <ContentPanel>
@@ -72,6 +74,8 @@ function TasksPageContent() {
                 <TaskList />
               ) : isRecentList ? (
                 <RecentTaskList />
+              ) : isRecurringList ? (
+                <RecurringTaskList />
               ) : (
                 <TaskContentPlaceholder />
               )}

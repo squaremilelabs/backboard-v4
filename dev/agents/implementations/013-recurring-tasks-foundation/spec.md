@@ -3,8 +3,8 @@
 | Field            | Value        |
 | ---------------- | ------------ |
 | **ID**           | 013          |
-| **Status**       | 🔵 Ready     |
-| **Progress**     | —            |
+| **Status**       | ✅ Complete  |
+| **Progress**     | 10/10        |
 | **Created**      | 2026-01-05   |
 | **Last Updated** | 2026-01-05   |
 
@@ -97,15 +97,17 @@ Read these before implementing:
 
 Files this implementation will create or modify:
 
-- [ ] `src/lib/recurring-task-mutations.ts` — Create: CRUD + insert now functions
-- [ ] `src/hooks/use-recurring-tasks.ts` — Create: Dexie live query hooks
-- [ ] `src/components/tasks/recurring-task-list.tsx` — Create: Main list component
-- [ ] `src/components/tasks/recurring-task-item.tsx` — Create: Task row with day indicator
-- [ ] `src/components/tasks/add-recurring-task-input.tsx` — Create: Inline input
-- [ ] `src/components/tasks/frequency-indicator.tsx` — Create: Day circles + popover trigger
-- [ ] `src/components/tasks/frequency-picker.tsx` — Create: Popover with weekday/time picker
-- [ ] `src/hooks/use-task-scopes.ts` — Modify: Handle "recurring" list type properly
-- [ ] `src/app/tasks/page.tsx` — Modify: Render RecurringTaskList for recurring tab
+- [x] `src/lib/recurring-task-mutations.ts` — Create: CRUD + insert now functions
+- [x] `src/hooks/use-recurring-tasks.ts` — Create: Dexie live query hooks
+- [x] `src/components/tasks/recurring-task-list.tsx` — Create: Main list component
+- [x] `src/components/tasks/recurring-task-item.tsx` — Create: Task row with day indicator
+- [x] `src/components/tasks/add-recurring-task-input.tsx` — Create: Inline input
+- [x] `src/components/tasks/frequency-indicator.tsx` — Create: Day circles + popover trigger
+- [x] `src/components/tasks/frequency-picker.tsx` — Create: Popover with weekday/time picker
+- [x] `src/hooks/use-task-scopes.ts` — Modify: Handle "recurring" list type properly
+- [x] `src/app/tasks/page.tsx` — Modify: Render RecurringTaskList for recurring tab
+- [x] `src/lib/db.ts` — Modify: Added RecurringTaskAction type and pendingAction field
+- [x] `src/components/tasks/scope-list.tsx` — Modify: Handle recurring tab auto-select
 
 ---
 

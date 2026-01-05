@@ -34,7 +34,8 @@ export interface TaskScopeData {
  * Filtering rules:
  * - "now": Show scheduled scopes + unscheduled scopes that have NOW tasks
  * - "later": Jobs always shown + Projects with MonthSlot + any scope with Later tasks
- * - "backlog", "recurring": Show all scopes + any with tasks
+ * - "backlog": Show all scopes + any with tasks
+ * - "recurring": Show ALL non-archived scopes (no Triage)
  * - "recent": Show ONLY scopes that have done tasks within last 7 days
  *
  * @param showAllScopes - When true, show all non-archived scopes regardless of scheduling (only for now/later/backlog)
@@ -83,7 +84,7 @@ export function useTaskScopes(
       ? listType
       : listType === "recent"
         ? "done"
-        : null
+        : null // "recurring" has no task status to query
 
   // Get task counts and pending action counts by scope for current list
   const taskData = useLiveQuery(async () => {
@@ -116,12 +117,32 @@ export function useTaskScopes(
     return { counts, pendingCounts }
   }, [statusForQuery, listType])
 
+  // Get recurring task counts by scope (only for recurring list)
+  const recurringData = useLiveQuery(
+    async () => {
+      if (listType !== "recurring") {
+        return { counts: new Map<string, number>() }
+      }
+
+      const recurringTasks = await db.recurringTasks.toArray()
+      const counts = new Map<string, number>()
+
+      for (const task of recurringTasks) {
+        counts.set(task.scopeId, (counts.get(task.scopeId) ?? 0) + 1)
+      }
+
+      return { counts }
+    },
+    [listType]
+  )
+
   // Compute scopes with filtering and grouping
   const taskScopeData = useMemo((): TaskScopeData | undefined => {
     if (!scopes) return undefined
     if (listType === "now" && !todaySlots) return undefined
     if (listType === "later" && !monthSlots) return undefined
     if (!taskData) return undefined
+    if (listType === "recurring" && !recurringData) return undefined
 
     const { counts: taskCounts, pendingCounts } = taskData
     const todaySlotsSet = new Set(todaySlots?.map((s) => s.scopeId) ?? [])
@@ -140,6 +161,9 @@ export function useTaskScopes(
 
     // Helper to check if scope has tasks in current list
     const hasTasks = (scopeId: string): boolean => {
+      if (listType === "recurring") {
+        return (recurringData?.counts.get(scopeId) ?? 0) > 0
+      }
       return (taskCounts.get(scopeId) ?? 0) > 0
     }
 
@@ -153,6 +177,10 @@ export function useTaskScopes(
       // For recent list: ONLY show scopes with recent tasks
       if (listType === "recent") {
         return hasTasks(scope.id)
+      }
+      // For recurring list: show ALL non-archived scopes
+      if (listType === "recurring") {
+        return true
       }
       // When showAllScopes is true, include all non-archived scopes
       if (showAllScopes) return true
@@ -223,7 +251,7 @@ export function useTaskScopes(
     const triageHasPendingActions = hasPending("triage")
 
     return { jobs, projectGroups, triageHasTasks, triageHasPendingActions }
-  }, [scopes, listType, todaySlots, monthSlots, taskData, showAllScopes])
+  }, [scopes, listType, todaySlots, monthSlots, taskData, recurringData, showAllScopes])
 
   return taskScopeData
 }

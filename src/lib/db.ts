@@ -29,6 +29,8 @@ export interface FrequencyValue {
   timezone: string // e.g., America/New_York
 }
 
+export type RecurringTaskAction = "delete" | "insert"
+
 export interface RecurringTask {
   id: string
   scopeId: string
@@ -37,6 +39,7 @@ export interface RecurringTask {
   frequency: FrequencyValue[]
   createdAt: number
   lastInsertedDate?: string // YYYY-MM-DD, prevents duplicate insertion
+  pendingAction?: RecurringTaskAction | null
 }
 
 export interface Scope {

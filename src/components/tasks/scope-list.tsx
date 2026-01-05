@@ -53,6 +53,13 @@ export function ScopeList() {
             setActiveScopeId(firstGroup.children[0].project.id)
           }
         }
+      } else if (activeListType === "recurring") {
+        // For Recurring list: no triage, select first job or project
+        if (scopeData.jobs.length > 0) {
+          setActiveScopeId(scopeData.jobs[0].id)
+        } else if (scopeData.projectGroups.length > 0) {
+          setActiveScopeId(scopeData.projectGroups[0].parent.id)
+        }
       } else {
         // Existing logic for other list types
         if (showTriage) {
