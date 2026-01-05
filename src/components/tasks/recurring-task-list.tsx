@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryState } from "nuqs"
-import { RecurringTaskItem } from "./recurring-task-item"
+import { SortableRecurringTaskList } from "./sortable-recurring-task-list"
 import { AddRecurringTaskInput } from "./add-recurring-task-input"
 import { searchParamsParsers } from "@/app/tasks/search-params"
 import { useRecurringTasks, useRecurringTaskPendingCount } from "@/hooks/use-recurring-tasks"
@@ -69,11 +69,7 @@ function RecurringTaskListContent({ scopeId }: { scopeId: string }) {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col">
-            {tasks.map((task) => (
-              <RecurringTaskItem key={task.id} task={task} themeClass={themeClass} />
-            ))}
-          </div>
+          <SortableRecurringTaskList tasks={tasks} scopeId={scopeId} themeClass={themeClass} />
         )}
       </div>
 

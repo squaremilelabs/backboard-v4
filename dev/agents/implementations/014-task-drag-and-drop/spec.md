@@ -3,8 +3,8 @@
 | Field            | Value                |
 | ---------------- | -------------------- |
 | **ID**           | 014                  |
-| **Status**       | 🟢 In Progress       |
-| **Progress**     | Part 1 complete (6/17) |
+| **Status**       | ✅ Complete          |
+| **Progress**     | All steps complete   |
 | **Created**      | 2026-01-05           |
 | **Last Updated** | 2026-01-05           |
 
@@ -87,13 +87,18 @@ Read these before implementing:
 
 ### Part 2: Drag and Drop
 
-- [ ] `package.json` — Add @dnd-kit dependencies
-- [ ] `src/components/tasks/draggable-task-list.tsx` — Create: DnD wrapper for task lists
-- [ ] `src/components/tasks/draggable-task-item.tsx` — Create: Draggable task row
-- [ ] `src/components/tasks/draggable-recurring-task-item.tsx` — Create: Draggable recurring task row
-- [ ] `src/components/tasks/task-list.tsx` — Integrate draggable components
-- [ ] `src/components/tasks/recurring-task-list.tsx` — Integrate draggable components
-- [ ] `src/components/tasks/scope-list.tsx` — Add drop targets for scope change
+- [x] `package.json` — Add @dnd-kit dependencies ✅
+- [x] `src/components/tasks/task-dnd-provider.tsx` — Create: Shared DnD context with scope-change handling ✅
+- [x] `src/components/tasks/sortable-task-list.tsx` — Create: Sortable wrapper for task lists ✅
+- [x] `src/components/tasks/draggable-task-item.tsx` — Create: Draggable task row ✅
+- [x] `src/components/tasks/sortable-recurring-task-list.tsx` — Create: Sortable wrapper for recurring lists ✅
+- [x] `src/components/tasks/draggable-recurring-task-item.tsx` — Create: Draggable recurring task row ✅
+- [x] `src/components/tasks/task-item.tsx` — Add drag handle props ✅
+- [x] `src/components/tasks/recurring-task-item.tsx` — Add drag handle props ✅
+- [x] `src/components/tasks/task-list.tsx` — Integrate sortable components ✅
+- [x] `src/components/tasks/recurring-task-list.tsx` — Integrate sortable components ✅
+- [x] `src/components/tasks/scope-list.tsx` — Add drop targets for scope change ✅
+- [x] `src/app/tasks/page.tsx` — Wrap with TaskDndProvider ✅
 
 ---
 
