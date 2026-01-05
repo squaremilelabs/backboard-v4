@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { SyncButton } from "./sync-button"
+import { UserMenu } from "@/components/auth/user-menu"
+import { LoginDialog } from "@/components/auth/login-dialog"
 import { useTaskIndicators } from "@/hooks/use-task-indicators"
 import { ActivityDots, type DotVariant } from "@/components/ui/activity-dot"
 import { cn } from "@/lib/utils"
@@ -73,8 +75,9 @@ export function AppSidebar() {
         })}
       </nav>
 
-      {/* Secondary navigation (Sync + Archive) */}
+      {/* Secondary navigation (Auth + Sync + Archive) */}
       <nav className="space-y-1 px-3 pt-6 pb-3">
+        <UserMenu />
         <SyncButton />
         {secondaryNavItems.map((item) => (
           <NavItem
@@ -85,6 +88,9 @@ export function AppSidebar() {
           />
         ))}
       </nav>
+
+      {/* Login dialog - renders when login flow is triggered */}
+      <LoginDialog />
     </aside>
   )
 }

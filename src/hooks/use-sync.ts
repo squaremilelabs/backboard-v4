@@ -1,23 +1,29 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { useLiveQuery } from "dexie-react-hooks"
+import { useLiveQuery, useObservable } from "dexie-react-hooks"
 import { db } from "@/lib/db"
 import { runSyncJobs, type SyncResult } from "@/lib/sync"
+
+export interface UnifiedSyncResult {
+  local: SyncResult
+  cloudTriggered: boolean
+}
 
 interface UseSyncReturn {
   isSyncing: boolean
   lastSyncedAt: number | null
-  lastResult: SyncResult | null
-  sync: () => Promise<SyncResult>
+  lastResult: UnifiedSyncResult | null
+  cloudSyncActive: boolean
+  sync: () => Promise<UnifiedSyncResult>
 }
 
 /**
- * Hook for managing sync state and triggering sync jobs
+ * Hook for managing unified sync (local jobs + cloud sync)
  */
 export function useSync(): UseSyncReturn {
   const [isSyncing, setIsSyncing] = useState(false)
-  const [lastResult, setLastResult] = useState<SyncResult | null>(null)
+  const [lastResult, setLastResult] = useState<UnifiedSyncResult | null>(null)
 
   // Live query for last synced timestamp
   const lastSyncedAt = useLiveQuery(async () => {
@@ -25,21 +31,45 @@ export function useSync(): UseSyncReturn {
     return meta?.lastSyncedAt ?? null
   })
 
-  const sync = useCallback(async (): Promise<SyncResult> => {
+  // Observe cloud sync state to know if cloud is active
+  const cloudSyncState = useObservable(db.cloud.syncState)
+  const cloudSyncActive = cloudSyncState?.status === "connected"
+
+  const sync = useCallback(async (): Promise<UnifiedSyncResult> => {
     setIsSyncing(true)
     try {
-      const result = await runSyncJobs()
+      // Run local sync jobs first
+      const localResult = await runSyncJobs()
+
+      // If cloud is connected, trigger a sync
+      // Dexie Cloud syncs automatically, but we can request an immediate sync
+      let cloudTriggered = false
+      if (cloudSyncState?.status === "connected") {
+        try {
+          await db.cloud.sync()
+          cloudTriggered = true
+        } catch (e) {
+          // Cloud sync might fail if offline - that's okay
+          console.warn("Cloud sync skipped:", e)
+        }
+      }
+
+      const result: UnifiedSyncResult = {
+        local: localResult,
+        cloudTriggered,
+      }
       setLastResult(result)
       return result
     } finally {
       setIsSyncing(false)
     }
-  }, [])
+  }, [cloudSyncState?.status])
 
   return {
     isSyncing,
     lastSyncedAt: lastSyncedAt ?? null,
     lastResult,
+    cloudSyncActive,
     sync,
   }
 }
@@ -47,41 +77,35 @@ export function useSync(): UseSyncReturn {
 /**
  * Format sync result as a human-readable message
  */
-export function formatSyncResult(result: SyncResult): string {
+export function formatSyncResult(result: UnifiedSyncResult): string {
   const parts: string[] = []
 
-  if (result.recurringTasksInserted > 0) {
+  if (result.local.recurringTasksInserted > 0) {
     parts.push(
-      `${result.recurringTasksInserted} recurring task${result.recurringTasksInserted === 1 ? "" : "s"} inserted`
+      `${result.local.recurringTasksInserted} recurring task${result.local.recurringTasksInserted === 1 ? "" : "s"} inserted`
     )
   }
 
-  if (result.scheduleSlotsCreated > 0) {
+  if (result.local.scheduleSlotsCreated > 0) {
     parts.push(
-      `${result.scheduleSlotsCreated} schedule slot${result.scheduleSlotsCreated === 1 ? "" : "s"} created`
+      `${result.local.scheduleSlotsCreated} schedule slot${result.local.scheduleSlotsCreated === 1 ? "" : "s"} created`
     )
   }
 
-  if (result.tasksPurged > 0) {
-    parts.push(`${result.tasksPurged} old task${result.tasksPurged === 1 ? "" : "s"} purged`)
-  }
-
-  if (result.scopesPurged > 0) {
+  if (result.local.tasksPurged > 0) {
     parts.push(
-      `${result.scopesPurged} archived scope${result.scopesPurged === 1 ? "" : "s"} purged`
+      `${result.local.tasksPurged} old task${result.local.tasksPurged === 1 ? "" : "s"} purged`
     )
   }
 
-  if (result.scheduleSlotsArchived > 0) {
+  if (result.local.scopesPurged > 0) {
     parts.push(
-      `${result.scheduleSlotsArchived} past schedule slot${result.scheduleSlotsArchived === 1 ? "" : "s"} archived`
+      `${result.local.scopesPurged} archived scope${result.local.scopesPurged === 1 ? "" : "s"} purged`
     )
   }
 
-  if (result.monthSlotsArchived > 0) {
-    parts.push(
-      `${result.monthSlotsArchived} past month slot${result.monthSlotsArchived === 1 ? "" : "s"} archived`
-    )
+  if (result.cloudTriggered) {
+    parts.push("cloud synced")
   }
 
   if (parts.length === 0) {

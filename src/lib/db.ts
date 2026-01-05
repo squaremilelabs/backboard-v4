@@ -161,6 +161,20 @@ class BackboardDB extends Dexie {
         }
       })
 
+    // Version 3: Cloud-compatible schema with @id auto-generated keys
+    // BREAKING CHANGE: This clears existing data due to ID format change
+    // But enables: anonymous data → user's private realm on sign-in
+    this.version(3).stores({
+      tasks: "@id, scopeId, status, createdAt, completedAt",
+      recurringTasks: "@id, scopeId",
+      tasklists: "id, scopeId, type", // Keep manual ID (derived key pattern)
+      scopes: "@id, type, archivedAt",
+      scheduleSlots: "@id, date, scopeId, [date+scopeId]",
+      monthSlots: "@id, month, projectId, [month+projectId]",
+      defaultScheduleSlots: "@id, weekday, jobId, [weekday+jobId]",
+      appMeta: "id", // Keep manual ID (singleton record)
+    })
+
     // Configure Dexie Cloud only if URL is provided
     // Without URL: pure local database (no sync)
     // With URL: sync-ready (requireAuth: false allows anonymous local usage)
@@ -169,6 +183,7 @@ class BackboardDB extends Dexie {
       this.cloud.configure({
         databaseUrl: cloudUrl,
         requireAuth: false,
+        customLoginGui: true, // We provide our own login dialog
       })
     }
   }

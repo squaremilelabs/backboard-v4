@@ -19,17 +19,18 @@ export function SyncProvider({ children }: SyncProviderProps) {
 
     const runInitialSync = async () => {
       try {
-        const result = await runSyncJobs()
-        const message = formatSyncResult(result)
+        const localResult = await runSyncJobs()
+        // Wrap in UnifiedSyncResult format for formatSyncResult
+        const message = formatSyncResult({ local: localResult, cloudTriggered: false })
 
         // Only show toast if there were changes
         const hasChanges =
-          result.recurringTasksInserted > 0 ||
-          result.scheduleSlotsCreated > 0 ||
-          result.tasksPurged > 0 ||
-          result.scopesPurged > 0 ||
-          result.scheduleSlotsArchived > 0 ||
-          result.monthSlotsArchived > 0
+          localResult.recurringTasksInserted > 0 ||
+          localResult.scheduleSlotsCreated > 0 ||
+          localResult.tasksPurged > 0 ||
+          localResult.scopesPurged > 0 ||
+          localResult.scheduleSlotsArchived > 0 ||
+          localResult.monthSlotsArchived > 0
 
         if (hasChanges) {
           toast.success("Synced on startup", { description: message })
