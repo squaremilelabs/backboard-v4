@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { SyncButton } from "./sync-button"
 import { useTaskIndicators } from "@/hooks/use-task-indicators"
 import { ActivityDots, type DotVariant } from "@/components/ui/activity-dot"
 import { cn } from "@/lib/utils"
@@ -72,8 +73,9 @@ export function AppSidebar() {
         })}
       </nav>
 
-      {/* Secondary navigation (Archive) */}
-      <nav className="px-3 pt-6 pb-3">
+      {/* Secondary navigation (Sync + Archive) */}
+      <nav className="space-y-1 px-3 pt-6 pb-3">
+        <SyncButton />
         {secondaryNavItems.map((item) => (
           <NavItem
             key={item.href}
