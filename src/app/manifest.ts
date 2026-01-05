@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Task management for what's current",
     start_url: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#1a1a1a",
+    background_color: "#f5f5f5",
+    theme_color: "#f5f5f5",
     icons: [
       {
         src: "/icons/icon-192.png",
