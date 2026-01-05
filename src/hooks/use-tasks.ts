@@ -57,3 +57,23 @@ export function useIsScopeScheduledToday(scopeId: string | null): boolean | unde
     return slot !== undefined
   }, [scopeId])
 }
+
+/**
+ * Get recent tasks (done within last 7 days) for a specific scope
+ * Sorted by completedAt descending (most recent first)
+ */
+export function useRecentTasks(scopeId: string | "triage"): Task[] | undefined {
+  return useLiveQuery(async () => {
+    const actualScopeId = scopeId === "triage" ? null : scopeId
+    const recentCutoff = Date.now() - 7 * 24 * 60 * 60 * 1000
+
+    const tasks = await db.tasks
+      .where("status")
+      .equals("done")
+      .filter((task) => task.scopeId === actualScopeId && (task.completedAt ?? 0) >= recentCutoff)
+      .toArray()
+
+    // Sort by completedAt descending (most recent first)
+    return tasks.sort((a, b) => (b.completedAt ?? 0) - (a.completedAt ?? 0))
+  }, [scopeId])
+}
