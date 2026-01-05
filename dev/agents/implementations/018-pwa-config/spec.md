@@ -3,8 +3,8 @@
 | Field            | Value       |
 | ---------------- | ----------- |
 | **ID**           | 018         |
-| **Status**       | 🟢 In Progress |
-| **Progress**     | Step 6 of 10 complete |
+| **Status**       | ✅ Complete |
+| **Progress**     | All steps complete |
 | **Created**      | 2026-01-05  |
 | **Last Updated** | 2026-01-05  |
 | **Note**         | Updated for Next.js 16 PWA best practices |
@@ -72,8 +72,8 @@ Exact files this implementation will create or modify:
 - [x] `public/icons/icon-192.png` — Placeholder 192x192 icon
 - [x] `public/icons/icon-512.png` — Placeholder 512x512 icon
 - [x] `public/icons/ICON-REPLACEMENT.md` — Instructions for replacing icons
-- [ ] `src/app/offline/page.tsx` — Minimal offline fallback page
-- [ ] `src/app/layout.tsx` — Update with PWA metadata
+- [x] `src/app/offline/page.tsx` — Minimal offline fallback page
+- [x] `src/app/layout.tsx` — Update with PWA metadata
 - [x] `package.json` — Add @serwist/next and serwist dependencies
 
 ---
@@ -309,7 +309,7 @@ export default function manifest(): MetadataRoute.Manifest {
 
 ---
 
-### Step 7: Create offline fallback page
+### Step 7: Create offline fallback page ✅
 
 **Do**: Create a minimal offline page for when the user has no connection.
 
@@ -345,7 +345,7 @@ export default function OfflinePage() {
 
 ---
 
-### Step 8: Update root layout with PWA metadata
+### Step 8: Update root layout with PWA metadata ✅
 
 **Do**: Add PWA meta tags to enable installation (manifest auto-discovered by Next.js).
 
@@ -379,7 +379,7 @@ export const metadata = {
 
 ---
 
-### Step 9: Build and test PWA functionality
+### Step 9: Build and test PWA functionality ✅
 
 **Do**: Build the app and verify PWA features are working.
 
@@ -435,7 +435,7 @@ pnpm dev --experimental-https
 
 ---
 
-### Step 10: Add PWA setup notes to project
+### Step 10: Add PWA setup notes to project ✅
 
 **Do**: Document the PWA setup for future reference (optional but recommended).
 
