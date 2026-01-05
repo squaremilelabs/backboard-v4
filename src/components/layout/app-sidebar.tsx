@@ -2,6 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useTaskIndicators } from "@/hooks/use-task-indicators"
+import { ActivityDots, type DotVariant } from "@/components/ui/activity-dot"
 import { cn } from "@/lib/utils"
 
 const mainNavItems = [
@@ -17,26 +19,33 @@ interface NavItemProps {
   href: string
   label: string
   isActive: boolean
+  dots?: DotVariant[]
 }
 
-function NavItem({ href, label, isActive }: NavItemProps) {
+function NavItem({ href, label, isActive, dots }: NavItemProps) {
   return (
     <Link
       href={href}
       className={cn(
-        "block rounded-xl border-2 border-transparent px-3 py-1.5 text-sm transition-colors",
+        `flex items-center justify-between rounded-xl border-2 border-transparent px-3 py-1.5
+        text-sm transition-colors`,
         isActive
           ? "border-border bg-background font-bold text-foreground"
           : "text-muted-foreground hover:bg-background hover:text-foreground"
       )}
     >
-      {label}
+      <span>{label}</span>
+      {dots && dots.length > 0 && <ActivityDots variants={dots} />}
     </Link>
   )
 }
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const indicators = useTaskIndicators()
+
+  // Get dots for Tasks nav item (same as NOW tab)
+  const tasksDots = indicators?.nowDots ?? []
 
   return (
     <aside className="flex h-full w-52 flex-col">
@@ -47,14 +56,20 @@ export function AppSidebar() {
 
       {/* Main navigation */}
       <nav className="flex-1 space-y-1">
-        {mainNavItems.map((item) => (
-          <NavItem
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
-          />
-        ))}
+        {mainNavItems.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+          const dots = item.href === "/tasks" ? tasksDots : undefined
+
+          return (
+            <NavItem
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              isActive={isActive}
+              dots={dots}
+            />
+          )
+        })}
       </nav>
 
       {/* Secondary navigation (Archive) */}

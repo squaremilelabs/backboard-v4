@@ -2,19 +2,26 @@
 
 import { useState, useRef, useEffect } from "react"
 import { GripVertical } from "lucide-react"
+import { TaskActionButtons, PendingActionIndicator } from "./task-action-buttons"
 import { updateTaskTitle } from "@/lib/task-mutations"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
-import type { Task } from "@/lib/db"
+import type { Task, TaskStatus } from "@/lib/db"
 
 interface TaskItemProps {
   task: Task
+  currentStatus: TaskStatus
+  themeClass?: string
 }
 
-export function TaskItem({ task }: TaskItemProps) {
+export function TaskItem({ task, currentStatus, themeClass }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(task.title)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [isHovered, setIsHovered] = useState(false)
+
+  const hasPendingAction = task.pendingAction != null
+  const isPendingDelete = task.pendingAction === "delete"
 
   // Focus input when entering edit mode
   useEffect(() => {
@@ -25,7 +32,7 @@ export function TaskItem({ task }: TaskItemProps) {
   }, [isEditing])
 
   const startEditing = () => {
-    // Reset to current task title when starting edit
+    if (isPendingDelete) return // Don't allow editing if pending delete
     setEditValue(task.title)
     setIsEditing(true)
   }
@@ -48,9 +55,19 @@ export function TaskItem({ task }: TaskItemProps) {
 
   return (
     <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={cn(
         "group flex min-h-10 items-center gap-2 px-4 py-2",
-        "transition-colors hover:bg-muted/50"
+        "transition-colors",
+        // Pending action background
+        hasPendingAction && !isPendingDelete && "bg-muted",
+        // Pending delete: faded background
+        isPendingDelete && "bg-muted/50",
+        // Hover state (only when no pending action)
+        !hasPendingAction && "hover:bg-muted/50",
+        // Apply theme for colored actions
+        themeClass
       )}
     >
       {/* Drag handle - for future drag-and-drop */}
@@ -72,7 +89,10 @@ export function TaskItem({ task }: TaskItemProps) {
             onClick={startEditing}
             className={cn(
               "block cursor-text truncate text-sm",
-              "-mx-1 rounded px-1 hover:bg-muted"
+              "-mx-1 rounded px-1",
+              !isPendingDelete && "hover:bg-muted",
+              // Strikethrough for pending delete
+              isPendingDelete && "text-muted-foreground line-through"
             )}
           >
             {task.title}
@@ -80,8 +100,17 @@ export function TaskItem({ task }: TaskItemProps) {
         )}
       </div>
 
-      {/* Action buttons placeholder - for future implementation */}
-      {/* Will contain: done, forward, back, delete buttons */}
+      {/* Action buttons or pending indicator */}
+      {hasPendingAction ? (
+        // Show pending indicator (clickable to clear)
+        <PendingActionIndicator task={task} currentStatus={currentStatus} />
+      ) : isHovered ? (
+        // Show full action bar when hovered and no pending action
+        <TaskActionButtons task={task} currentStatus={currentStatus} />
+      ) : (
+        // Empty placeholder to maintain layout
+        <div className="h-7 w-7" />
+      )}
     </div>
   )
 }

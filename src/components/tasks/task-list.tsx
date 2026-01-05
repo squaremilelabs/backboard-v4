@@ -3,8 +3,10 @@
 import { useQueryState } from "nuqs"
 import { TaskItem } from "./task-item"
 import { AddTaskInput } from "./add-task-input"
+import { PendingActionsFooter } from "./pending-actions-footer"
+import { UnfocusedWarningLabel, MoveAllToLaterButton } from "./unfocused-warning"
 import { searchParamsParsers } from "@/app/tasks/search-params"
-import { useTasks } from "@/hooks/use-tasks"
+import { useTasks, usePendingActionCount, useIsScopeScheduledToday } from "@/hooks/use-tasks"
 import { useScope } from "@/hooks/use-scopes"
 import { cn } from "@/lib/utils"
 import type { TaskStatus } from "@/lib/db"
@@ -15,6 +17,7 @@ export function TaskList() {
 
   // Only render for now/later/backlog
   const isActiveList = ["now", "later", "backlog"].includes(listType)
+  const isNowList = listType === "now"
 
   // Get scope info for theme
   const scope = useScope(scopeId === "triage" ? null : scopeId)
@@ -32,6 +35,17 @@ export function TaskList() {
   // Fetch tasks for this scope and status
   const tasks = useTasks(scopeId, listType as TaskStatus)
 
+  // Get pending action count
+  const pendingCount = usePendingActionCount(scopeId, listType as TaskStatus)
+
+  // Check if scope is scheduled for today (only relevant for NOW list)
+  const actualScopeId = scopeId === "triage" ? null : scopeId
+  const isScheduledToday = useIsScopeScheduledToday(actualScopeId)
+
+  // Show unfocused warning if: NOW list + has tasks + not scheduled today
+  const showUnfocusedWarning =
+    isNowList && tasks !== undefined && tasks.length > 0 && isScheduledToday === false
+
   // Loading state
   if (tasks === undefined) {
     return (
@@ -41,11 +55,11 @@ export function TaskList() {
     )
   }
 
-  // Determine actual scopeId for creating tasks (null for triage)
-  const actualScopeId = scopeId === "triage" ? null : scopeId
-
   return (
     <div className={cn("flex h-full flex-col", themeClass)}>
+      {/* Unfocused warning (above task list) */}
+      {showUnfocusedWarning && <UnfocusedWarningLabel />}
+
       {/* Task list with add input at top */}
       <div className="flex-1 overflow-y-auto">
         {/* Add task input - always at top */}
@@ -58,11 +72,27 @@ export function TaskList() {
         ) : (
           <div className="flex flex-col">
             {tasks.map((task) => (
-              <TaskItem key={task.id} task={task} />
+              <TaskItem
+                key={task.id}
+                task={task}
+                currentStatus={listType as TaskStatus}
+                themeClass={themeClass}
+              />
             ))}
           </div>
         )}
       </div>
+
+      {/* Footer: either pending actions or unfocused bulk action */}
+      {pendingCount !== undefined && pendingCount > 0 ? (
+        <PendingActionsFooter
+          scopeId={actualScopeId}
+          currentStatus={listType as TaskStatus}
+          pendingCount={pendingCount}
+        />
+      ) : showUnfocusedWarning ? (
+        <MoveAllToLaterButton scopeId={actualScopeId} />
+      ) : null}
     </div>
   )
 }

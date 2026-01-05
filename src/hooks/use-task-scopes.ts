@@ -2,11 +2,14 @@
 
 import { useMemo } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
-import { db, type Scope, type ScheduleSlot, type MonthSlot } from "@/lib/db"
+import { db, type Scope, type ScheduleSlot, type MonthSlot, type TaskStatus } from "@/lib/db"
 import type { TaskListType } from "@/app/tasks/search-params"
 
 export interface TaskScope extends Scope {
   isFaded: boolean
+  isUnfocused: boolean // Has tasks but not scheduled
+  hasTasksInList: boolean // Whether scope has tasks in current list
+  hasPendingActions: boolean // Whether scope has unsaved pending actions
 }
 
 export interface TaskScopeChild {
@@ -21,15 +24,17 @@ export interface TaskScopeGroup {
 export interface TaskScopeData {
   jobs: TaskScope[]
   projectGroups: TaskScopeGroup[]
+  triageHasTasks: boolean
+  triageHasPendingActions: boolean
 }
 
 /**
  * Get scopes for the tasks page with contextual filtering
  *
- * Filtering rules (scopes not meeting criteria are omitted):
- * - "now": Only show scopes with ScheduleSlot for today
- * - "later": Only show Projects with MonthSlot for current month (Jobs always shown)
- * - "backlog", "recurring", "recent": Show all scopes
+ * Filtering rules:
+ * - "now": Show scheduled scopes + unscheduled scopes that have NOW tasks
+ * - "later": Jobs always shown + Projects with MonthSlot + any scope with Later tasks
+ * - "backlog", "recurring", "recent": Show all scopes + any with tasks
  *
  * Returns scopes sorted: Jobs first, then Projects grouped by parent/child
  */
@@ -67,30 +72,86 @@ export function useTaskScopes(listType: TaskListType): TaskScopeData | undefined
     [listType, currentMonth]
   )
 
+  // Map task status for querying
+  const statusForQuery: TaskStatus | null =
+    listType === "now" || listType === "later" || listType === "backlog"
+      ? listType
+      : listType === "recent"
+        ? "done"
+        : null
+
+  // Get task counts and pending action counts by scope for current list
+  const taskData = useLiveQuery(async () => {
+    if (!statusForQuery) {
+      return {
+        counts: new Map<string, number>(),
+        pendingCounts: new Map<string, number>(),
+      }
+    }
+
+    const tasks = await db.tasks.where("status").equals(statusForQuery).toArray()
+    const counts = new Map<string, number>()
+    const pendingCounts = new Map<string, number>()
+
+    for (const task of tasks) {
+      const key = task.scopeId ?? "triage"
+      counts.set(key, (counts.get(key) ?? 0) + 1)
+      if (task.pendingAction != null) {
+        pendingCounts.set(key, (pendingCounts.get(key) ?? 0) + 1)
+      }
+    }
+
+    return { counts, pendingCounts }
+  }, [statusForQuery])
+
   // Compute scopes with filtering and grouping
   const taskScopeData = useMemo((): TaskScopeData | undefined => {
     if (!scopes) return undefined
     if (listType === "now" && !todaySlots) return undefined
     if (listType === "later" && !monthSlots) return undefined
+    if (!taskData) return undefined
+
+    const { counts: taskCounts, pendingCounts } = taskData
+    const todaySlotsSet = new Set(todaySlots?.map((s) => s.scopeId) ?? [])
+    const monthSlotsSet = new Set(monthSlots?.map((s) => s.projectId) ?? [])
+
+    // Helper to check if a scope is scheduled
+    const isScheduled = (scope: Scope): boolean => {
+      if (listType === "now") {
+        return todaySlotsSet.has(scope.id)
+      } else if (listType === "later") {
+        if (scope.type === "job") return true
+        return monthSlotsSet.has(scope.id)
+      }
+      return true // For backlog/recurring/recent, all are considered "scheduled"
+    }
+
+    // Helper to check if scope has tasks in current list
+    const hasTasks = (scopeId: string): boolean => {
+      return (taskCounts.get(scopeId) ?? 0) > 0
+    }
+
+    // Helper to check if scope has pending actions
+    const hasPending = (scopeId: string): boolean => {
+      return (pendingCounts.get(scopeId) ?? 0) > 0
+    }
 
     // Helper to check if a scope should be included
     const shouldInclude = (scope: Scope): boolean => {
-      if (listType === "now") {
-        // Only include scopes with a schedule slot for today
-        return todaySlots?.some((slot) => slot.scopeId === scope.id) ?? false
-      } else if (listType === "later") {
-        // Jobs are always included, Projects need a MonthSlot for current month
-        if (scope.type === "job") return true
-        return monthSlots?.some((slot) => slot.projectId === scope.id) ?? false
-      }
-      // For "backlog", "recurring", "recent": include all
-      return true
+      // Include if scheduled OR has tasks in current list
+      return isScheduled(scope) || hasTasks(scope.id)
     }
 
     // Split into jobs and projects, filtering by inclusion rules
     const jobs: TaskScope[] = scopes
       .filter((s) => s.type === "job" && shouldInclude(s))
-      .map((scope) => ({ ...scope, isFaded: false }))
+      .map((scope) => ({
+        ...scope,
+        isFaded: false,
+        isUnfocused: !isScheduled(scope) && hasTasks(scope.id),
+        hasTasksInList: hasTasks(scope.id),
+        hasPendingActions: hasPending(scope.id),
+      }))
 
     const projects = scopes.filter((s) => s.type === "project")
 
@@ -119,16 +180,32 @@ export function useTaskScopes(listType: TaskListType): TaskScopeData | undefined
         }
 
         return {
-          parent: { ...parent, isFaded: !parentIncluded },
+          parent: {
+            ...parent,
+            isFaded: !parentIncluded,
+            isUnfocused: !isScheduled(parent) && hasTasks(parent.id),
+            hasTasksInList: hasTasks(parent.id),
+            hasPendingActions: hasPending(parent.id),
+          },
           children: includedChildren.map((child) => ({
-            project: { ...child, isFaded: false },
+            project: {
+              ...child,
+              isFaded: false,
+              isUnfocused: !isScheduled(child) && hasTasks(child.id),
+              hasTasksInList: hasTasks(child.id),
+              hasPendingActions: hasPending(child.id),
+            },
           })),
         }
       })
       .filter((group): group is TaskScopeGroup => group !== null)
 
-    return { jobs, projectGroups }
-  }, [scopes, listType, todaySlots, monthSlots])
+    // Check if triage has tasks and pending actions
+    const triageHasTasks = hasTasks("triage")
+    const triageHasPendingActions = hasPending("triage")
+
+    return { jobs, projectGroups, triageHasTasks, triageHasPendingActions }
+  }, [scopes, listType, todaySlots, monthSlots, taskData])
 
   return taskScopeData
 }
