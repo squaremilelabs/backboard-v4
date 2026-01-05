@@ -85,8 +85,7 @@ interface ScopeButtonProps {
 function ScopeButton({ scope, isActive, onClick, themeClass, isChild }: ScopeButtonProps) {
   // Jobs: filled dot, Projects: parent = filled, child = outlined
   const isProject = scope.type === "project"
-  const dotClass =
-    isProject && isChild ? "border-2 border-primary bg-transparent" : "bg-primary"
+  const dotClass = isProject && isChild ? "border-2 border-primary bg-transparent" : "bg-primary"
 
   return (
     <button

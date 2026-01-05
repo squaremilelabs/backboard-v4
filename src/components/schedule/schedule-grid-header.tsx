@@ -11,7 +11,7 @@ export function ScheduleGridHeader() {
         text-muted-foreground"
     >
       {/* Title column header - fixed width, sticky */}
-      <div className="sticky left-0 z-10 w-2xs shrink-0 bg-background px-4 py-3 font-medium">
+      <div className="sticky left-0 z-10 w-64 shrink-0 bg-background px-4 py-3 font-medium">
         Schedule
       </div>
 

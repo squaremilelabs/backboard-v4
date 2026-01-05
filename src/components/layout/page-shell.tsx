@@ -9,7 +9,7 @@ interface PageShellProps {
 
 export function PageShell({ children }: PageShellProps) {
   return (
-    <div className="flex h-screen flex-col bg-muted lg:flex-row lg:justify-center">
+    <div className="flex h-screen w-7xl max-w-full flex-col bg-muted lg:flex-row lg:justify-center">
       {/* Mobile header - only visible below lg breakpoint */}
       <header className="flex h-12 shrink-0 items-center gap-2 px-3 lg:hidden">
         <MobileNav />

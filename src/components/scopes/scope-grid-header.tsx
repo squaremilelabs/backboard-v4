@@ -19,9 +19,7 @@ export function ScopeGridHeader({ type }: ScopeGridHeaderProps) {
         text-muted-foreground"
     >
       {/* Title column header - fixed width, sticky */}
-      <div
-        className="sticky left-0 z-10 w-3xs shrink-0 bg-background px-4 py-3 font-medium lg:w-2xs"
-      >
+      <div className="sticky left-0 z-10 w-64 shrink-0 bg-background px-4 py-3 font-medium">
         {isJobs ? "Jobs" : "Projects"}
       </div>
 

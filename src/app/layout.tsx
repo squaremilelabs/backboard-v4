@@ -14,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className="bg-muted">
+      <body className="flex flex-col items-center bg-muted">
         <NuqsAdapter>
           <PageShell>{children}</PageShell>
         </NuqsAdapter>

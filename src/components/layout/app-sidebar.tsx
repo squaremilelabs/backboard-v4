@@ -39,14 +39,14 @@ export function AppSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="flex h-full w-72 flex-col">
+    <aside className="flex h-full w-52 flex-col">
       {/* Logotype */}
-      <div className="flex h-12 items-center px-4">
+      <div className="flex h-12 items-center px-3">
         <span className="text-sm font-semibold">Backboard</span>
       </div>
 
       {/* Main navigation */}
-      <nav className="flex-1 space-y-0.5 px-3 py-2">
+      <nav className="flex-1 space-y-1">
         {mainNavItems.map((item) => (
           <NavItem
             key={item.href}
