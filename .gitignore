@@ -35,3 +35,7 @@ next-env.d.ts
 # OS
 .DS_Store
 Thumbs.db
+
+# Dexie Cloud
+dexie-cloud.json
+dexie-cloud.key
