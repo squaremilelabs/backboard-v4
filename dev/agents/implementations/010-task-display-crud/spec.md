@@ -1,12 +1,12 @@
 # Task Display & CRUD
 
-| Field            | Value        |
-| ---------------- | ------------ |
-| **ID**           | 010          |
-| **Status**       | 🔵 Ready     |
-| **Progress**     | —            |
-| **Created**      | 2026-01-05   |
-| **Last Updated** | 2026-01-05   |
+| Field            | Value             |
+| ---------------- | ----------------- |
+| **ID**           | 010               |
+| **Status**       | 🟢 In Progress    |
+| **Progress**     | Step 6 of 8       |
+| **Created**      | 2026-01-05        |
+| **Last Updated** | 2026-01-05        |
 
 ---
 
@@ -68,12 +68,12 @@ Read these before implementing:
 
 Files this implementation will create or modify:
 
-- [ ] `src/lib/task-mutations.ts` — Create: `createTask`, `updateTaskTitle` functions
-- [ ] `src/hooks/use-tasks.ts` — Create: `useTasks` hook for fetching tasks
-- [ ] `src/components/tasks/task-item.tsx` — Create: Task row with inline title editing
-- [ ] `src/components/tasks/add-task-input.tsx` — Create: Inline input for adding tasks
-- [ ] `src/components/tasks/task-list.tsx` — Create: Main task list component
-- [ ] `src/app/tasks/page.tsx` — Modify: Use TaskList for now/later/backlog
+- [x] `src/lib/task-mutations.ts` — Create: `createTask`, `updateTaskTitle` functions
+- [x] `src/hooks/use-tasks.ts` — Create: `useTasks` hook for fetching tasks
+- [x] `src/components/tasks/task-item.tsx` — Create: Task row with inline title editing
+- [x] `src/components/tasks/add-task-input.tsx` — Create: Inline input for adding tasks
+- [x] `src/components/tasks/task-list.tsx` — Create: Main task list component
+- [x] `src/app/tasks/page.tsx` — Modify: Use TaskList for now/later/backlog
 
 ---
 

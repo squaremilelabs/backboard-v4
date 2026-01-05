@@ -1,10 +1,13 @@
 "use client"
 
 import { Suspense } from "react"
+import { useQueryState } from "nuqs"
+import { searchParamsParsers } from "@/app/tasks/search-params"
 import { ContentPanel } from "@/components/layout/content-panel"
 import { TaskListTabs } from "@/components/tasks/task-list-tabs"
 import { ScopeList } from "@/components/tasks/scope-list"
 import { ScopeSelector } from "@/components/tasks/scope-selector"
+import { TaskList } from "@/components/tasks/task-list"
 import { TaskContentPlaceholder } from "@/components/tasks/task-content-placeholder"
 import { useIsMobile } from "@/hooks/use-media-query"
 
@@ -32,6 +35,10 @@ function TasksPageSkeleton() {
 
 function TasksPageContent() {
   const isMobile = useIsMobile()
+  const [listType] = useQueryState("list", searchParamsParsers.list)
+
+  // Show TaskList for now/later/backlog, placeholder for recurring/recent
+  const isActiveList = ["now", "later", "backlog"].includes(listType)
 
   return (
     <ContentPanel>
@@ -57,9 +64,9 @@ function TasksPageContent() {
               </div>
             )}
 
-            {/* Content area (placeholder for now) */}
-            <div className="flex-1 overflow-y-auto">
-              <TaskContentPlaceholder />
+            {/* Content area */}
+            <div className="flex-1 overflow-hidden">
+              {isActiveList ? <TaskList /> : <TaskContentPlaceholder />}
             </div>
           </main>
         </div>

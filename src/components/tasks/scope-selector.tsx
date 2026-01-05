@@ -146,8 +146,7 @@ interface ScopeItemProps {
 function ScopeItem({ scope, isSelected, onSelect, themeClass, isChild }: ScopeItemProps) {
   // Jobs: filled dot, Projects: parent = filled, child = outlined
   const isProject = scope.type === "project"
-  const dotClass =
-    isProject && isChild ? "border-2 border-primary bg-transparent" : "bg-primary"
+  const dotClass = isProject && isChild ? "border-2 border-primary bg-transparent" : "bg-primary"
 
   // isFaded means this parent is only shown for visual grouping (not selectable)
   const isDisabled = scope.isFaded
@@ -157,7 +156,7 @@ function ScopeItem({ scope, isSelected, onSelect, themeClass, isChild }: ScopeIt
     return (
       <div
         className={cn(
-          "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm",
+          "relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm select-none",
           "text-muted-foreground/60",
           isChild && "pl-8"
         )}
@@ -173,11 +172,7 @@ function ScopeItem({ scope, isSelected, onSelect, themeClass, isChild }: ScopeIt
   }
 
   return (
-    <CommandItem
-      value={scope.id}
-      onSelect={onSelect}
-      className={cn(isChild && "pl-8")}
-    >
+    <CommandItem value={scope.id} onSelect={onSelect} className={cn(isChild && "pl-8")}>
       <Check className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
       <span className={themeClass}>
         <span className={cn("mr-2 block h-2 w-2 shrink-0 rounded-full", dotClass)} />
