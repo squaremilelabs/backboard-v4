@@ -72,6 +72,18 @@ export function formatSyncResult(result: SyncResult): string {
     )
   }
 
+  if (result.scheduleSlotsArchived > 0) {
+    parts.push(
+      `${result.scheduleSlotsArchived} past schedule slot${result.scheduleSlotsArchived === 1 ? "" : "s"} archived`
+    )
+  }
+
+  if (result.monthSlotsArchived > 0) {
+    parts.push(
+      `${result.monthSlotsArchived} past month slot${result.monthSlotsArchived === 1 ? "" : "s"} archived`
+    )
+  }
+
   if (parts.length === 0) {
     return "Everything up to date"
   }

@@ -7,6 +7,8 @@ export interface SyncResult {
   scheduleSlotsCreated: number
   tasksPurged: number
   scopesPurged: number
+  scheduleSlotsArchived: number
+  monthSlotsArchived: number
 }
 
 /**
@@ -16,12 +18,15 @@ export interface SyncResult {
 export async function runSyncJobs(): Promise<SyncResult> {
   const now = new Date()
   const today = format(now, "yyyy-MM-dd")
+  const currentMonth = format(now, "yyyy-MM")
 
   const results = await Promise.all([
     insertRecurringTasks(now, today),
     populateScheduleSlots(today),
     purgeDoneTasks(now),
     purgeArchivedScopes(now),
+    purgeStaleScheduleSlots(today),
+    purgeStaleMonthSlots(currentMonth),
   ])
 
   // Update last synced timestamp
@@ -37,6 +42,8 @@ export async function runSyncJobs(): Promise<SyncResult> {
     scheduleSlotsCreated: results[1],
     tasksPurged: results[2],
     scopesPurged: results[3],
+    scheduleSlotsArchived: results[4],
+    monthSlotsArchived: results[5],
   }
 }
 
@@ -258,4 +265,32 @@ async function purgeArchivedScopes(now: Date): Promise<number> {
   )
 
   return scopesToDelete.length
+}
+
+/**
+ * Purge schedule slots with dates before today
+ */
+async function purgeStaleScheduleSlots(today: string): Promise<number> {
+  // Find all schedule slots with date before today
+  const staleSlots = await db.scheduleSlots.where("date").below(today).toArray()
+
+  if (staleSlots.length === 0) return 0
+
+  await db.scheduleSlots.bulkDelete(staleSlots.map((s) => s.id))
+
+  return staleSlots.length
+}
+
+/**
+ * Purge month slots with months before current month
+ */
+async function purgeStaleMonthSlots(currentMonth: string): Promise<number> {
+  // Find all month slots with month before current month
+  const staleSlots = await db.monthSlots.where("month").below(currentMonth).toArray()
+
+  if (staleSlots.length === 0) return 0
+
+  await db.monthSlots.bulkDelete(staleSlots.map((s) => s.id))
+
+  return staleSlots.length
 }

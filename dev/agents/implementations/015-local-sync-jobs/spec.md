@@ -1,12 +1,12 @@
 # Local Sync Jobs
 
-| Field            | Value        |
-| ---------------- | ------------ |
-| **ID**           | 015          |
-| **Status**       | 🔵 Ready     |
-| **Progress**     | —            |
-| **Created**      | 2026-01-05   |
-| **Last Updated** | 2026-01-05   |
+| Field            | Value           |
+| ---------------- | --------------- |
+| **ID**           | 015             |
+| **Status**       | 🟢 In Progress  |
+| **Progress**     | Step 8 of 9     |
+| **Created**      | 2026-01-05      |
+| **Last Updated** | 2026-01-05      |
 
 ---
 
@@ -76,20 +76,20 @@ Read these before implementing:
 
 ## Files Created/Modified
 
-- [ ] `package.json` — Add `sonner` for toast notifications
-- [ ] `src/lib/sync.ts` — Create: All sync job functions
-- [ ] `src/hooks/use-sync.ts` — Create: Hook for sync state and trigger
-- [ ] `src/components/layout/sync-button.tsx` — Create: Sync button with timestamp
-- [ ] `src/components/layout/app-sidebar.tsx` — Modify: Add SyncButton to secondary nav
-- [ ] `src/components/layout/mobile-nav.tsx` — Modify: Add SyncButton to mobile nav
-- [ ] `src/components/providers/sync-provider.tsx` — Create: Provider that runs sync on mount
-- [ ] `src/app/layout.tsx` — Modify: Add Toaster and SyncProvider
+- [x] `package.json` — Add `sonner` for toast notifications
+- [x] `src/lib/sync.ts` — Create: All sync job functions
+- [x] `src/hooks/use-sync.ts` — Create: Hook for sync state and trigger
+- [x] `src/components/layout/sync-button.tsx` — Create: Sync button with timestamp
+- [x] `src/components/layout/app-sidebar.tsx` — Modify: Add SyncButton to secondary nav
+- [x] `src/components/layout/mobile-nav.tsx` — Modify: Add SyncButton to mobile nav
+- [x] `src/components/providers/sync-provider.tsx` — Create: Provider that runs sync on mount
+- [x] `src/app/layout.tsx` — Modify: Add Toaster and SyncProvider
 
 ---
 
 ## Implementation Plan
 
-### Step 1: Install sonner
+### Step 1: Install sonner ✅
 
 **Do**: Add sonner toast library for sync feedback.
 
@@ -103,7 +103,7 @@ pnpm add sonner
 
 ---
 
-### Step 2: Create sync.ts with all sync jobs
+### Step 2: Create sync.ts with all sync jobs ✅
 
 **Do**: Create the core sync job functions based on TRD §6.
 
@@ -368,7 +368,7 @@ async function purgeArchivedScopes(now: Date): Promise<number> {
 
 ---
 
-### Step 3: Create use-sync.ts hook
+### Step 3: Create use-sync.ts hook ✅
 
 **Do**: Create a hook that manages sync state and provides a trigger function.
 
@@ -486,7 +486,7 @@ export function formatLastSynced(timestamp: number | null): string {
 
 ---
 
-### Step 4: Create sync-button.tsx component
+### Step 4: Create sync-button.tsx component ✅
 
 **Do**: Create the sync button component with timestamp display.
 
@@ -580,7 +580,7 @@ export function SyncButton({ className, variant = "sidebar" }: SyncButtonProps) 
 
 ---
 
-### Step 5: Create sync-provider.tsx
+### Step 5: Create sync-provider.tsx ✅
 
 **Do**: Create a provider component that runs sync on app mount.
 
@@ -647,7 +647,7 @@ export function SyncProvider({ children }: SyncProviderProps) {
 
 ---
 
-### Step 6: Update app-sidebar.tsx
+### Step 6: Update app-sidebar.tsx ✅
 
 **Do**: Add the SyncButton to the sidebar's secondary navigation area.
 
@@ -697,7 +697,7 @@ Replace with:
 
 ---
 
-### Step 7: Update mobile-nav.tsx
+### Step 7: Update mobile-nav.tsx ✅
 
 **Do**: Add the SyncButton to the mobile navigation.
 
@@ -749,7 +749,7 @@ Replace with:
 
 ---
 
-### Step 8: Update layout.tsx
+### Step 8: Update layout.tsx ✅
 
 **Do**: Wrap the app with SyncProvider to enable toasts and auto-sync on mount.
 

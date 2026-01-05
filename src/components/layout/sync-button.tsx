@@ -22,7 +22,9 @@ export function SyncButton({ className, variant = "sidebar" }: SyncButtonProps) 
       result.recurringTasksInserted > 0 ||
       result.scheduleSlotsCreated > 0 ||
       result.tasksPurged > 0 ||
-      result.scopesPurged > 0
+      result.scopesPurged > 0 ||
+      result.scheduleSlotsArchived > 0 ||
+      result.monthSlotsArchived > 0
 
     if (hasChanges) {
       toast.success("Synced", { description: message })
