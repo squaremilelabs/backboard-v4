@@ -1,4 +1,4 @@
-import { format, subDays, addDays } from "date-fns"
+import { format, subDays } from "date-fns"
 import { prependToTasklist, removeManyFromTasklist } from "./tasklist-helpers"
 import {
   db,
@@ -127,7 +127,7 @@ async function insertRecurringTaskToNow(
 
 /**
  * Populate schedule slots for the next 7 days from default schedule slots
- * Respects user exclusions (manually removed today's slots)
+ * Respects user exclusions (manually removed slots)
  * Also cleans up stale exclusions (dates before today)
  */
 async function populateScheduleSlots(today: string): Promise<number> {
@@ -141,17 +141,21 @@ async function populateScheduleSlots(today: string): Promise<number> {
   // Get all default schedule slots
   const defaults = await db.defaultScheduleSlots.toArray()
 
-  // Get current exclusions (only today matters since we're populating forward)
+  // Get current exclusions for the next 7 days
   const exclusions = await db.excludedScheduleSlots.toArray()
   const exclusionSet = new Set(exclusions.map((e) => `${e.date}:${e.scopeId}`))
 
   let createdCount = 0
 
   // Create slots for next 7 days
+  // Use local date construction to avoid timezone issues with date string parsing
+  const now = new Date()
+  const weekdayMap: Weekday[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+
   for (let i = 0; i < 7; i++) {
-    const date = addDays(new Date(today), i)
-    const dateStr = format(date, "yyyy-MM-dd")
-    const weekday = format(date, "eee").toLowerCase() as Weekday
+    const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i)
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+    const weekday = weekdayMap[date.getDay()]
 
     // Find defaults for this weekday
     const dayDefaults = defaults.filter((d) => d.weekday === weekday)

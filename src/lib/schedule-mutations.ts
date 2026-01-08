@@ -1,4 +1,3 @@
-import { format } from "date-fns"
 import {
   db,
   type Weekday,
@@ -62,9 +61,6 @@ export async function toggleScheduleSlot(
   scopeId: string,
   date: string // YYYY-MM-DD
 ): Promise<void> {
-  const today = format(new Date(), "yyyy-MM-dd")
-  const isToday = date === today
-
   // Check if slot exists
   const existing = await db.scheduleSlots.where("[date+scopeId]").equals([date, scopeId]).first()
 
@@ -72,19 +68,17 @@ export async function toggleScheduleSlot(
     // Removing a slot - delete it
     await db.scheduleSlots.delete(existing.id)
 
-    // If removing today's slot, add exclusion to prevent sync re-adding it
-    if (isToday) {
-      const existingExclusion = await db.excludedScheduleSlots
-        .where("[date+scopeId]")
-        .equals([date, scopeId])
-        .first()
+    // Add exclusion to prevent sync re-adding it (for all dates in the 7-day window)
+    const existingExclusion = await db.excludedScheduleSlots
+      .where("[date+scopeId]")
+      .equals([date, scopeId])
+      .first()
 
-      if (!existingExclusion) {
-        await db.excludedScheduleSlots.add({
-          date,
-          scopeId,
-        } as ExcludedScheduleSlot)
-      }
+    if (!existingExclusion) {
+      await db.excludedScheduleSlots.add({
+        date,
+        scopeId,
+      } as ExcludedScheduleSlot)
     }
   } else {
     // Adding a slot - create it
@@ -100,16 +94,14 @@ export async function toggleScheduleSlot(
       scopeId,
     } as ScheduleSlot)
 
-    // If adding today's slot, remove any exclusion
-    if (isToday) {
-      const existingExclusion = await db.excludedScheduleSlots
-        .where("[date+scopeId]")
-        .equals([date, scopeId])
-        .first()
+    // Remove any exclusion for this slot
+    const existingExclusion = await db.excludedScheduleSlots
+      .where("[date+scopeId]")
+      .equals([date, scopeId])
+      .first()
 
-      if (existingExclusion) {
-        await db.excludedScheduleSlots.delete(existingExclusion.id)
-      }
+    if (existingExclusion) {
+      await db.excludedScheduleSlots.delete(existingExclusion.id)
     }
   }
 }

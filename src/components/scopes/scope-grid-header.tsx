@@ -18,8 +18,8 @@ export function ScopeGridHeader({ type }: ScopeGridHeaderProps) {
       className="sticky top-0 z-20 flex shrink-0 items-center border-b bg-background text-sm
         text-muted-foreground"
     >
-      {/* Title column header - fixed width, sticky */}
-      <div className="sticky left-0 z-10 w-64 shrink-0 bg-background px-4 py-3 font-medium">
+      {/* Title column header - fixed width */}
+      <div className="w-64 shrink-0 bg-background px-4 py-3 font-medium">
         {isJobs ? "Jobs" : "Projects"}
       </div>
 

@@ -7,6 +7,8 @@ import { useState } from "react"
 import { SyncButton } from "./sync-button"
 import { UserMenu } from "@/components/auth/user-menu"
 import { LoginDialog } from "@/components/auth/login-dialog"
+import { useTaskIndicators } from "@/hooks/use-task-indicators"
+import { ActivityDots, type DotVariant } from "@/components/ui/activity-dot"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
@@ -25,21 +27,23 @@ interface NavItemProps {
   label: string
   isActive: boolean
   onClick?: () => void
+  dots?: DotVariant[]
 }
 
-function NavItem({ href, label, isActive, onClick }: NavItemProps) {
+function NavItem({ href, label, isActive, onClick, dots }: NavItemProps) {
   return (
     <Link
       href={href}
       onClick={onClick}
       className={cn(
-        "block rounded-md px-3 py-2 text-sm font-medium transition-colors",
+        "flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors",
         isActive
           ? "bg-secondary text-secondary-foreground"
           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
       )}
     >
-      {label}
+      <span>{label}</span>
+      {dots && dots.length > 0 && <ActivityDots variants={dots} />}
     </Link>
   )
 }
@@ -47,6 +51,10 @@ function NavItem({ href, label, isActive, onClick }: NavItemProps) {
 export function MobileNav() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const indicators = useTaskIndicators()
+
+  // Get dots for Tasks nav item (same as NOW tab)
+  const tasksDots = indicators?.nowDots ?? []
 
   const closeSheet = () => setOpen(false)
 
@@ -65,15 +73,21 @@ export function MobileNav() {
         <div className="flex h-[calc(100%-57px)] flex-col">
           {/* Main navigation */}
           <nav className="flex-1 space-y-1 p-4">
-            {mainNavItems.map((item) => (
-              <NavItem
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
-                onClick={closeSheet}
-              />
-            ))}
+            {mainNavItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+              const dots = item.href === "/tasks" ? tasksDots : undefined
+
+              return (
+                <NavItem
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  isActive={isActive}
+                  onClick={closeSheet}
+                  dots={dots}
+                />
+              )
+            })}
           </nav>
 
           {/* Secondary navigation (Auth + Sync + Archive) */}

@@ -12,11 +12,11 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { ActivityDot, type DotVariant } from "@/components/ui/activity-dot"
 
 export function ScopeSelector() {
   const [open, setOpen] = useState(false)
@@ -31,6 +31,9 @@ export function ScopeSelector() {
 
   // Show Triage in Now/Later/Backlog only
   const showTriage = ["now", "later", "backlog"].includes(activeListType)
+
+  // Only show colored dots in "now" list - later/backlog are neutral
+  const isNowList = activeListType === "now"
 
   // Find current selected scope
   const selectedScope = activeScopeId !== "triage" ? findTaskScope(scopeData, activeScopeId) : null
@@ -67,7 +70,6 @@ export function ScopeSelector() {
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0" align="start">
         <Command>
-          <CommandInput placeholder="Search scopes..." />
           <CommandList>
             <CommandEmpty>No scope found.</CommandEmpty>
             <CommandGroup>
@@ -87,7 +89,14 @@ export function ScopeSelector() {
                     )}
                   />
                   <span className="mr-2 h-2 w-2 shrink-0 rounded-full bg-muted-foreground" />
-                  Triage
+                  <span className="flex-1">Triage</span>
+                  {scopeData?.triageHasTasks && (
+                    <ActivityDot
+                      variant="neutral"
+                      outlined={scopeData.triageHasPendingActions}
+                      className="ml-auto"
+                    />
+                  )}
                 </CommandItem>
               )}
 
@@ -102,6 +111,8 @@ export function ScopeSelector() {
                     setOpen(false)
                   }}
                   themeClass="theme-gold"
+                  dotVariant="gold"
+                  isNowList={isNowList}
                 />
               ))}
 
@@ -116,6 +127,8 @@ export function ScopeSelector() {
                       setOpen(false)
                     }}
                     themeClass="theme-blue"
+                    dotVariant="blue"
+                    isNowList={isNowList}
                   />
                   {group.children.map((child) => (
                     <ScopeItem
@@ -127,6 +140,8 @@ export function ScopeSelector() {
                         setOpen(false)
                       }}
                       themeClass="theme-blue"
+                      dotVariant="blue"
+                      isNowList={isNowList}
                       isChild
                     />
                   ))}
@@ -152,16 +167,40 @@ interface ScopeItemProps {
   isSelected: boolean
   onSelect: () => void
   themeClass: "theme-gold" | "theme-blue"
+  dotVariant: "gold" | "blue"
+  isNowList: boolean
   isChild?: boolean
 }
 
-function ScopeItem({ scope, isSelected, onSelect, themeClass, isChild }: ScopeItemProps) {
+function ScopeItem({
+  scope,
+  isSelected,
+  onSelect,
+  themeClass,
+  dotVariant,
+  isNowList,
+  isChild,
+}: ScopeItemProps) {
   // Jobs: filled dot, Projects: parent = filled, child = outlined
   const isProject = scope.type === "project"
   const dotClass = isProject && isChild ? "border-2 border-primary bg-transparent" : "bg-primary"
 
   // isFaded means this parent is only shown for visual grouping (not selectable)
   const isDisabled = scope.isFaded
+
+  // Determine right-hand indicator dot variant
+  // In "now" list: red if unfocused, otherwise scope color
+  // In later/backlog: always neutral
+  const indicatorVariant: DotVariant | null = scope.hasTasksInList
+    ? isNowList
+      ? scope.isUnfocused
+        ? "red"
+        : dotVariant
+      : "neutral"
+    : null
+
+  // Outlined if there are pending actions
+  const isOutlined = scope.hasPendingActions
 
   if (isDisabled) {
     // Render as non-interactive label for visual grouping
@@ -178,7 +217,8 @@ function ScopeItem({ scope, isSelected, onSelect, themeClass, isChild }: ScopeIt
         <span className={cn(themeClass, "opacity-50")}>
           <span className={cn("mr-2 block h-2 w-2 shrink-0 rounded-full", dotClass)} />
         </span>
-        {scope.title}
+        <span className="flex-1">{scope.title}</span>
+        {indicatorVariant && <ActivityDot variant={indicatorVariant} outlined={isOutlined} />}
       </div>
     )
   }
@@ -189,7 +229,8 @@ function ScopeItem({ scope, isSelected, onSelect, themeClass, isChild }: ScopeIt
       <span className={themeClass}>
         <span className={cn("mr-2 block h-2 w-2 shrink-0 rounded-full", dotClass)} />
       </span>
-      {scope.title}
+      <span className="flex-1">{scope.title}</span>
+      {indicatorVariant && <ActivityDot variant={indicatorVariant} outlined={isOutlined} />}
     </CommandItem>
   )
 }

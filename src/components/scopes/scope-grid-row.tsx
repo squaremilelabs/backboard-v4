@@ -129,10 +129,10 @@ export function ScopeGridRow({
 
   return (
     <div className="group flex min-w-0 items-center">
-      {/* Title cell - fixed width, sticky on scroll, clickable on mobile */}
+      {/* Title cell - fixed width, clickable on mobile */}
       <div
         className={cn(
-          "sticky left-0 z-10 flex w-64 shrink-0 items-center gap-2 bg-background px-4 py-2",
+          "flex w-64 shrink-0 items-center gap-2 bg-background px-4 py-2",
           isMobile && "cursor-pointer"
         )}
         onClick={handleRowClick}
