@@ -11,9 +11,7 @@ export function ScheduleGridHeader() {
         text-muted-foreground"
     >
       {/* Title column header - fixed width */}
-      <div className="w-64 shrink-0 bg-background px-4 py-3 font-medium">
-        Schedule
-      </div>
+      <div className="w-64 shrink-0 bg-background px-4 py-3 font-medium">Schedule</div>
 
       {/* Date column headers */}
       <div className="flex flex-1 items-center px-2">

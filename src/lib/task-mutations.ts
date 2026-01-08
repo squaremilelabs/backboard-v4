@@ -47,97 +47,126 @@ export async function updateTaskTitle(taskId: string, title: string): Promise<vo
 }
 
 /**
- * Set a pending action on a task
+ * Move a single task to a new status (immediate action, no pending state)
  */
-export async function setTaskPendingAction(
+export async function moveTask(
   taskId: string,
-  action: TaskStatus | "delete" | null
+  fromStatus: TaskStatus,
+  toStatus: TaskStatus,
+  scopeId: string | null
 ): Promise<void> {
-  await db.tasks.update(taskId, { pendingAction: action })
+  const now = Date.now()
+
+  await db.transaction("rw", [db.tasks, db.tasklists], async () => {
+    const updates: Partial<Task> = {
+      status: toStatus,
+      insertedAt: now,
+      insertedFrom: fromStatus,
+    }
+    if (toStatus === "done") {
+      updates.completedAt = now
+    }
+    await db.tasks.update(taskId, updates)
+
+    // Move between tasklists
+    await moveTaskBetweenLists(taskId, scopeId, fromStatus, scopeId, toStatus)
+  })
 }
 
 /**
- * Commit all pending actions for a specific scope and status.
- * - Status changes: Update task.status, set insertedFrom to previous status
- * - Delete: Remove task from database
+ * Delete a single task (immediate action)
  */
-export async function commitPendingActions(
-  scopeId: string | null,
-  currentStatus: TaskStatus
+export async function deleteTask(
+  taskId: string,
+  status: TaskStatus,
+  scopeId: string | null
 ): Promise<void> {
-  const tasks = await db.tasks
-    .where("status")
-    .equals(currentStatus)
-    .filter((t) => t.scopeId === scopeId && t.pendingAction != null)
-    .toArray()
+  await db.transaction("rw", [db.tasks, db.tasklists], async () => {
+    await db.tasks.delete(taskId)
+    await removeManyFromTasklist(scopeId, status, [taskId])
+  })
+}
+
+/**
+ * Move multiple tasks to a new status (batch action)
+ * Preserves relative order by prepending in reverse order
+ */
+export async function batchMoveTasks(
+  taskIds: string[],
+  fromStatus: TaskStatus,
+  toStatus: TaskStatus,
+  scopeId: string | null
+): Promise<void> {
+  if (taskIds.length === 0) return
 
   const now = Date.now()
 
-  // Group tasks by their pending action for batch operations
-  const toDelete: string[] = []
-  const toMove: Map<TaskStatus, string[]> = new Map()
-
-  for (const task of tasks) {
-    if (task.pendingAction === "delete") {
-      toDelete.push(task.id)
-    } else if (task.pendingAction) {
-      const targetStatus = task.pendingAction
-      if (!toMove.has(targetStatus)) {
-        toMove.set(targetStatus, [])
-      }
-      toMove.get(targetStatus)!.push(task.id)
-    }
-  }
-
   await db.transaction("rw", [db.tasks, db.tasklists], async () => {
-    // Handle deletes
-    for (const taskId of toDelete) {
-      await db.tasks.delete(taskId)
-    }
-    if (toDelete.length > 0) {
-      await removeManyFromTasklist(scopeId, currentStatus, toDelete)
-    }
-
-    // Handle moves (preserving order within each destination)
-    for (const [targetStatus, taskIds] of toMove) {
-      for (const taskId of taskIds) {
-        const updates: Partial<Task> = {
-          status: targetStatus,
-          pendingAction: null,
-          insertedAt: now,
-          insertedFrom: currentStatus,
-        }
-        if (targetStatus === "done") {
-          updates.completedAt = now
-        }
-        await db.tasks.update(taskId, updates)
+    // Update each task
+    for (const taskId of taskIds) {
+      const updates: Partial<Task> = {
+        status: toStatus,
+        insertedAt: now,
+        insertedFrom: fromStatus,
       }
-
-      // Remove from source, add to destination (preserving relative order)
-      await removeManyFromTasklist(scopeId, currentStatus, taskIds)
-      await prependManyToTasklist(scopeId, targetStatus, taskIds)
+      if (toStatus === "done") {
+        updates.completedAt = now
+      }
+      await db.tasks.update(taskId, updates)
     }
+
+    // Remove from source list, add to destination (preserving relative order)
+    await removeManyFromTasklist(scopeId, fromStatus, taskIds)
+    await prependManyToTasklist(scopeId, toStatus, taskIds)
   })
 }
 
 /**
- * Clear all pending actions for a specific scope and status
+ * Delete multiple tasks (batch action)
  */
-export async function clearPendingActions(
-  scopeId: string | null,
-  currentStatus: TaskStatus
+export async function batchDeleteTasks(
+  taskIds: string[],
+  status: TaskStatus,
+  scopeId: string | null
 ): Promise<void> {
-  const tasks = await db.tasks
-    .where("status")
-    .equals(currentStatus)
-    .filter((t) => t.scopeId === scopeId && t.pendingAction != null)
-    .toArray()
+  if (taskIds.length === 0) return
 
-  await db.transaction("rw", db.tasks, async () => {
-    for (const task of tasks) {
-      await db.tasks.update(task.id, { pendingAction: null })
+  await db.transaction("rw", [db.tasks, db.tasklists], async () => {
+    for (const taskId of taskIds) {
+      await db.tasks.delete(taskId)
     }
+    await removeManyFromTasklist(scopeId, status, taskIds)
   })
+}
+
+/**
+ * Reorder multiple tasks within a tasklist (multi-drag)
+ * Moves selected tasks to new positions as a group
+ */
+export async function reorderMultipleTasks(
+  scopeId: string | null,
+  status: TaskStatus,
+  selectedIds: string[],
+  allTaskIds: string[],
+  overIndex: number
+): Promise<void> {
+  if (selectedIds.length === 0) return
+
+  // Build new order: remove selected, insert at target position
+  const remaining = allTaskIds.filter((id) => !selectedIds.includes(id))
+
+  // Calculate insert position - if dropping after original positions, adjust
+  const insertAt = Math.min(overIndex, remaining.length)
+
+  // Insert selected items (preserving their relative order from original list)
+  const orderedSelected = allTaskIds.filter((id) => selectedIds.includes(id))
+  const newOrder = [
+    ...remaining.slice(0, insertAt),
+    ...orderedSelected,
+    ...remaining.slice(insertAt),
+  ]
+
+  await reorderTasklist(scopeId, status, newOrder)
 }
 
 /**
@@ -159,7 +188,6 @@ export async function moveAllToLater(scopeId: string | null): Promise<void> {
     for (const task of tasks) {
       await db.tasks.update(task.id, {
         status: "later",
-        pendingAction: null,
         insertedAt: now,
         insertedFrom: "now",
       })
@@ -218,7 +246,6 @@ export async function moveAllFromLaterToNow(scopeId: string | null): Promise<voi
     for (const task of tasks) {
       await db.tasks.update(task.id, {
         status: "now",
-        pendingAction: null,
         insertedAt: now,
         insertedFrom: "later",
       })

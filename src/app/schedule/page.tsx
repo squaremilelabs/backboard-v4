@@ -5,8 +5,17 @@ import { ContentPanel } from "@/components/layout/content-panel"
 import { ScheduleGridHeader } from "@/components/schedule/schedule-grid-header"
 import { ScheduleGridRow } from "@/components/schedule/schedule-grid-row"
 import { useScheduleScopes, type ScheduleScopeData } from "@/hooks/use-scopes"
-import { useScheduleSlots, useDefaultScheduleSlots, useMonthSlots, getNext7Days } from "@/hooks/use-schedule-slots"
-import { sortJobsBySchedule, sortProjectGroupsBySchedule, type ProjectGroup } from "@/lib/scope-sorting"
+import {
+  useScheduleSlots,
+  useDefaultScheduleSlots,
+  useMonthSlots,
+  getNext7Days,
+} from "@/hooks/use-schedule-slots"
+import {
+  sortJobsBySchedule,
+  sortProjectGroupsBySchedule,
+  type ProjectGroup,
+} from "@/lib/scope-sorting"
 import type { Scope } from "@/lib/db"
 
 export default function SchedulePage() {

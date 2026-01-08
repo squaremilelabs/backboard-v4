@@ -14,8 +14,9 @@ import {
   type CollisionDetection,
 } from "@dnd-kit/core"
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable"
-import { reorderTasks, changeTaskScope } from "@/lib/task-mutations"
+import { reorderTasks, changeTaskScope, reorderMultipleTasks } from "@/lib/task-mutations"
 import { reorderRecurringTasks, changeRecurringTaskScope } from "@/lib/recurring-task-mutations"
+import { useTaskSelection } from "@/hooks/use-task-selection"
 import type { Task, TaskStatus, RecurringTask } from "@/lib/db"
 
 /**
@@ -85,6 +86,9 @@ export function TaskDndProvider({ children }: TaskDndProviderProps) {
     type: null,
   })
 
+  // Get selection context for multi-drag support
+  const { selectedIds, isSelected, deselectAll } = useTaskSelection()
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -139,83 +143,105 @@ export function TaskDndProvider({ children }: TaskDndProviderProps) {
     }
   }, [])
 
-  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
-    const { active, over } = event
-    const taskId = active.id as string
-    const taskType = activeRef.current.type
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event
+      const taskId = active.id as string
+      const taskType = activeRef.current.type
 
-    // Reset active
-    activeRef.current.taskId = null
-    activeRef.current.type = null
+      // Reset active
+      activeRef.current.taskId = null
+      activeRef.current.type = null
 
-    if (!over) return
+      if (!over) return
 
-    const overId = over.id as string
+      const overId = over.id as string
 
-    // Check if dropped on a scope (scope drop target IDs start with "scope-drop-")
-    if (overId.startsWith("scope-drop-")) {
-      const newScopeId = over.data.current?.scopeId as string | null
+      // Check if dropped on a scope (scope drop target IDs start with "scope-drop-")
+      if (overId.startsWith("scope-drop-")) {
+        const newScopeId = over.data.current?.scopeId as string | null
+
+        if (taskType === "task") {
+          // Find which list this task belongs to
+          for (const entry of taskListsRef.current.values()) {
+            const task = entry.tasks.find((t) => t.id === taskId)
+            if (task) {
+              // Don't move if same scope
+              if (task.scopeId === newScopeId) return
+              // Can't move to triage (per PRD)
+              if (newScopeId === null) return
+              await changeTaskScope(taskId, newScopeId)
+              return
+            }
+          }
+        } else if (taskType === "recurring") {
+          // Recurring tasks can't go to triage
+          if (newScopeId === null) return
+          for (const entry of recurringListsRef.current.values()) {
+            const task = entry.tasks.find((t) => t.id === taskId)
+            if (task) {
+              if (task.scopeId === newScopeId) return
+              await changeRecurringTaskScope(taskId, newScopeId)
+              return
+            }
+          }
+        }
+        return
+      }
+
+      // Otherwise, it's a reorder within a list
+      if (active.id === over.id) return
 
       if (taskType === "task") {
-        // Find which list this task belongs to
+        // Find the list containing this task
         for (const entry of taskListsRef.current.values()) {
-          const task = entry.tasks.find((t) => t.id === taskId)
-          if (task) {
-            // Don't move if same scope
-            if (task.scopeId === newScopeId) return
-            // Can't move to triage (per PRD)
-            if (newScopeId === null) return
-            await changeTaskScope(taskId, newScopeId)
+          const oldIndex = entry.tasks.findIndex((t) => t.id === active.id)
+          const newIndex = entry.tasks.findIndex((t) => t.id === over.id)
+
+          if (oldIndex !== -1 && newIndex !== -1) {
+            const taskIds = entry.tasks.map((t) => t.id)
+
+            // Check if this is a multi-drag (active item is selected and there are other selections)
+            const draggingSelected = isSelected(taskId) && selectedIds.size > 1
+
+            if (draggingSelected) {
+              // Multi-drag: move all selected items
+              const selectedInList = taskIds.filter((id) => selectedIds.has(id))
+              await reorderMultipleTasks(
+                entry.scopeId,
+                entry.status,
+                selectedInList,
+                taskIds,
+                newIndex
+              )
+              deselectAll() // Clear selection after multi-drag
+            } else {
+              // Single drag: normal reorder
+              const newTaskIds = [...taskIds]
+              const [movedId] = newTaskIds.splice(oldIndex, 1)
+              newTaskIds.splice(newIndex, 0, movedId)
+              await reorderTasks(entry.scopeId, entry.status, newTaskIds)
+            }
             return
           }
         }
       } else if (taskType === "recurring") {
-        // Recurring tasks can't go to triage
-        if (newScopeId === null) return
         for (const entry of recurringListsRef.current.values()) {
-          const task = entry.tasks.find((t) => t.id === taskId)
-          if (task) {
-            if (task.scopeId === newScopeId) return
-            await changeRecurringTaskScope(taskId, newScopeId)
+          const oldIndex = entry.tasks.findIndex((t) => t.id === active.id)
+          const newIndex = entry.tasks.findIndex((t) => t.id === over.id)
+
+          if (oldIndex !== -1 && newIndex !== -1) {
+            const newTaskIds = entry.tasks.map((t) => t.id)
+            const [movedId] = newTaskIds.splice(oldIndex, 1)
+            newTaskIds.splice(newIndex, 0, movedId)
+            await reorderRecurringTasks(entry.scopeId, newTaskIds)
             return
           }
         }
       }
-      return
-    }
-
-    // Otherwise, it's a reorder within a list
-    if (active.id === over.id) return
-
-    if (taskType === "task") {
-      // Find the list containing this task
-      for (const entry of taskListsRef.current.values()) {
-        const oldIndex = entry.tasks.findIndex((t) => t.id === active.id)
-        const newIndex = entry.tasks.findIndex((t) => t.id === over.id)
-
-        if (oldIndex !== -1 && newIndex !== -1) {
-          const newTaskIds = entry.tasks.map((t) => t.id)
-          const [movedId] = newTaskIds.splice(oldIndex, 1)
-          newTaskIds.splice(newIndex, 0, movedId)
-          await reorderTasks(entry.scopeId, entry.status, newTaskIds)
-          return
-        }
-      }
-    } else if (taskType === "recurring") {
-      for (const entry of recurringListsRef.current.values()) {
-        const oldIndex = entry.tasks.findIndex((t) => t.id === active.id)
-        const newIndex = entry.tasks.findIndex((t) => t.id === over.id)
-
-        if (oldIndex !== -1 && newIndex !== -1) {
-          const newTaskIds = entry.tasks.map((t) => t.id)
-          const [movedId] = newTaskIds.splice(oldIndex, 1)
-          newTaskIds.splice(newIndex, 0, movedId)
-          await reorderRecurringTasks(entry.scopeId, newTaskIds)
-          return
-        }
-      }
-    }
-  }, [])
+    },
+    [isSelected, selectedIds, deselectAll]
+  )
 
   const contextValue = useMemo(
     (): TaskDndContextValue => ({

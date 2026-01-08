@@ -104,14 +104,13 @@ export function useTaskScopes(
     }
 
     const counts = new Map<string, number>()
+    // Note: pendingCounts is now always empty for regular tasks
+    // since we replaced pending actions with batch selection
     const pendingCounts = new Map<string, number>()
 
     for (const task of tasks) {
       const key = task.scopeId ?? "triage"
       counts.set(key, (counts.get(key) ?? 0) + 1)
-      if (task.pendingAction != null) {
-        pendingCounts.set(key, (pendingCounts.get(key) ?? 0) + 1)
-      }
     }
 
     return { counts, pendingCounts }

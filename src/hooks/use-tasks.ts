@@ -50,26 +50,6 @@ export function useTasks(scopeId: string | "triage", status: TaskStatus): Task[]
 }
 
 /**
- * Count tasks with pending actions for a specific scope and status
- */
-export function usePendingActionCount(
-  scopeId: string | "triage",
-  status: TaskStatus
-): number | undefined {
-  return useLiveQuery(async () => {
-    const actualScopeId = scopeId === "triage" ? null : scopeId
-
-    const count = await db.tasks
-      .where("status")
-      .equals(status)
-      .filter((task) => task.scopeId === actualScopeId && task.pendingAction != null)
-      .count()
-
-    return count
-  }, [scopeId, status])
-}
-
-/**
  * Check if a scope has a schedule slot for today
  */
 export function useIsScopeScheduledToday(scopeId: string | null): boolean | undefined {

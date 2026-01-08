@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect } from "react"
 import { GripVertical } from "lucide-react"
-import { TaskActionButtons, PendingActionIndicator } from "./task-action-buttons"
+import { TaskActionButtons } from "./task-action-buttons"
+import { TaskCheckbox } from "./task-checkbox"
+import { useTaskSelection } from "@/hooks/use-task-selection"
 import { updateTaskTitle } from "@/lib/task-mutations"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
@@ -11,18 +13,25 @@ import type { Task, TaskStatus } from "@/lib/db"
 interface TaskItemProps {
   task: Task
   currentStatus: TaskStatus
+  scopeId: string | null
   themeClass?: string
   dragHandleProps?: React.HTMLAttributes<HTMLDivElement>
 }
 
-export function TaskItem({ task, currentStatus, themeClass, dragHandleProps }: TaskItemProps) {
+export function TaskItem({
+  task,
+  currentStatus,
+  scopeId,
+  themeClass,
+  dragHandleProps,
+}: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(task.title)
   const inputRef = useRef<HTMLInputElement>(null)
   const [isHovered, setIsHovered] = useState(false)
 
-  const hasPendingAction = task.pendingAction != null
-  const isPendingDelete = task.pendingAction === "delete"
+  const { isSelected, toggle } = useTaskSelection()
+  const checked = isSelected(task.id)
 
   // Focus input when entering edit mode
   useEffect(() => {
@@ -33,7 +42,6 @@ export function TaskItem({ task, currentStatus, themeClass, dragHandleProps }: T
   }, [isEditing])
 
   const startEditing = () => {
-    if (isPendingDelete) return // Don't allow editing if pending delete
     setEditValue(task.title)
     setIsEditing(true)
   }
@@ -59,28 +67,28 @@ export function TaskItem({ task, currentStatus, themeClass, dragHandleProps }: T
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "group flex min-h-10 items-center gap-2 px-4 py-2",
+        "group flex min-h-10 items-center gap-2 py-2 pl-2 pr-3",
         "transition-colors",
-        // Pending action background
-        hasPendingAction && !isPendingDelete && "bg-muted",
-        // Pending delete: faded background
-        isPendingDelete && "bg-muted/50",
-        // Hover state (only when no pending action)
-        !hasPendingAction && "hover:bg-muted/50",
-        // Apply theme for colored actions
+        checked && "bg-muted/50",
+        !checked && "hover:bg-muted/30",
         themeClass
       )}
     >
-      {/* Drag handle */}
+      {/* Drag handle (left, always visible but muted) */}
       <div
         {...dragHandleProps}
-        className="flex h-8 w-8 shrink-0 cursor-grab items-center justify-center rounded
-          hover:bg-muted active:cursor-grabbing"
+        className={cn(
+          "flex h-6 w-6 shrink-0 cursor-grab items-center justify-center rounded",
+          "hover:bg-muted active:cursor-grabbing"
+        )}
       >
-        <GripVertical className="h-4 w-4 text-muted-foreground/50" />
+        <GripVertical className="h-3.5 w-3.5 text-muted-foreground/50" />
       </div>
 
-      {/* Task title - editable */}
+      {/* Checkbox */}
+      <TaskCheckbox checked={checked} onChange={() => toggle(task.id)} />
+
+      {/* Task title - editable (center, flex-1) */}
       <div className="min-w-0 flex-1">
         {isEditing ? (
           <Input
@@ -97,9 +105,7 @@ export function TaskItem({ task, currentStatus, themeClass, dragHandleProps }: T
             className={cn(
               "block cursor-text truncate text-sm",
               "-mx-1 rounded px-1",
-              !isPendingDelete && "hover:bg-muted",
-              // Strikethrough for pending delete
-              isPendingDelete && "text-muted-foreground line-through"
+              "hover:bg-muted"
             )}
           >
             {task.title}
@@ -107,17 +113,10 @@ export function TaskItem({ task, currentStatus, themeClass, dragHandleProps }: T
         )}
       </div>
 
-      {/* Action buttons or pending indicator */}
-      {hasPendingAction ? (
-        // Show pending indicator (clickable to clear)
-        <PendingActionIndicator task={task} currentStatus={currentStatus} />
-      ) : isHovered ? (
-        // Show full action bar when hovered and no pending action
-        <TaskActionButtons task={task} currentStatus={currentStatus} />
-      ) : (
-        // Empty placeholder to maintain layout
-        <div className="h-7 w-7" />
-      )}
+      {/* Right side: action buttons (on hover) */}
+      <div className={cn("transition-opacity", isHovered ? "opacity-100" : "opacity-0")}>
+        <TaskActionButtons task={task} currentStatus={currentStatus} scopeId={scopeId} />
+      </div>
     </div>
   )
 }

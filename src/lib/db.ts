@@ -16,7 +16,6 @@ export interface Task {
   title: string
   content?: string
   status: TaskStatus
-  pendingAction?: TaskStatus | "delete" | null
   insertedAt: number
   insertedFrom: TasklistType // For undo & metadata display
   createdAt: number
@@ -184,6 +183,21 @@ class BackboardDB extends Dexie {
 
     // Version 4: Add excludedScheduleSlots for user unschedule protection
     this.version(4).stores({
+      tasks: "@id, scopeId, status, createdAt, completedAt",
+      recurringTasks: "@id, scopeId",
+      tasklists: "id, scopeId, type",
+      scopes: "@id, type, archivedAt",
+      scheduleSlots: "@id, date, scopeId, [date+scopeId]",
+      monthSlots: "@id, month, projectId, [month+projectId]",
+      defaultScheduleSlots: "@id, weekday, jobId, [weekday+jobId]",
+      appMeta: "id",
+      excludedScheduleSlots: "@id, date, scopeId, [date+scopeId]",
+    })
+
+    // Version 5: Remove pendingAction field (batch actions replace pending state)
+    // No actual schema migration needed - Dexie is schema-less for non-indexed fields
+    // This just documents the change and bumps version for sync consistency
+    this.version(5).stores({
       tasks: "@id, scopeId, status, createdAt, completedAt",
       recurringTasks: "@id, scopeId",
       tasklists: "id, scopeId, type",

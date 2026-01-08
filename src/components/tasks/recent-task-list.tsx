@@ -2,9 +2,9 @@
 
 import { useQueryState } from "nuqs"
 import { TaskItem } from "./task-item"
-import { PendingActionsFooter } from "./pending-actions-footer"
+import { BatchActionBar } from "./batch-action-bar"
 import { searchParamsParsers } from "@/app/tasks/search-params"
-import { useRecentTasks, usePendingActionCount } from "@/hooks/use-tasks"
+import { useRecentTasks } from "@/hooks/use-tasks"
 import { useScope } from "@/hooks/use-scopes"
 import { cn } from "@/lib/utils"
 
@@ -26,10 +26,7 @@ export function RecentTaskList() {
 
   // Fetch recent tasks (done within last 7 days) for this scope
   const tasks = useRecentTasks(scopeId)
-
-  // Get pending action count
   const actualScopeId = scopeId === "triage" ? null : scopeId
-  const pendingCount = usePendingActionCount(scopeId, "done")
 
   // Loading state
   if (tasks === undefined) {
@@ -39,6 +36,8 @@ export function RecentTaskList() {
       </div>
     )
   }
+
+  const taskIds = tasks.map((t) => t.id)
 
   return (
     <div className={cn("flex h-full flex-col", themeClass)}>
@@ -51,20 +50,20 @@ export function RecentTaskList() {
         ) : (
           <div className="flex flex-col">
             {tasks.map((task) => (
-              <TaskItem key={task.id} task={task} currentStatus="done" themeClass={themeClass} />
+              <TaskItem
+                key={task.id}
+                task={task}
+                currentStatus="done"
+                scopeId={actualScopeId}
+                themeClass={themeClass}
+              />
             ))}
           </div>
         )}
       </div>
 
-      {/* Pending actions footer */}
-      {pendingCount !== undefined && pendingCount > 0 && (
-        <PendingActionsFooter
-          scopeId={actualScopeId}
-          currentStatus="done"
-          pendingCount={pendingCount}
-        />
-      )}
+      {/* Batch action bar */}
+      <BatchActionBar taskIds={taskIds} currentStatus="done" scopeId={actualScopeId} />
     </div>
   )
 }

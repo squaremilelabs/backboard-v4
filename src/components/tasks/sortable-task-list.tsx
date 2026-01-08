@@ -16,7 +16,6 @@ interface SortableTaskListProps {
 export function SortableTaskList({ tasks, scopeId, status, themeClass }: SortableTaskListProps) {
   const { registerTaskList, unregisterTaskList } = useTaskDnd()
 
-  // Register this list with the provider so drag end handler has access to tasks
   useEffect(() => {
     registerTaskList(scopeId, status, tasks)
     return () => unregisterTaskList(scopeId, status)
@@ -32,6 +31,7 @@ export function SortableTaskList({ tasks, scopeId, status, themeClass }: Sortabl
             key={task.id}
             task={task}
             currentStatus={status}
+            scopeId={scopeId}
             themeClass={themeClass}
           />
         ))}

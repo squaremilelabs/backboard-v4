@@ -1,18 +1,19 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo } from "react"
 import { useQueryState } from "nuqs"
 import { useDroppable } from "@dnd-kit/core"
 import { ScopeToggle } from "./scope-toggle"
 import { searchParamsParsers } from "@/app/tasks/search-params"
 import { useTaskScopes, findTaskScope, type TaskScope } from "@/hooks/use-task-scopes"
+import { useLocalStorage } from "@/hooks/use-local-storage"
 import { ActivityDot, type DotVariant } from "@/components/ui/activity-dot"
 import { cn } from "@/lib/utils"
 
 export function ScopeList() {
   const [activeListType] = useQueryState("list", searchParamsParsers.list)
   const [activeScopeId, setActiveScopeId] = useQueryState("scope", searchParamsParsers.scope)
-  const [showUnfocused, setShowUnfocused] = useState(false)
+  const [showUnfocused, setShowUnfocused] = useLocalStorage("backboard:showUnfocused", false)
 
   // Show toggle only for now/later/backlog (not recurring/recent)
   const showToggle = ["now", "later", "backlog"].includes(activeListType)

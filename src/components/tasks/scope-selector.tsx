@@ -6,6 +6,7 @@ import { useQueryState } from "nuqs"
 import { ScopeToggle } from "./scope-toggle"
 import { searchParamsParsers } from "@/app/tasks/search-params"
 import { useTaskScopes, findTaskScope, type TaskScope } from "@/hooks/use-task-scopes"
+import { useLocalStorage } from "@/hooks/use-local-storage"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,7 +21,7 @@ import { ActivityDot, type DotVariant } from "@/components/ui/activity-dot"
 
 export function ScopeSelector() {
   const [open, setOpen] = useState(false)
-  const [showUnfocused, setShowUnfocused] = useState(false)
+  const [showUnfocused, setShowUnfocused] = useLocalStorage("backboard:showUnfocused", false)
   const [activeListType] = useQueryState("list", searchParamsParsers.list)
   const [activeScopeId, setActiveScopeId] = useQueryState("scope", searchParamsParsers.scope)
 

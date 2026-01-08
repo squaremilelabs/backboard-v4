@@ -12,6 +12,7 @@ import { RecentTaskList } from "@/components/tasks/recent-task-list"
 import { RecurringTaskList } from "@/components/tasks/recurring-task-list"
 import { TaskContentPlaceholder } from "@/components/tasks/task-content-placeholder"
 import { TaskDndProvider } from "@/components/tasks/task-dnd-provider"
+import { TaskSelectionProvider } from "@/hooks/use-task-selection"
 import { useIsMobile } from "@/hooks/use-media-query"
 
 export default function TasksPage() {
@@ -47,45 +48,47 @@ function TasksPageContent() {
 
   return (
     <ContentPanel>
-      <TaskDndProvider>
-        <div className="flex h-full flex-col overflow-hidden">
-          {/* Tabs (horizontal navigation) */}
-          <TaskListTabs />
+      <TaskSelectionProvider>
+        <TaskDndProvider>
+          <div className="flex h-full flex-col overflow-hidden">
+            {/* Tabs (horizontal navigation) */}
+            <TaskListTabs />
 
-          {/* Two-column layout: Scope selector + Content */}
-          <div className="flex flex-1 overflow-hidden">
-            {/* Left: Scope selector sidebar (desktop) */}
-            {!isMobile && (
-              <aside className="w-64 shrink-0 overflow-y-auto border-r">
-                <ScopeList />
-              </aside>
-            )}
-
-            {/* Right: Main content area */}
-            <main className="flex flex-1 flex-col overflow-hidden">
-              {/* Mobile: Scope selector dropdown */}
-              {isMobile && (
-                <div className="border-b p-3">
-                  <ScopeSelector />
-                </div>
+            {/* Two-column layout: Scope selector + Content */}
+            <div className="flex flex-1 overflow-hidden">
+              {/* Left: Scope selector sidebar (desktop) */}
+              {!isMobile && (
+                <aside className="w-64 shrink-0 overflow-y-auto border-r">
+                  <ScopeList />
+                </aside>
               )}
 
-              {/* Content area */}
-              <div className="flex-1 overflow-hidden">
-                {isActiveList ? (
-                  <TaskList />
-                ) : isRecentList ? (
-                  <RecentTaskList />
-                ) : isRecurringList ? (
-                  <RecurringTaskList />
-                ) : (
-                  <TaskContentPlaceholder />
+              {/* Right: Main content area */}
+              <main className="flex flex-1 flex-col overflow-x-hidden overflow-y-hidden">
+                {/* Mobile: Scope selector dropdown */}
+                {isMobile && (
+                  <div className="border-b p-3">
+                    <ScopeSelector />
+                  </div>
                 )}
-              </div>
-            </main>
+
+                {/* Content area */}
+                <div className="flex-1 overflow-x-hidden overflow-y-hidden">
+                  {isActiveList ? (
+                    <TaskList />
+                  ) : isRecentList ? (
+                    <RecentTaskList />
+                  ) : isRecurringList ? (
+                    <RecurringTaskList />
+                  ) : (
+                    <TaskContentPlaceholder />
+                  )}
+                </div>
+              </main>
+            </div>
           </div>
-        </div>
-      </TaskDndProvider>
+        </TaskDndProvider>
+      </TaskSelectionProvider>
     </ContentPanel>
   )
 }

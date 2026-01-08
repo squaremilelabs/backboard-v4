@@ -4,15 +4,10 @@ import { ArrowUp } from "lucide-react"
 import { useQueryState } from "nuqs"
 import { SortableTaskList } from "./sortable-task-list"
 import { AddTaskInput } from "./add-task-input"
-import { PendingActionsFooter } from "./pending-actions-footer"
+import { BatchActionBar } from "./batch-action-bar"
 import { UnfocusedWarningLabel, MoveAllToLaterButton } from "./unfocused-warning"
 import { searchParamsParsers } from "@/app/tasks/search-params"
-import {
-  useTasks,
-  usePendingActionCount,
-  useIsScopeScheduledToday,
-  useLaterTaskCount,
-} from "@/hooks/use-tasks"
+import { useTasks, useIsScopeScheduledToday, useLaterTaskCount } from "@/hooks/use-tasks"
 import { useScope } from "@/hooks/use-scopes"
 import { moveAllFromLaterToNow } from "@/lib/task-mutations"
 import { cn } from "@/lib/utils"
@@ -32,7 +27,7 @@ export function TaskList() {
   // Determine theme class based on scope type
   const themeClass =
     scopeId === "triage"
-      ? "" // No theme for triage
+      ? ""
       : scope?.type === "job"
         ? "theme-gold"
         : scope?.type === "project"
@@ -41,9 +36,6 @@ export function TaskList() {
 
   // Fetch tasks for this scope and status
   const tasks = useTasks(scopeId, listType as TaskStatus)
-
-  // Get pending action count
-  const pendingCount = usePendingActionCount(scopeId, listType as TaskStatus)
 
   // Check if scope is scheduled for today (only relevant for NOW list)
   const actualScopeId = scopeId === "triage" ? null : scopeId
@@ -68,13 +60,15 @@ export function TaskList() {
     )
   }
 
+  const taskIds = tasks.map((t) => t.id)
+
   return (
     <div className={cn("flex h-full flex-col", themeClass)}>
       {/* Unfocused warning (above task list) */}
       {showUnfocusedWarning && <UnfocusedWarningLabel />}
 
       {/* Task list with add input at top */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto">
         {/* Add task input - always at top */}
         {isActiveList && <AddTaskInput scopeId={actualScopeId} status={listType as TaskStatus} />}
 
@@ -104,16 +98,15 @@ export function TaskList() {
         )}
       </div>
 
-      {/* Footer: either pending actions or unfocused bulk action */}
-      {pendingCount !== undefined && pendingCount > 0 ? (
-        <PendingActionsFooter
-          scopeId={actualScopeId}
+      {/* Footer: batch action bar or unfocused bulk action */}
+      {isActiveList && (
+        <BatchActionBar
+          taskIds={taskIds}
           currentStatus={listType as TaskStatus}
-          pendingCount={pendingCount}
+          scopeId={actualScopeId}
         />
-      ) : showUnfocusedWarning ? (
-        <MoveAllToLaterButton scopeId={actualScopeId} />
-      ) : null}
+      )}
+      {showUnfocusedWarning && <MoveAllToLaterButton scopeId={actualScopeId} />}
     </div>
   )
 }
