@@ -113,8 +113,13 @@ export function TaskItem({
         )}
       </div>
 
-      {/* Right side: action buttons (on hover) */}
-      <div className={cn("transition-opacity", isHovered ? "opacity-100" : "opacity-0")}>
+      {/* Right side: action buttons (on hover, desktop only) */}
+      <div
+        className={cn(
+          "hidden transition-opacity md:block",
+          isHovered ? "opacity-100" : "opacity-0"
+        )}
+      >
         <TaskActionButtons task={task} currentStatus={currentStatus} scopeId={scopeId} />
       </div>
     </div>

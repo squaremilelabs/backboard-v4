@@ -65,40 +65,44 @@ export function BatchActionBar({ taskIds, currentStatus, scopeId }: BatchActionB
   }
 
   return (
-    <div className="flex items-center gap-4 border-t bg-background px-4 py-3">
-      {/* Select all checkbox */}
-      <div className="flex items-center gap-2">
-        <TaskCheckbox checked={allSelected} onChange={() => toggleAll(taskIds)} />
-        <span className="text-sm text-muted-foreground">{selectedCount} selected</span>
+    <div className="overflow-x-auto border-t bg-background">
+      <div className="flex items-center gap-4 px-4 py-3">
+        {/* Select all checkbox */}
+        <div className="flex shrink-0 items-center gap-2">
+          <TaskCheckbox checked={allSelected} onChange={() => toggleAll(taskIds)} />
+          <span className="whitespace-nowrap text-sm text-muted-foreground">
+            {selectedCount} selected
+          </span>
+        </div>
+
+        {/* Spacer (hidden on mobile to allow scroll) */}
+        <div className="hidden flex-1 md:block" />
+
+        {/* Action buttons */}
+        <div className="flex shrink-0 items-center gap-2">
+          {actions.map(({ icon: Icon, label, targetStatus, variant }) => (
+            <Button
+              key={targetStatus}
+              variant={variant === "destructive" ? "ghost" : variant}
+              size="sm"
+              onClick={() => handleAction(targetStatus)}
+              className={
+                variant === "destructive"
+                  ? "shrink-0 gap-1.5 text-muted-foreground hover:bg-destructive hover:text-white"
+                  : "shrink-0 gap-1.5"
+              }
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </Button>
+          ))}
+        </div>
+
+        {/* Cancel button */}
+        <Button variant="ghost" size="sm" onClick={deselectAll} className="shrink-0">
+          Cancel
+        </Button>
       </div>
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Action buttons */}
-      <div className="flex items-center gap-2">
-        {actions.map(({ icon: Icon, label, targetStatus, variant }) => (
-          <Button
-            key={targetStatus}
-            variant={variant === "destructive" ? "ghost" : variant}
-            size="sm"
-            onClick={() => handleAction(targetStatus)}
-            className={
-              variant === "destructive"
-                ? "gap-1.5 text-muted-foreground hover:bg-destructive hover:text-white"
-                : "gap-1.5"
-            }
-          >
-            <Icon className="h-4 w-4" />
-            {label}
-          </Button>
-        ))}
-      </div>
-
-      {/* Cancel button */}
-      <Button variant="ghost" size="sm" onClick={deselectAll}>
-        Cancel
-      </Button>
     </div>
   )
 }
